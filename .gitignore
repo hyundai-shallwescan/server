@@ -1,4 +1,5 @@
 ### Eclipse ###
+.idea
 .metadata
 bin/
 tmp/
@@ -11,9 +12,10 @@ local.properties
 .loadpath
 .recommenders
 
+
 # STS (Spring Tool Suite)
 .springBeans
-
+.factorypath
 .classpath
 .project
 .settings/
