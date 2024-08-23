@@ -1,0 +1,27 @@
+### Eclipse ###
+.metadata
+bin/
+tmp/
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.recommenders
+
+# STS (Spring Tool Suite)
+.springBeans
+
+.classpath
+.project
+.settings/
+target/
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+
+# properties
+**/*.properties

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!-- 
+ * 상품 Mybatis 매퍼
+ * @author 정은지
+ * @since 2024.08.23
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일        	수정자        수정내용
+ * ==========  =========    =========
+ * 2024.08.23  	정은지        최초 생성
+ * </pre>
+ -->
+ 
+<mapper namespace="com.ite.sws.domain.product.mapper.ProductMapper">
+ 	<select id="selectProduct" resultType="com.ite.sws.domain.product.vo.ProductVO">
+		SELECT PRODUCT_ID,
+		       NAME,
+		       PRICE,
+		       THUMBNAIL_IMAGE,
+		       DESCRIPTION_IMAGE,
+		       BARCODE,
+		       DESCRIPTION,
+		       CREATED_AT,
+		       UPDATED_AT
+		FROM   PRODUCT
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+	
+</mapper>
