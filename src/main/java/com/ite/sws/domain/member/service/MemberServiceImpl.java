@@ -1,18 +1,11 @@
 package com.ite.sws.domain.member.service;
 
-import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
 import com.ite.sws.domain.member.mapper.MemberMapper;
 import com.ite.sws.domain.member.vo.AuthVO;
 import com.ite.sws.domain.member.vo.MemberVO;
-import com.ite.sws.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,9 +35,9 @@ public class MemberServiceImpl implements MemberService {
     private final BCryptPasswordEncoder passwordEncoder;
 
     /**
-     * 아이디 중복 확인
+     * 로그인 아이디 중복 체크
      * @param loginId 아이디
-     * @return
+     * @return 아이디 중복 여부
      */
     @Override
     public boolean isLoginIdAvailable(String loginId) {

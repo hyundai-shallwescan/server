@@ -1,7 +1,5 @@
 package com.ite.sws.domain.member.controller;
 
-import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
 import com.ite.sws.domain.member.service.MemberService;
 import com.ite.sws.exception.CustomException;
@@ -16,9 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.ite.sws.exception.ErrorCode.INTERNAL_SERVER_ERROR;
@@ -49,7 +44,7 @@ public class MemberController {
     private final MemberService memberService;
 
     /**
-     * 아이디 중복 확인
+     * 로그인 아이디 중복 체크
      * @param loginId 로그인 아이디
      * @return 중복 여부 응답
      */

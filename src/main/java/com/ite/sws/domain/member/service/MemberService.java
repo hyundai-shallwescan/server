@@ -1,7 +1,5 @@
 package com.ite.sws.domain.member.service;
 
-import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
 
 /**
