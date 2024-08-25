@@ -2,12 +2,15 @@ package com.ite.sws.domain.review.service;
 
 import com.ite.sws.domain.review.constant.S3Constant.Review;
 import com.ite.sws.domain.review.dto.GetReviewDetailRes;
+import com.ite.sws.domain.review.dto.GetReviewRes;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
 import com.ite.sws.domain.review.exception.ReviewErrorCode;
 import com.ite.sws.domain.review.exception.ReviewException;
 import com.ite.sws.domain.review.mapper.ReviewMapper;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,6 +49,14 @@ public class ReviewServiceImpl implements ReviewService {
         String reviewBucketPrefix = Review.PREFIX;
 
         reviewUploader.upload(createReviewReq, reviewBucketPrefix, files);
+    }
+
+    @Override
+    public List<GetReviewRes> getReviews(int size, int page) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("size", size);
+        params.put("page", page);
+        return reviewMapper.getReviews(params);
     }
 
 
