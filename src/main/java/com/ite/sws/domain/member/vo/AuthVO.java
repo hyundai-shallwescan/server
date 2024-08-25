@@ -11,14 +11,11 @@ import java.util.Date;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberVO {
+public class AuthVO {
     private Long memberId;
-    private String name;
-    private Character gender;
-    private Integer age;
-    private String phoneNumber;
-    private String carNumber;
-    private Integer isDeleted;
+    private String role;
+    private String loginId;
+    private String password;
     private Date createdAt;
     private Date updatedAt;
 }
