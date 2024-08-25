@@ -13,7 +13,12 @@
 	
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<annotation-driven >
-		<!-- custom argument resolvers -->
+		<!-- HttpMessageConverter 명시 -->
+		<message-converters>
+			<beans:bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+				<beans:property name="objectMapper" ref="jacksonObjectMapper" />
+			</beans:bean>
+		</message-converters>
 	</annotation-driven>
 
 	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the ${webappRoot}/resources directory -->
@@ -40,5 +45,8 @@
 
 	<context:component-scan base-package="com.ite.sws" />
 	<aop:aspectj-autoproxy />
-	
+
+	<!-- KstDateTimeObjectMapper 등록 -->
+	<beans:bean id="jacksonObjectMapper" class="com.ite.sws.util.KstDateTimeObjectMapper" />
+
 </beans:beans>

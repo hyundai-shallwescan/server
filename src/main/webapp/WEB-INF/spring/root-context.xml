@@ -46,6 +46,7 @@
 													com.ite.sws.domain.payment
 													com.ite.sws.domain.review" />
  		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+		<property name="typeHandlersPackage" value="com.ite.sws.util"/>
  	</bean>
  	
  	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
