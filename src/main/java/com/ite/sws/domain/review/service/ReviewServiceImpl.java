@@ -8,7 +8,6 @@ import com.ite.sws.domain.review.exception.ReviewException;
 import com.ite.sws.domain.review.mapper.ReviewMapper;
 import java.util.Arrays;
 import java.util.List;
-import org.apache.ibatis.exceptions.TooManyResultsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -49,13 +48,17 @@ public class ReviewServiceImpl implements ReviewService {
         reviewUploader.upload(createReviewReq, reviewBucketPrefix, files);
     }
 
+
     @Override
     public GetReviewDetailRes getReviewDetail(Long reviewId) {
-        try {
-            return reviewMapper.getReviewDetail(reviewId);
-        } catch (TooManyResultsException e) {
-            throw new ReviewException(ReviewErrorCode.SYSTEM_DATABASE_INTEGRITY_ERROR);
-        }
+        return reviewMapper.getReviewDetail(reviewId)
+            .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_IS_NOT_EXIST));
     }
 
+    @Override
+    public void deleteReview(Long reviewId) {
+        reviewMapper.getReviewDetail(reviewId)
+            .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_IS_NOT_EXIST));
+        reviewMapper.deleteReview(reviewId);
+    }
 }

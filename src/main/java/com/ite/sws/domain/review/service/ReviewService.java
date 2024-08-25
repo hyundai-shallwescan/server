@@ -2,7 +2,6 @@ package com.ite.sws.domain.review.service;
 
 import com.ite.sws.domain.review.dto.GetReviewDetailRes;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
-import java.sql.SQLException;
 import org.springframework.web.multipart.MultipartFile;
 /**
  * Review관련 Service interface
@@ -23,6 +22,8 @@ public interface ReviewService {
       MultipartFile shortForm);
 
   GetReviewDetailRes getReviewDetail(Long reviewId);
+
+  void deleteReview(Long reviewId);
 
 
 }

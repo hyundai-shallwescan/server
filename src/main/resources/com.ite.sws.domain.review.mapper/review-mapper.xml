@@ -46,12 +46,13 @@
         THUMBNAIL_IMAGE AS thumbnailImage
         FROM SHORT_FORM
         WHERE SHORT_FORM_ID = #{shortFormId}
-        AND is_deleted NOT IN('1')
+        AND IS_DELETED NOT IN('1')
     </select>
 
-    <!--    <delete id="deleteReview" parameterType="java.lang.Long">-->
-    <!--        DELETE FROM SHORT_FORM-->
-    <!--        WHERE SHORT_FORM_ID = #{shortFormId}-->
-    <!--    </delete>-->
+    <update id="deleteReview" parameterType="java.lang.Long">
+        UPDATE SHORT_FORM
+        SET IS_DELETED = '1'
+        WHERE SHORT_FORM_ID = #{shortFormId}
+    </update>
 
 </mapper>
