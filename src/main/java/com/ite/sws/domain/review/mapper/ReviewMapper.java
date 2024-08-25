@@ -1,6 +1,9 @@
 package com.ite.sws.domain.review.mapper;
 
+import com.ite.sws.domain.review.dto.GetReviewDetailRes;
 import com.ite.sws.domain.review.vo.Review;
+import java.util.List;
+import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 /**
  * Mybatis Mapper interface
@@ -17,5 +20,8 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ReviewMapper {
+
     void createReview(Review review);
+
+    GetReviewDetailRes getReviewDetail(Long reviewId);
 }

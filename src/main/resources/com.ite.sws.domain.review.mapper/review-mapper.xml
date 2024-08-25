@@ -28,32 +28,30 @@
 <!--        PAYMENT_ITEM_ID AS paymentItemId,-->
 <!--        PRODUCT_ID AS productId,-->
 <!--        SHORT_FORM_URL AS shortFormUrl,-->
-<!--        THUMBNAIL_IMAGE AS thumbnailImage-->
-<!--        FROM REVIEW-->
-<!--        WHERE is_deleted != #{isDeleted}-->
-<!--        ORDER BY CREATED_AT DESC-->
-<!--        <if test="size != null and page != null">-->
-<!--            OFFSET #{page} * #{size} ROWS FETCH NEXT #{size} ROWS ONLY-->
-<!--        </if>-->
-<!--    </select>-->
+    <!--        THUMBNAIL_IMAGE AS thumbnailImage-->
+    <!--        FROM SHORT_FORM-->
+    <!--        WHERE is_deleted != #{isDeleted}-->
+    <!--        ORDER BY CREATED_AT DESC-->
+    <!--        <if test="size != null and page != null">-->
+    <!--            OFFSET #{page} * #{size} ROWS FETCH NEXT #{size} ROWS ONLY-->
+    <!--        </if>-->
+    <!--    </select>-->
 
-<!--    <select id="getReviewDetail" parameterType="java.lang.Long"-->
-<!--      resultType="com.ite.sws.domain.review.dto.GetReviewDetailRes">-->
-<!--        SELECT-->
-<!--        SHORT_FORM_ID AS shortFormId,-->
-<!--        PAYMENT_ITEM_ID AS paymentItemId,-->
-<!--        PRODUCT_ID AS productId,-->
-<!--        SHORT_FORM_URL AS shortFormUrl,-->
-<!--        THUMBNAIL_IMAGE AS thumbnailImage,-->
-<!--        CREATED_AT AS createdAt,-->
-<!--        IS_DELETED AS isDeleted-->
-<!--        FROM REVIEW-->
-<!--        WHERE SHORT_FORM_ID = #{shortFormId} AND is_deleted != #{isDeleted}-->
-<!--    </select>-->
+    <select id="getReviewDetail" parameterType="java.lang.Long"
+      resultType="com.ite.sws.domain.review.dto.GetReviewDetailRes">
+        SELECT
+        SHORT_FORM_ID AS shortFormId,
+        PRODUCT_ID AS productId,
+        SHORT_FORM_URL AS shortFormUrl,
+        THUMBNAIL_IMAGE AS thumbnailImage
+        FROM SHORT_FORM
+        WHERE SHORT_FORM_ID = #{shortFormId}
+        AND is_deleted NOT IN('1')
+    </select>
 
-<!--    <delete id="deleteReview" parameterType="java.lang.Long">-->
-<!--        DELETE FROM REVIEW-->
-<!--        WHERE SHORT_FORM_ID = #{shortFormId}-->
-<!--    </delete>-->
+    <!--    <delete id="deleteReview" parameterType="java.lang.Long">-->
+    <!--        DELETE FROM SHORT_FORM-->
+    <!--        WHERE SHORT_FORM_ID = #{shortFormId}-->
+    <!--    </delete>-->
 
 </mapper>
