@@ -18,6 +18,7 @@
  * 2024.08.26  김민정        장바구니 아이템 추가 및 수량 증가
  * 2024.08.26  김민정        바코드로 상품 조회
  * 2024.08.26  김민정        장바구니 아이템 수량 업데이트를 위한 프로시저 호출
+ * 2024.08.26  김민정        장바구니 아이템 삭제
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -79,13 +80,22 @@
 	<!-- 바코드로 상품 조회 -->
 	<select id="selectProductByBarcode" resultType="java.lang.Long">
 		SELECT PRODUCT_ID
-		FROM PRODUCT
-		WHERE BARCODE = #{barcode}
+		FROM   PRODUCT
+		WHERE  BARCODE = #{barcode}
+		  	   AND IS_DELETED = 0
 	</select>
 
 	<!-- 장바구니 아이템 수량 업데이트를 위한 프로시저 호출 -->
 	<update id="updateCartItemQuantity">
 		CALL update_cart_item_quantity(#{cartId}, #{productId}, #{quantity})
+	</update>
+
+	<!-- 장바구니 아이템 삭제 -->
+	<update id="deleteCartItem">
+		UPDATE CART_ITEM
+		SET    IS_DELETED = 1
+		WHERE  CART_ID = #{cartId}
+        	   AND PRODUCT_ID = #{productId}
 	</update>
 
 </mapper>

@@ -6,6 +6,7 @@ import com.ite.sws.domain.cart.service.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.08.26  	김민정       장바구니 조회 API 생성
  * 2024.08.26  	김민정       장바구니 항목 추가 및 수량 증가 API 생성
  * 2024.08.26  	김민정       장바구니 수량 변경 API 생성
+ * 2024.08.26  	김민정       장바구니 아이템 삭제 API 생성
  * </pre>
  */
 @RestController
@@ -74,6 +76,19 @@ public class CartController {
                                                        @PathVariable Long productId,
                                                        @RequestParam int delta) {
         cartService.modifyCartItemQuantity(cartId, productId, delta);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 장바구니 아이템 삭제
+     * @param cartId 장바구니 ID
+     * @param productId 상품 ID
+     * @return 장바구니 아이템 삭제 결과 응답
+     */
+    @DeleteMapping("/{cartId}/products/{productId}")
+    public ResponseEntity<Void> removeCartItem(@PathVariable Long cartId,
+                                               @PathVariable Long productId) {
+        cartService.removeCartItem(cartId, productId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

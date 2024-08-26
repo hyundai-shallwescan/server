@@ -23,6 +23,7 @@ import java.util.List;
  * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
  * 2024.08.26  	김민정       바코드로 상품 조회
  * 2024.08.26  	김민정       장바구니 아이템 수량 업데이트를 위한 프로시저 호출
+ * 2024.08.26  	김민정       장바구니 아이템 삭제
  * </pre>
  */
 public interface CartMapper {
@@ -62,7 +63,13 @@ public interface CartMapper {
 
     /**
      * 장바구니 아이템 수량 업데이트를 위한 프로시저 호출
-     * @param modifyCart 장바구니 아이템 수정 객체
+     * @param modifyCartItem 장바구니 아이템 수정 객체
      */
-    void updateCartItemQuantity(CartItemVO modifyCart);
+    void updateCartItemQuantity(CartItemVO modifyCartItem);
+
+    /**
+     * 장바구니 아이템 삭제
+     * @param deleteCartItem 장바구니 아이템 삭제 객체
+     */
+    void deleteCartItem(CartItemVO deleteCartItem);
 }
