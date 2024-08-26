@@ -34,7 +34,7 @@ public class ReviewUploader extends AbstractUploader<PostCreateReviewReq> {
 
     @Override
     protected void handlePersistenceException(PersistenceException e) {
-        throw new CustomException(ErrorCode.REVIEW_CANT_BE_PERSIST);
+        throw new CustomException(ErrorCode.DATABASE_ERROR);
     }
 
     @Override
