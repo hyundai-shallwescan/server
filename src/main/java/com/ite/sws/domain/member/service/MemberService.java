@@ -1,6 +1,9 @@
 package com.ite.sws.domain.member.service;
 
+import com.ite.sws.domain.member.dto.JwtToken;
+import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
+import com.ite.sws.domain.member.vo.MemberVO;
 
 /**
  * 회원 서비스
@@ -13,6 +16,7 @@ import com.ite.sws.domain.member.dto.PostMemberReq;
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
  * 2024.08.24   정은지        중복 아이디 체크 및 회원가입 기능 추가
+ * 2024.08.25   정은지        로그인 기능 추가
  * </pre>
  */
 
@@ -29,5 +33,19 @@ public interface MemberService {
      * 회원가입
      * @param postMemberReq 회원 정보
      */
-    void registerMember(PostMemberReq postMemberReq);
+    void addMember(PostMemberReq postMemberReq);
+
+    /**
+     * 로그인
+     * @param postLoginReq 아이디, 비밀번호
+     * @return JwtToken 객체
+     */
+    JwtToken findMemberByLoginId(PostLoginReq postLoginReq);
+
+    /**
+     * 멤버 아이디로 회원 정보 조회
+     * @param memberId 멤버 아이디
+     * @return MemberVO 객체
+     */
+    MemberVO getMemberById(Long memberId);
 }
