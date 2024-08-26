@@ -44,7 +44,7 @@ public class CartServiceImpl implements CartService {
         Long cartId = findCartByMemberId(memberId);
 
         // 해당 cart_id에 속하는 cart items 가져오기
-        List<CartItemVO> cartItems = cartMapper.selectCartItemListByCartId(cartId);
+        List<GetCartRes.GetCartItemRes> cartItems = cartMapper.selectCartItemListByCartId(cartId);
 
         return GetCartRes.builder()
                 .cartId(cartId)

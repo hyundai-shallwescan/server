@@ -30,7 +30,7 @@
 	</select>
 
 	<!-- Cart ID에 해당하는 장바구니 아이템 가져오기 -->
-	<select id="selectCartItemListByCartId" resultType="com.ite.sws.domain.cart.vo.CartItemVO">
+	<select id="selectCartItemListByCartId" resultType="com.ite.sws.domain.cart.dto.GetCartRes$GetCartItemRes">
 		SELECT CI.PRODUCT_ID     AS productId,
 			   CI.QUANTITY       AS quantity,
 			   P.NAME            AS productName,

@@ -1,5 +1,6 @@
 package com.ite.sws.domain.cart.mapper;
 
+import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartVO;
 import org.apache.ibatis.annotations.Param;
@@ -37,7 +38,7 @@ public interface CartMapper {
      * @param cartId 장바구니 ID
      * @return 장바구니 아이템 리스트
      */
-    List<CartItemVO> selectCartItemListByCartId(@Param("cartId") Long cartId);
+    List<GetCartRes.GetCartItemRes> selectCartItemListByCartId(@Param("cartId") Long cartId);
 
     /**
      * 새로운 장바구니 생성
