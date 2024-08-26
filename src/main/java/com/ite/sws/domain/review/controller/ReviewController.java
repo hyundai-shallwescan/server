@@ -41,7 +41,7 @@ public class ReviewController {
   public ResponseEntity<Void> createReview(
       @RequestPart MultipartFile shortForm,
       @RequestPart MultipartFile image,
-      @RequestPart @Valid  PostCreateReviewReq postCreateReviewReq) {
+      @RequestPart @Valid PostCreateReviewReq postCreateReviewReq) {
     reviewService.createReview(postCreateReviewReq, image,
         shortForm);
     return ResponseEntity.status(HttpStatus.CREATED).build();
