@@ -5,6 +5,8 @@ import com.ite.sws.domain.cart.dto.PostCartItemReq;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartVO;
+import com.ite.sws.exception.CustomException;
+import com.ite.sws.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,6 +70,9 @@ public class CartServiceImpl implements CartService {
 
         // 바코드 번호로 상품 아이디 조회
         Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());
+        if (productId == null) {
+            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
 
         // 장바구니 아이템 생성 시 필요한 데이터 설정
         CartItemVO newCartItem = CartItemVO.builder()
@@ -120,6 +125,16 @@ public class CartServiceImpl implements CartService {
      */
     @Transactional
     public void modifyCartItemQuantity(Long cartId, Long productId, int delta) {
+        // cartId가 유효한지 확인
+        if (cartMapper.existsCart(cartId) == 0) {
+            throw new CustomException(ErrorCode.CART_NOT_FOUND);
+        }
+
+        // productId가 유효한지 확인
+        if (cartMapper.existsProduct(productId) == 0) {
+            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
         CartItemVO modifyCartItem = CartItemVO.builder()
                 .cartId(cartId)
                 .productId(productId)
@@ -135,6 +150,16 @@ public class CartServiceImpl implements CartService {
      */
     @Transactional
     public void removeCartItem(Long cartId, Long productId) {
+        // cartId가 유효한지 확인
+        if (cartMapper.existsCart(cartId) == 0) {
+            throw new CustomException(ErrorCode.CART_NOT_FOUND);
+        }
+
+        // productId가 유효한지 확인
+        if (cartMapper.existsProduct(productId) == 0) {
+            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
         CartItemVO deleteCartItem = CartItemVO.builder()
                 .cartId(cartId)
                 .productId(productId)

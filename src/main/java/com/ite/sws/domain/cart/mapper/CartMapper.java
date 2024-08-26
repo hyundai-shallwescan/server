@@ -24,6 +24,8 @@ import java.util.List;
  * 2024.08.26  	김민정       바코드로 상품 조회
  * 2024.08.26  	김민정       장바구니 아이템 수량 업데이트를 위한 프로시저 호출
  * 2024.08.26  	김민정       장바구니 아이템 삭제
+ * 2024.08.26  	김민정       장바구니가 존재하는지 확인
+ * 2024.08.26  	김민정       상품이 존재하는지 확인
  * </pre>
  */
 public interface CartMapper {
@@ -72,4 +74,18 @@ public interface CartMapper {
      * @param deleteCartItem 장바구니 아이템 삭제 객체
      */
     void deleteCartItem(CartItemVO deleteCartItem);
+
+    /**
+     * 장바구니가 존재하는지 확인
+     * @param cartId 장바구니 ID
+     * @return
+     */
+    int existsCart(@Param("cartId") Long cartId);
+
+    /**
+     * 상품이 존재하는지 확인
+     * @param productId 상품 ID
+     * @return
+     */
+    int existsProduct(@Param("productId") Long productId);
 }

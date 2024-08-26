@@ -25,13 +25,17 @@ public enum ErrorCode {
     /* 400: Bad Request */
     FIND_FAIL_MEMBER_ID(BAD_REQUEST.value(), "존재하지 않는 멤버입니다."),
 
-    /* 403: Forbidden */
-    FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),
-
-    /* 404: Unauthorized */
+    /* 401: Unauthorized */
     UNAUTHORIZED_ACCESS(UNAUTHORIZED.value(), "인증이 필요합니다."),
     FCM_TOKEN_EXPIRED(UNAUTHORIZED.value(), "FCM 토큰이 만료되었습니다."),
     MEMBER_NOT_FOUND(UNAUTHORIZED.value(), "회원 정보를 찾을 수 없습니다."),
+
+    /* 403: Forbidden */
+    FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),
+
+    /* 404: NOT FOUND*/
+    PRODUCT_NOT_FOUND(NOT_FOUND.value(), "상품이 존재하지 않습니다."),
+    CART_NOT_FOUND(NOT_FOUND.value(), "장바구니가 존재하지 않습니다."),
 
     /* 409: Conflict */
     LOGIN_ID_ALREADY_EXISTS(CONFLICT.value(), "이미 존재하는 아이디입니다."),
