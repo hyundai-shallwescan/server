@@ -1,5 +1,6 @@
 package com.ite.sws.domain.review.dto;
 
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PostCreateReviewReq {
+  @NotNull
   private Long paymentItemId;
+  @NotNull
   private Long productId;
 }
