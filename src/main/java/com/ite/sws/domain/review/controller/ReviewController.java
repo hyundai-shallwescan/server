@@ -6,6 +6,7 @@ import com.ite.sws.domain.review.dto.GetReviewRes;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
 import com.ite.sws.domain.review.service.ReviewService;
 import java.util.List;
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,7 @@ public class ReviewController {
   public ResponseEntity<Void> createReview(
       @RequestPart MultipartFile shortForm,
       @RequestPart MultipartFile image,
-      @RequestPart PostCreateReviewReq postCreateReviewReq) {
+      @RequestPart @Valid PostCreateReviewReq postCreateReviewReq) {
     reviewService.createReview(postCreateReviewReq, image,
         shortForm);
     return ResponseEntity.status(HttpStatus.CREATED).build();
