@@ -1,10 +1,12 @@
 package com.ite.sws.domain.review.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 /**
- * Review를 생성하기위한 DTO
+ * Review Detail을 얻기 위한 DTO
  *
  * @author 구지웅
  * @version 1.0
@@ -17,10 +19,13 @@ import lombok.NoArgsConstructor;
  * @since 2024.08.24
  */
 
-@Getter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PostCreateReviewReq {
-  private Long paymentItemId;
+@Getter
+public class GetReviewDetailRes {
+  private Long shortFormId;
   private Long productId;
+  private String shortFormUrl;
+  private String thumbnailImage;
 }

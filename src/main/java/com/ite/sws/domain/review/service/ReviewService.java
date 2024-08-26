@@ -1,7 +1,9 @@
 package com.ite.sws.domain.review.service;
 
+import com.ite.sws.domain.review.dto.GetReviewDetailRes;
+import com.ite.sws.domain.review.dto.GetReviewRes;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
-import java.sql.SQLException;
+import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 /**
  * Review관련 Service interface
@@ -19,6 +21,13 @@ import org.springframework.web.multipart.MultipartFile;
 public interface ReviewService {
 
   void createReview(PostCreateReviewReq createReviewReq, MultipartFile thumbnail,
-      MultipartFile shortForm) throws SQLException;
+      MultipartFile shortForm);
+
+  List<GetReviewRes> getReviews(int page, int size);
+
+  GetReviewDetailRes getReviewDetail(Long reviewId);
+
+  void deleteReview(Long reviewId);
+
 
 }
