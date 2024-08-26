@@ -1,9 +1,13 @@
 package com.ite.sws.exception;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.CONFLICT;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.HttpStatus.UNAUTHORIZED;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import static org.springframework.http.HttpStatus.*;
 
 /**
  * 에러 코드
@@ -41,8 +45,9 @@ public enum ErrorCode {
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
     NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다."),
 
-
-    ;
+    REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(),"리뷰가 존재하지 않습니다."),
+    REVIEW_CANT_BE_PERSIST(BAD_REQUEST.value(), "리뷰를 저장할 수 없습니다. 데이터를 확인해주세요"),
+    REVIEW_FILE_TYPE_NOT_PERMITTED(BAD_REQUEST.value(), "올바르지 않은 파일 형식입니다.");
 
     private final int status;
     private final String message;

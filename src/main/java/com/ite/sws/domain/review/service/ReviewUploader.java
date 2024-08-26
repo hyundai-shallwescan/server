@@ -1,10 +1,10 @@
 package com.ite.sws.domain.review.service;
 
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
-import com.ite.sws.domain.review.exception.ReviewErrorCode;
-import com.ite.sws.domain.review.exception.ReviewException;
 import com.ite.sws.domain.review.mapper.ReviewBindingMapper;
 import com.ite.sws.domain.review.mapper.ReviewMapper;
+import com.ite.sws.exception.CustomException;
+import com.ite.sws.exception.ErrorCode;
 import java.util.List;
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +34,11 @@ public class ReviewUploader extends AbstractUploader<PostCreateReviewReq> {
 
     @Override
     protected void handlePersistenceException(PersistenceException e) {
-        throw new ReviewException(ReviewErrorCode.REVIEW_CANT_BE_PERSIST);
+        throw new CustomException(ErrorCode.REVIEW_CANT_BE_PERSIST);
     }
 
     @Override
     protected void handleGeneralException(Exception e) {
-        throw new ReviewException(ReviewErrorCode.SYSTEM_ERROR);
+        throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
     }
 }
