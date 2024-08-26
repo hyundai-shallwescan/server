@@ -18,7 +18,8 @@ import java.util.List;
  * 2024.08.26  	김민정       최초 생성
  * 2024.08.26  	김민정       ACTIVE 상태인 가장 최신의 Cart ID를 가져오기 기능 추가
  * 2024.08.26  	김민정       Cart ID에 해당하는 장바구니 아이템 가져오기 기능 추가
- * 2024.08.26  	김민정       새로운 장바구니 생성
+ * 2024.08.26  	김민정       새로운 장바구니 생성 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 생성 기능 추가
  * </pre>
  */
 public interface CartMapper {
@@ -42,4 +43,10 @@ public interface CartMapper {
      * @param cart 장바구니 객체
      */
     void insertCart(CartVO cart);
+
+    /**
+     * 장바구니 아이템 생성
+     * @param cartItem 장바구니 아이템 객체
+     */
+    void insertCartItem(CartItemVO cartItem);
 }

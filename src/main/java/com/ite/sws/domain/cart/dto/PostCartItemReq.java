@@ -1,4 +1,4 @@
-package com.ite.sws.domain.cart.vo;
+package com.ite.sws.domain.cart.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * CartItem VO
+ * 장바구니 아이템 생성 Request DTO
  * @author 김민정
  * @since 2024.08.26
  * @version 1.0
@@ -21,11 +21,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Getter
-public class CartItemVO {
-    private Long cartId;
+public class PostCartItemReq {
     private Long productId;
-    private int quantity;
-    private String productName;
-    private int productPrice;
-    private String productThumbnail;
 }
