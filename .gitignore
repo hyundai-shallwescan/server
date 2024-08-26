@@ -27,3 +27,6 @@ target/
 
 # properties
 **/*.properties
+
+#LOCAL CACHE
+**/sws.iml

@@ -3,6 +3,7 @@ package com.ite.sws.exception;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+
 import static org.springframework.http.HttpStatus.*;
 
 /**
@@ -16,6 +17,7 @@ import static org.springframework.http.HttpStatus.*;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	김민정      최초 생성
+ * 2024.08.25   정은지      로그인 필요 에러 코드 추가
  * </pre>
  */
 @Getter
@@ -24,8 +26,10 @@ public enum ErrorCode {
 
     /* 400: Bad Request */
     FIND_FAIL_MEMBER_ID(BAD_REQUEST.value(), "존재하지 않는 멤버입니다."),
+    REVIEW_FILE_TYPE_NOT_PERMITTED(BAD_REQUEST.value(), "올바르지 않은 파일 형식입니다."),
 
     /* 401: Unauthorized */
+    REQUIRED_LOGIN(UNAUTHORIZED.value(), "로그인이 필요합니다."),
     UNAUTHORIZED_ACCESS(UNAUTHORIZED.value(), "인증이 필요합니다."),
     FCM_TOKEN_EXPIRED(UNAUTHORIZED.value(), "FCM 토큰이 만료되었습니다."),
     MEMBER_NOT_FOUND(UNAUTHORIZED.value(), "회원 정보를 찾을 수 없습니다."),
@@ -36,6 +40,7 @@ public enum ErrorCode {
     /* 404: NOT FOUND*/
     PRODUCT_NOT_FOUND(NOT_FOUND.value(), "상품이 존재하지 않습니다."),
     CART_NOT_FOUND(NOT_FOUND.value(), "장바구니가 존재하지 않습니다."),
+    REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(),"리뷰가 존재하지 않습니다."),
 
     /* 409: Conflict */
     LOGIN_ID_ALREADY_EXISTS(CONFLICT.value(), "이미 존재하는 아이디입니다."),
@@ -43,10 +48,8 @@ public enum ErrorCode {
     /* 500: Internal Server Error */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
-    NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다."),
+    NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다.");
 
-
-    ;
 
     private final int status;
     private final String message;
