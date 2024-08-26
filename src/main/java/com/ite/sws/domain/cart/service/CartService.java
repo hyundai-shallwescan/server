@@ -24,7 +24,7 @@ public interface CartService {
      * @param memberId 멤버 식별자
      * @return 장바구니 아이템 리스트
      */
-    GetCartRes findCartItemListByMemberId(Long memberId);
+    GetCartRes findCartItemList(Long memberId);
 
     /**
      * 장바구니 아이템 추가 및 수량 증가

@@ -40,9 +40,9 @@ public class CartController {
      * @return 장바구니 아이템 조회 결과 응답
      */
     @GetMapping
-    public ResponseEntity<GetCartRes> cartItemList(@RequestParam Long memberId) {
+    public ResponseEntity<GetCartRes> findCartItemList(@RequestParam Long memberId) {
         // TODO: memberId 파라미터 제거
-        return ResponseEntity.ok(cartService.findCartItemListByMemberId(memberId));
+        return ResponseEntity.ok(cartService.findCartItemList(memberId));
     }
 
     /**

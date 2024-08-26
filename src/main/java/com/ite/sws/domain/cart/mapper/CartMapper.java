@@ -37,7 +37,7 @@ public interface CartMapper {
      * @param cartId 장바구니 ID
      * @return 장바구니 아이템 리스트
      */
-    List<CartItemVO> selectCartItemsByCartId(@Param("cartId") Long cartId);
+    List<CartItemVO> selectCartItemListByCartId(@Param("cartId") Long cartId);
 
     /**
      * 새로운 장바구니 생성

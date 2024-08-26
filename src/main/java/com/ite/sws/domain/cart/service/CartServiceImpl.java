@@ -40,11 +40,11 @@ public class CartServiceImpl implements CartService {
      */
     @Override
     @Transactional
-    public GetCartRes findCartItemListByMemberId(Long memberId) {
+    public GetCartRes findCartItemList(Long memberId) {
         Long cartId = findCartByMemberId(memberId);
 
         // 해당 cart_id에 속하는 cart items 가져오기
-        List<CartItemVO> cartItems = cartMapper.selectCartItemsByCartId(cartId);
+        List<CartItemVO> cartItems = cartMapper.selectCartItemListByCartId(cartId);
 
         return GetCartRes.builder()
                 .cartId(cartId)
@@ -86,7 +86,7 @@ public class CartServiceImpl implements CartService {
 
         // 해당 유저의 장바구니가 없을 시, 장바구니 생성
         if (cartId == null) {
-            cartId = createNewCart(memberId);
+            cartId = addNewCart(memberId);
         }
 
         return cartId;
@@ -97,7 +97,7 @@ public class CartServiceImpl implements CartService {
      * @param memberId 멤버 식별자
      * @return 새로 생성된 장바구니 ID
      */
-    private Long createNewCart(Long memberId) {
+    private Long addNewCart(Long memberId) {
         // 장바구니 생성 시 필요한 데이터 설정
         CartVO newCart = CartVO.builder()
                 .memberId(memberId)
