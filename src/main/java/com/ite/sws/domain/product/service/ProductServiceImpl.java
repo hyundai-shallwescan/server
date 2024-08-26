@@ -2,6 +2,8 @@ package com.ite.sws.domain.product.service;
 
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.domain.product.vo.ProductVO;
+import com.ite.sws.exception.CustomException;
+import com.ite.sws.exception.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper mapper;
 
     @Override
-    public ProductVO getProduct() throws Exception {
-        return mapper.selectProduct();
+    public ProductVO findProduct(Long productId) {
+        return mapper.selectProduct(productId).orElseThrow(() -> {
+            throw new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND);
+        });
     }
 }

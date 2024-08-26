@@ -18,21 +18,28 @@
 <mapper namespace="com.ite.sws.domain.admin.mapper.AdminMapper">
   <insert id="insertProduct" parameterType="com.ite.sws.domain.product.vo.ProductVO">
     INSERT INTO PRODUCT (
-      PRODUCT_ID,
-      NAME,
-      PRICE,
-      THUMBNAIL_IMAGE,
-      DESCRIPTION_IMAGE,
-      BARCODE,
-      DESCRIPTION
+    PRODUCT_ID,
+    NAME,
+    PRICE,
+    THUMBNAIL_IMAGE,
+    DESCRIPTION_IMAGE,
+    BARCODE,
+    DESCRIPTION
     ) VALUES (
-      SEQ_PRODUCT_ID.NEXTVAL,
-      #{name},
-      #{price},
-      #{thumbnailImage},
-      #{descriptionImage},
-      #{barcode},
-      #{description}
+    SEQ_PRODUCT_ID.NEXTVAL,
+    #{name},
+    #{price},
+    #{thumbnailImage},
+    #{descriptionImage},
+    #{barcode},
+    #{description}
     )
   </insert>
+
+  <update id="updateProductIsDeleted" parameterType="long">
+    UPDATE PRODUCT
+    SET IS_DELETED = 1
+    WHERE PRODUCT_ID = #{productId}
+  </update>
+
 </mapper>

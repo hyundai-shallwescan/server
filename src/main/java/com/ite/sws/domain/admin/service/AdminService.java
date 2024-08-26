@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public interface AdminService {
-  public void addProduct(PostCreateProductReq postCreateProductReq, MultipartFile thumbnail,
+   void addProduct(PostCreateProductReq postCreateProductReq, MultipartFile thumbnail,
       MultipartFile descriptionImage);
+   void deleteProduct(Long productId);
 }
