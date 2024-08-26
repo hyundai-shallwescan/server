@@ -16,6 +16,8 @@
  * 2024.08.26  김민정        Cart ID에 해당하는 장바구니 아이템 가져오기
  * 2024.08.26  김민정        새로운 장바구니 생성
  * 2024.08.26  김민정        장바구니 아이템 추가 및 수량 증가
+ * 2024.08.26  김민정        바코드로 상품 조회
+ * 2024.08.26  김민정        장바구니 아이템 수량 업데이트를 위한 프로시저 호출
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -80,5 +82,10 @@
 		FROM PRODUCT
 		WHERE BARCODE = #{barcode}
 	</select>
+
+	<!-- 장바구니 아이템 수량 업데이트를 위한 프로시저 호출 -->
+	<update id="updateCartItemQuantity">
+		CALL update_cart_item_quantity(#{cartId}, #{productId}, #{quantity})
+	</update>
 
 </mapper>

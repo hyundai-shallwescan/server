@@ -25,6 +25,7 @@ import java.util.List;
  * 2024.08.26   김민정       새로운 장바구니 생성 기능 추가
  * 2024.08.26   김민정       MemberId로 장바구니 조회 기능 추가
  * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 수량 변경 기능 추가
  * </pre>
  */
 @Service
@@ -108,5 +109,21 @@ public class CartServiceImpl implements CartService {
 
         // 새로 생성된 장바구니의 ID 반환
         return newCart.getCartId();
+    }
+
+    /**
+     * 장바구니 아이템 수량 변경
+     * @param cartId 장바구니 ID
+     * @param productId 상품 ID
+     * @param delta 수량 변화량 (+1, -1)
+     */
+    @Transactional
+    public void modifyCartItemQuantity(Long cartId, Long productId, int delta) {
+        CartItemVO modifyCart = CartItemVO.builder()
+                .cartId(cartId)
+                .productId(productId)
+                .quantity(delta)
+                .build();
+        cartMapper.updateCartItemQuantity(modifyCart);
     }
 }
