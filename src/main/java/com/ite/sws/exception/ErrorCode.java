@@ -40,7 +40,7 @@ public enum ErrorCode {
     MEMBER_NOT_FOUND(UNAUTHORIZED.value(), "회원 정보를 찾을 수 없습니다."),
 
     /* NOT FOUND*/
-    REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(),"리뷰가 존재하지 않습니다."),
+    REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(), "리뷰가 존재하지 않습니다."),
 
     /* 409: Conflict */
     LOGIN_ID_ALREADY_EXISTS(CONFLICT.value(), "이미 존재하는 아이디입니다."),
@@ -48,7 +48,8 @@ public enum ErrorCode {
     /* 500: Internal Server Error */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
-    NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다.");
+    NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다."),
+    S3_PERSIST_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다.");
 
 
     private final int status;
