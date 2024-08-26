@@ -1,6 +1,7 @@
 package com.ite.sws.domain.cart.service;
 
 import com.ite.sws.domain.cart.dto.GetCartRes;
+import com.ite.sws.domain.cart.dto.PostCartItemReq;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartVO;
@@ -22,6 +23,8 @@ import java.util.List;
  * 2024.08.26  	김민정       최초 생성
  * 2024.08.26  	김민정       MemberId로 장바구니 아이템 조회 기능 추가
  * 2024.08.26   김민정       새로운 장바구니 생성 기능 추가
+ * 2024.08.26   김민정       MemberId로 장바구니 조회 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
  * </pre>
  */
 @Service
@@ -37,18 +40,11 @@ public class CartServiceImpl implements CartService {
      */
     @Override
     @Transactional
-    public GetCartRes findCartItemListByMemberId(Long memberId) {
-        // 장바구니에서 ACTIVE인 상태 중 가장 최근에 생성된 cart 가져오기
-        Long cartId = cartMapper.selectActiveCartByMemberId(memberId);
-
-
-        // 해당 유저의 장바구니가 없을 시, 장바구니 생성
-        if (cartId == null) {
-            cartId = createNewCart(memberId);
-        }
+    public GetCartRes findCartItemList(Long memberId) {
+        Long cartId = findCartByMemberId(memberId);
 
         // 해당 cart_id에 속하는 cart items 가져오기
-        List<CartItemVO> cartItems = cartMapper.selectCartItemsByCartId(cartId);
+        List<GetCartRes.GetCartItemRes> cartItems = cartMapper.selectCartItemListByCartId(cartId);
 
         return GetCartRes.builder()
                 .cartId(cartId)
@@ -57,11 +53,51 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
+     * 장바구니 아이템 추가 및 수량 증가
+     * (1) 기존에 장바구니에 해당 상품이 존재하지 않을 시, 새로운 아이템 생성
+     * (2) 기존에 장바구니에 해당 상품이 존재할 시, 수량 증가
+     * @param postCartItemReq 장바구니 아이템 객체
+     */
+    @Override
+    @Transactional
+    public void addAndModifyCartItem(PostCartItemReq postCartItemReq, Long memberId) {
+        // 유저의 장바구니 조회
+        Long cartId = findCartByMemberId(memberId);
+
+        // 바코드 번호로 상품 아이디 조회
+        Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());
+
+        // 장바구니 아이템 생성 시 필요한 데이터 설정
+        CartItemVO newCartItem = CartItemVO.builder()
+                .cartId(cartId)
+                .productId(productId)
+                .build();
+        cartMapper.insertCartItem(newCartItem);
+    }
+
+    /**
+     * MemberId로 장바구니 조회
+     * @param memberId 멤버 식별자
+     * @return 멤버의 장바구니 식별자
+     */
+    private Long findCartByMemberId(Long memberId) {
+        // 장바구니에서 ACTIVE인 상태 중 가장 최근에 생성된 cart 가져오기
+        Long cartId = cartMapper.selectActiveCartByMemberId(memberId);
+
+        // 해당 유저의 장바구니가 없을 시, 장바구니 생성
+        if (cartId == null) {
+            cartId = addNewCart(memberId);
+        }
+
+        return cartId;
+    }
+
+    /**
      * 새로운 장바구니 생성
      * @param memberId 멤버 식별자
      * @return 새로 생성된 장바구니 ID
      */
-    private Long createNewCart(Long memberId) {
+    private Long addNewCart(Long memberId) {
         // 장바구니 생성 시 필요한 데이터 설정
         CartVO newCart = CartVO.builder()
                 .memberId(memberId)
