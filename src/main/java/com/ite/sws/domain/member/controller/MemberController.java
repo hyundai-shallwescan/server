@@ -6,7 +6,6 @@ import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
 import com.ite.sws.domain.member.service.MemberService;
 import com.ite.sws.exception.CustomException;
-import com.ite.sws.exception.ErrorResponse;
 import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -14,11 +13,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.ite.sws.exception.ErrorCode.INTERNAL_SERVER_ERROR;
 import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
@@ -76,19 +76,11 @@ public class MemberController {
 
         // 유효성 검사 실패 시
         if (bindingResult.hasErrors()) {
-            Map<String, String> errors = bindingResult.getFieldErrors().stream()
-                    .collect(Collectors.toMap(
-                            fieldError -> fieldError.getField(),
-                            fieldError -> fieldError.getDefaultMessage()
-                    ));
-
-            ErrorResponse errorResponse = ErrorResponse.create(
-                    HttpStatus.BAD_REQUEST.value(),
-                    "VALIDATION_ERROR",
-                    errors
-            );
-
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
         }
 
         try {
