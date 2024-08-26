@@ -1,13 +1,10 @@
 package com.ite.sws.exception;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * 에러 코드
@@ -20,7 +17,7 @@ import org.springframework.http.HttpStatus;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	김민정      최초 생성
- * 2024.08.25   정은지
+ * 2024.08.25   정은지      로그인 필요 에러 코드 추가
  * </pre>
  */
 @Getter
@@ -31,17 +28,14 @@ public enum ErrorCode {
     FIND_FAIL_MEMBER_ID(BAD_REQUEST.value(), "존재하지 않는 멤버입니다."),
     REVIEW_FILE_TYPE_NOT_PERMITTED(BAD_REQUEST.value(), "올바르지 않은 파일 형식입니다."),
 
-
     /* 401: Unauthorized */
     REQUIRED_LOGIN(UNAUTHORIZED.value(), "로그인이 필요합니다."),
-
-    /* 403: Forbidden */
-    FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),
-
-    /* 401: Unauthorized */
     UNAUTHORIZED_ACCESS(UNAUTHORIZED.value(), "인증이 필요합니다."),
     FCM_TOKEN_EXPIRED(UNAUTHORIZED.value(), "FCM 토큰이 만료되었습니다."),
     MEMBER_NOT_FOUND(UNAUTHORIZED.value(), "회원 정보를 찾을 수 없습니다."),
+
+    /* 403: Forbidden */
+    FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),
 
     /* NOT FOUND*/
     REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(),"리뷰가 존재하지 않습니다."),
