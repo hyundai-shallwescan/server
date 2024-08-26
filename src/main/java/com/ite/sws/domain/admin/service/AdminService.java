@@ -1,12 +1,27 @@
 package com.ite.sws.domain.admin.service;
 
 
+import com.ite.sws.domain.admin.dto.PatchProductReq;
 import com.ite.sws.domain.admin.dto.PostCreateProductReq;
+import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
-
+/**
+ * Admin 관련 서비스
+ * @since 2024.08.26
+ * @author 구지웅
+ * @version 1.0
+ * <pre>
+ * 수정일        수정자        수정내용
+ * ----------  --------    ---------------------------
+ * 2024.08.26  	구지웅      최초 생성
+ * </pre>
+ *
+ */
 
 public interface AdminService {
-   void addProduct(PostCreateProductReq postCreateProductReq, MultipartFile thumbnail,
-      MultipartFile descriptionImage);
+   void addProduct(PostCreateProductReq postCreateProductReq,List<MultipartFile> fileList);
+
    void deleteProduct(Long productId);
+
+   void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
 }

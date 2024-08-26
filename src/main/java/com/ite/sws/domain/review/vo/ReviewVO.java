@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 @Builder
-public class Review {
+public class ReviewVO {
 
   private Long shortFormId;
   private Long paymentItemId;

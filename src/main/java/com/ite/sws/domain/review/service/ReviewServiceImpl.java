@@ -1,13 +1,13 @@
 package com.ite.sws.domain.review.service;
 
-import com.ite.sws.constant.S3Constant.Review;
+import com.ite.sws.constant.UploadCommand;
 import com.ite.sws.domain.review.dto.GetReviewDetailRes;
 import com.ite.sws.domain.review.dto.GetReviewRes;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
+import com.ite.sws.domain.review.mapper.ReviewBindingMapper;
 import com.ite.sws.domain.review.mapper.ReviewMapper;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,23 +32,21 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class ReviewServiceImpl implements ReviewService {
 
-    private final ReviewUploader reviewUploader;
+    private final ReviewPersistenceHelper reviewUploader;
     private final ReviewMapper reviewMapper;
 
     @Autowired
-    public ReviewServiceImpl(ReviewUploader reviewUploader,ReviewMapper reviewMapper) {
+    public ReviewServiceImpl(ReviewPersistenceHelper reviewUploader, ReviewMapper reviewMapper) {
         this.reviewUploader = reviewUploader;
         this.reviewMapper = reviewMapper;
     }
 
     @Override
-    public void createReview(PostCreateReviewReq createReviewReq, MultipartFile thumbnail,
-        MultipartFile shortForm) {
-        List<MultipartFile> files = Arrays.asList(thumbnail, shortForm);
+    public void createReview(PostCreateReviewReq createReviewReq, List<MultipartFile> fileList) {
 
-        String reviewBucketPrefix = Review.PREFIX;
-
-        reviewUploader.upload(createReviewReq, reviewBucketPrefix, files);
+        reviewUploader.upload(ReviewBindingMapper.INSTANCE.toReviewVo(createReviewReq),
+            fileList,
+            UploadCommand.CREATE);
     }
 
     @Override

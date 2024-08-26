@@ -4,7 +4,7 @@
 
 <mapper namespace="com.ite.sws.domain.review.mapper.ReviewMapper">
 
-    <insert id="createReview" parameterType="com.ite.sws.domain.review.vo.Review">
+    <insert id="createReview" parameterType="com.ite.sws.domain.review.vo.ReviewVO">
         INSERT INTO SHORT_FORM (
         SHORT_FORM_ID,
         PAYMENT_ITEM_ID,

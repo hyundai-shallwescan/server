@@ -39,10 +39,10 @@
 													com.ite.sws.domain.chat
 													com.ite.sws.domain.parking
 													com.ite.sws.domain.payment
-													com.ite.sws.domain.review" />
+													com.ite.sws.domain.reviewVO" />
  		<property name="configLocation" value="classpath:/mybatis-config.xml"></property>
 		<property name="typeHandlersPackage" value="com.ite.sws.util"/>
-		<property name="mapperLocations" value="classpath:/*/review-mapper.xml"/>
+		<property name="mapperLocations" value="classpath:/*/reviewVO-mapper.xml"/>
  	</bean>
  	
  	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
@@ -58,7 +58,7 @@
 	<context:component-scan base-package="com.ite.sws.util"/>
 	<context:component-scan base-package="com.ite.sws.exception"/>
 	<context:component-scan base-package="com.ite.sws.config"/>
-	<context:component-scan base-package="com.ite.sws.domain.review.*"/>
+	<context:component-scan base-package="com.ite.sws.domain.reviewVO.*"/>
 	<!-- <context:component-scan base-package="com.ite.sws.constant"/> -->	
 
 	<!-- Enable AspectJ Auto Proxy -->

@@ -29,6 +29,8 @@ public enum ErrorCode {
     /* 400: Bad Request */
     FIND_FAIL_MEMBER_ID(BAD_REQUEST.value(), "존재하지 않는 멤버입니다."),
     REVIEW_FILE_TYPE_NOT_PERMITTED(BAD_REQUEST.value(), "올바르지 않은 파일 형식입니다."),
+    ALL_FILE_AND_INFO_SHOULD_BE_IN_REQUEST(BAD_REQUEST.value(), "파일과 모든 정보를 입력해야합니다."),
+    NO_COMMAND(BAD_REQUEST.value(), "존재하지 않은 명령어입니다."),
 
 
     /* 403: Forbidden */
@@ -51,7 +53,7 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
     NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다."),
-    S3_PERSIST_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다.");
+    PERSIST_EXCEPTION_TO_THIRD_PARTY(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 저장소에 저장을 실패했습니다.");
 
 
     private final int status;

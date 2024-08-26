@@ -2,7 +2,7 @@ package com.ite.sws.domain.review.mapper;
 
 import com.ite.sws.domain.review.dto.GetReviewDetailRes;
 import com.ite.sws.domain.review.dto.GetReviewRes;
-import com.ite.sws.domain.review.vo.Review;
+import com.ite.sws.domain.review.vo.ReviewVO;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -23,7 +23,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface ReviewMapper {
 
-    void createReview(Review review);
+    void createReview(ReviewVO reviewVO);
 
     List<GetReviewRes> getReviews(Map<String, Object> params);
 

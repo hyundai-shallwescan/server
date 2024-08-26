@@ -20,8 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface ReviewService {
 
-  void createReview(PostCreateReviewReq createReviewReq, MultipartFile thumbnail,
-      MultipartFile shortForm);
+  void createReview(PostCreateReviewReq createReviewReq, List<MultipartFile> fileList);
 
   List<GetReviewRes> getReviews(int page, int size);
 

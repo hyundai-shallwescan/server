@@ -42,4 +42,18 @@
     WHERE PRODUCT_ID = #{productId}
   </update>
 
+  <update id="updateProduct" parameterType="com.ite.sws.domain.product.vo.ProductVO">
+    UPDATE PRODUCT
+    SET
+    NAME = #{name},
+    PRICE = #{price},
+    THUMBNAIL_IMAGE = #{thumbnailImage},
+    DESCRIPTION_IMAGE = #{descriptionImage},
+    BARCODE = #{barcode},
+    DESCRIPTION = #{description},
+    UPDATED_AT = CURRENT_TIMESTAMP
+    WHERE
+    PRODUCT_ID = #{productId}
+  </update>
+
 </mapper>

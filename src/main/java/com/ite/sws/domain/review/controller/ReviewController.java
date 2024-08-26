@@ -5,6 +5,7 @@ import com.ite.sws.domain.review.dto.GetReviewDetailRes;
 import com.ite.sws.domain.review.dto.GetReviewRes;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
 import com.ite.sws.domain.review.service.ReviewService;
+import java.util.Arrays;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +43,10 @@ public class ReviewController {
       @RequestPart MultipartFile shortForm,
       @RequestPart MultipartFile image,
       @RequestPart @Valid PostCreateReviewReq postCreateReviewReq) {
-    reviewService.createReview(postCreateReviewReq, image,
-        shortForm);
+
+    List<MultipartFile> files = Arrays.asList(image, shortForm);
+    reviewService.createReview(postCreateReviewReq, files);
+
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 
