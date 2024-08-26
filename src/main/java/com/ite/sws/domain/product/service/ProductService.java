@@ -15,5 +15,5 @@ import com.ite.sws.domain.product.vo.ProductVO;
  * </pre>
  */
 public interface ProductService {
-    ProductVO getProduct() throws Exception;
+    ProductVO findProduct(Long productId);
 }

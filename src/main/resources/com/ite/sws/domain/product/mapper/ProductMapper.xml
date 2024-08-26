@@ -12,22 +12,26 @@
  * 수정일        	수정자        수정내용
  * ==========  =========    =========
  * 2024.08.23  	정은지        최초 생성
+ * 2024.08.23  	구지웅        select query 수정
  * </pre>
  -->
  
 <mapper namespace="com.ite.sws.domain.product.mapper.ProductMapper">
  	<select id="selectProduct" resultType="com.ite.sws.domain.product.vo.ProductVO">
-		SELECT PRODUCT_ID,
-		       NAME,
-		       PRICE,
-		       THUMBNAIL_IMAGE,
-		       DESCRIPTION_IMAGE,
-		       BARCODE,
-		       DESCRIPTION,
-		       CREATED_AT,
-		       UPDATED_AT
-		FROM   PRODUCT
-		FETCH FIRST 1 ROWS ONLY
+		SELECT
+		PRODUCT_ID,
+		NAME,
+		PRICE,
+		THUMBNAIL_IMAGE,
+		DESCRIPTION_IMAGE,
+		BARCODE,
+		DESCRIPTION,
+		CREATED_AT,
+		UPDATED_AT
+		FROM PRODUCT
+		WHERE IS_DELETED NOT IN ('1')
 	</select>
-	
+
+
+
 </mapper>
