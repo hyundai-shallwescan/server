@@ -16,6 +16,7 @@ import static org.springframework.http.HttpStatus.*;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	김민정      최초 생성
+ * 2024.08.25   정은지
  * </pre>
  */
 @Getter
@@ -24,6 +25,9 @@ public enum ErrorCode {
 
     /* 400: Bad Request */
     FIND_FAIL_MEMBER_ID(BAD_REQUEST.value(), "존재하지 않는 멤버입니다."),
+
+    /* 401: Unauthorized */
+    REQUIRED_LOGIN(UNAUTHORIZED.value(), "로그인이 필요합니다."),
 
     /* 403: Forbidden */
     FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),

@@ -1,5 +1,6 @@
 package com.ite.sws.config.security;
 
+import com.ite.sws.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -8,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Spring Security 설정 클래스
@@ -28,6 +30,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -39,11 +45,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic().disable()
                 .formLogin().disable()
                 .authorizeRequests()
-                .antMatchers("/**").permitAll();
-//                .antMatchers("/members/signup", "/members/check-id", "/members/login", "/members/logout").permitAll()
-//                .antMatchers("/members/test").hasRole("USER");
+//                .antMatchers("/**").permitAll();
+                .antMatchers("/members/signup", "/members/check-id", "/members/login", "/members/logout").permitAll()
+                .antMatchers("/members/test").hasRole("USER");
 //                .antMatchers("/admins/**").hasRole("ADMIN")
 //                .anyRequest().hasAnyRole("ADMIN", "USER");
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .exceptionHandling()
+                .authenticationEntryPoint(customAuthenticationEntryPoint)  // 인증되지 않은 사용자가 접근할 때 처리
+                .accessDeniedHandler(customAccessDeniedHandler)  // 권한이 없는 사용자가 접근할 때 처리
+                .and()
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
     }
 }

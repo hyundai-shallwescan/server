@@ -1,6 +1,9 @@
 package com.ite.sws.domain.member.service;
 
+import com.ite.sws.domain.member.dto.JwtToken;
+import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
+import com.ite.sws.domain.member.vo.MemberVO;
 
 /**
  * 회원 서비스
@@ -30,4 +33,13 @@ public interface MemberService {
      * @param postMemberReq 회원 정보
      */
     void registerMember(PostMemberReq postMemberReq);
+
+    /**
+     * 로그인
+     * @param postLoginReq 아이디, 비밀번호
+     * @return JwtToken 객체
+     */
+    JwtToken login(PostLoginReq postLoginReq);
+
+    MemberVO getMemberById(Long memberId);
 }

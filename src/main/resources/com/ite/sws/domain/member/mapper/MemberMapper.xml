@@ -50,4 +50,22 @@
                      #{loginId},
                      #{password})
     </insert>
+
+    <!-- 로그인 -->
+    <select id="selectMemberByLoginId">
+        SELECT A.MEMBER_ID,
+               A.LOGIN_ID,
+               A.PASSWORD,
+               A.ROLE
+        FROM   AUTH A
+                   JOIN MEMBER M ON A.MEMBER_ID = M.MEMBER_ID
+        WHERE  A.LOGIN_ID = #{loginId}
+          AND M.IS_DELETED = 0
+    </select>
+    
+    <select id="selectMemberByMemberId">
+        SELECT *
+        FROM MEMBER
+        WHERE MEMBER_ID = #{memberId}
+    </select>
 </mapper>

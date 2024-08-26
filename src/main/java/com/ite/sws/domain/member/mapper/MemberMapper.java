@@ -24,4 +24,6 @@ public interface MemberMapper {
     int selectCountByLoginId(String loginId);
     void insertMember(MemberVO member);
     void insertAuth(AuthVO auth);
+    Optional<AuthVO> selectMemberByLoginId(String loginId);
+    MemberVO selectMemberByMemberId(Long memberId);
 }
