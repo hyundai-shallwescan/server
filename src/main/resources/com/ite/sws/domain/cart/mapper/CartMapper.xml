@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!-- 
+ * 장바구니 Mybatis 매퍼
+ * @author 김민정
+ * @since 2024.08.26
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일       수정자        수정내용
+ * ==========  =========    =========
+ * 2024.08.26  김민정        최초 생성
+ * 2024.08.26  김민정        ACTIVE 상태인 가장 최신의 Cart ID를 가져오기
+ * 2024.08.26  김민정        Cart ID에 해당하는 장바구니 아이템 가져오기
+ * 2024.08.26  김민정        새로운 장바구니 생성
+ * </pre>
+ -->
+ 
+<mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
+	<!-- ACTIVE 상태인 가장 최신의 Cart ID를 가져오기 -->
+	<select id="selectActiveCartByMemberId" resultType="java.lang.Long">
+		SELECT   CART_ID
+		FROM     CART
+		WHERE    MEMBER_ID = #{memberId}
+		AND      STATUS = 'ACTIVE'
+		ORDER BY CREATED_AT DESC
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+
+	<!-- Cart ID에 해당하는 장바구니 아이템 가져오기 -->
+	<select id="selectCartItemsByCartId" resultType="com.ite.sws.domain.cart.vo.CartItemVO">
+		SELECT CI.PRODUCT_ID     AS productId,
+			   CI.QUANTITY       AS quantity,
+			   P.NAME            AS productName,
+			   P.PRICE           AS productPrice,
+			   P.THUMBNAIL_IMAGE AS productThumbnail
+		FROM   CART_ITEM CI
+			   JOIN PRODUCT P ON CI.PRODUCT_ID = P.PRODUCT_ID
+		WHERE  CI.CART_ID = #{cartId}
+       	AND CI.IS_DELETED = 0
+	</select>
+
+	<!-- 새로운 장바구니 생성 -->
+	<insert id="insertCart">
+		<selectKey keyProperty="cartId" resultType="long" order="BEFORE">
+			SELECT SEQ_CART_ID.NEXTVAL
+			FROM   DUAL
+		</selectKey>
+		INSERT INTO CART
+					(CART_ID,
+					 MEMBER_ID)
+		VALUES      (#{cartId},
+					 #{memberId})
+	</insert>
+
+</mapper>

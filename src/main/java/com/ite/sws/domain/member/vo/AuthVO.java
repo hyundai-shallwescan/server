@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Member VO
+ * Auth VO
  * @author 정은지
  * @since 2024.08.24
  * @version 1.0
@@ -24,14 +24,11 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MemberVO {
+public class AuthVO {
     private Long memberId;
-    private String name;
-    private Character gender;
-    private Integer age;
-    private String phoneNumber;
-    private String carNumber;
-    private Integer isDeleted;
+    private String role;
+    private String loginId;
+    private String password;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
