@@ -24,7 +24,7 @@ import java.util.List;
  * 2024.08.26  	김민정       MemberId로 장바구니 아이템 조회 기능 추가
  * 2024.08.26   김민정       새로운 장바구니 생성 기능 추가
  * 2024.08.26   김민정       MemberId로 장바구니 조회 기능 추가
- * 2024.08.26  	김민정       장바구니 아이템 생성 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
  * </pre>
  */
 @Service
@@ -53,18 +53,24 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * 장바구니 아이템 생성
-     * (1) 새로운 아이템 생성
-     * (2) 기존에 장바군에 해당 상품이 존재할 시, 수량 증가
+     * 장바구니 아이템 추가 및 수량 증가
+     * (1) 기존에 장바구니에 해당 상품이 존재하지 않을 시, 새로운 아이템 생성
+     * (2) 기존에 장바구니에 해당 상품이 존재할 시, 수량 증가
      * @param postCartItemReq 장바구니 아이템 객체
      */
     @Override
     @Transactional
-    public void addCartItem(PostCartItemReq postCartItemReq, Long memberId) {
+    public void addAndModifyCartItem(PostCartItemReq postCartItemReq, Long memberId) {
+        // 유저의 장바구니 조회
         Long cartId = findCartByMemberId(memberId);
+
+        // 바코드 번호로 상품 아이디 조회
+        Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());
+
+        // 장바구니 아이템 생성 시 필요한 데이터 설정
         CartItemVO newCartItem = CartItemVO.builder()
                 .cartId(cartId)
-                .productId(postCartItemReq.getProductId())
+                .productId(productId)
                 .build();
         cartMapper.insertCartItem(newCartItem);
     }

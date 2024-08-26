@@ -14,7 +14,7 @@ import com.ite.sws.domain.cart.dto.PostCartItemReq;
  * ----------  --------    ---------------------------
  * 2024.08.26  	김민정       최초 생성
  * 2024.08.26  	김민정       MemberId로 장바구니 아이템 조회 기능 추가
- * 2024.08.26  	김민정       장바구니 아이템 생성 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
  * </pre>
  */
 public interface CartService {
@@ -27,8 +27,8 @@ public interface CartService {
     GetCartRes findCartItemListByMemberId(Long memberId);
 
     /**
-     * 장바구니 아이템 생성
+     * 장바구니 아이템 추가 및 수량 증가
      * @param postCartItemReq 장바구니 아이템 객체
      */
-    void addCartItem(PostCartItemReq postCartItemReq, Long memberId);
+    void addAndModifyCartItem(PostCartItemReq postCartItemReq, Long memberId);
 }

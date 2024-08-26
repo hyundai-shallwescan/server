@@ -22,5 +22,5 @@ import lombok.NoArgsConstructor;
 @Builder
 @Getter
 public class PostCartItemReq {
-    private Long productId;
+    private String barcode;
 }

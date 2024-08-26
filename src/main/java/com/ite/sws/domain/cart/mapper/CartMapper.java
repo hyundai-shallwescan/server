@@ -19,7 +19,8 @@ import java.util.List;
  * 2024.08.26  	김민정       ACTIVE 상태인 가장 최신의 Cart ID를 가져오기 기능 추가
  * 2024.08.26  	김민정       Cart ID에 해당하는 장바구니 아이템 가져오기 기능 추가
  * 2024.08.26  	김민정       새로운 장바구니 생성 기능 추가
- * 2024.08.26  	김민정       장바구니 아이템 생성 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
+ * 2024.08.26  	김민정       바코드로 상품 조회
  * </pre>
  */
 public interface CartMapper {
@@ -45,8 +46,15 @@ public interface CartMapper {
     void insertCart(CartVO cart);
 
     /**
-     * 장바구니 아이템 생성
+     * 장바구니 아이템 추가 및 수량 증가
      * @param cartItem 장바구니 아이템 객체
      */
     void insertCartItem(CartItemVO cartItem);
+
+    /**
+     * 바코드로 상품 조회
+     * @param barcode
+     * @return
+     */
+    Long selectProductByBarcode(String barcode);
 }

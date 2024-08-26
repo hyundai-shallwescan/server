@@ -15,7 +15,7 @@
  * 2024.08.26  김민정        ACTIVE 상태인 가장 최신의 Cart ID를 가져오기
  * 2024.08.26  김민정        Cart ID에 해당하는 장바구니 아이템 가져오기
  * 2024.08.26  김민정        새로운 장바구니 생성
- * 2024.08.26  김민정        장바구니 아이템 생성
+ * 2024.08.26  김민정        장바구니 아이템 추가 및 수량 증가
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -55,7 +55,7 @@
 					 #{memberId})
 	</insert>
 
-	<!-- 장바구니 아이템 생성
+	<!-- 장바구니 아이템 추가 및 수량 증가
 	 	 (1) 새로운 아이템 생성
      	 (2) 기존에 장바군에 해당 상품이 존재할 시, 수량 증가 -->
 	<update id="insertCartItem">
@@ -73,5 +73,12 @@
 			VALUES (INPUT.CARTID,
 					INPUT.PRODUCTID)
 	</update>
+
+	<!-- 바코드로 상품 조회 -->
+	<select id="selectProductByBarcode" resultType="java.lang.Long">
+		SELECT PRODUCT_ID
+		FROM PRODUCT
+		WHERE BARCODE = #{barcode}
+	</select>
 
 </mapper>

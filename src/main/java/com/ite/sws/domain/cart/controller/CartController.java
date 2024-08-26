@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * ----------  --------    ---------------------------
  * 2024.08.26  	김민정       최초 생성
  * 2024.08.26  	김민정       장바구니 조회 API 생성
- * 2024.08.26  	김민정       장바구니에 상품 담기 API 생성
+ * 2024.08.26  	김민정       장바구니 항목 추가 및 수량 증가 API 생성
  * </pre>
  */
 @RestController
@@ -46,16 +46,16 @@ public class CartController {
     }
 
     /**
-     * 장바구니에 상품 담기 API
+     * 장바구니 항목 추가 및 수량 증가 API
      * @param postCartItemReq 장바구니 아이템 객체
      * @param memberId 멤버 식별자
      * @return 장바구니 상품 담기 결과 응답
      */
     @PostMapping
-    public ResponseEntity<Void> addCartItem(@RequestBody PostCartItemReq postCartItemReq,
-                                            @RequestParam Long memberId) {
+    public ResponseEntity<Void> addAndModifyCartItem(@RequestBody PostCartItemReq postCartItemReq,
+                                                    @RequestParam Long memberId) {
         // TODO: memberId 파라미터 제거
-        cartService.addCartItem(postCartItemReq, memberId);
+        cartService.addAndModifyCartItem(postCartItemReq, memberId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
