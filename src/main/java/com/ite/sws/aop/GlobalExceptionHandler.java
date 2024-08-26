@@ -9,6 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLException;
+
+import static com.ite.sws.exception.ErrorCode.*;
+
 /**
  * 전역 예외 처리 클래스
  *
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	김민정      최초 생성
+ * 2024.08.25   김민정      SQL Exception 처리
  * </pre>
  */
 @RestControllerAdvice
@@ -53,11 +58,28 @@ public class GlobalExceptionHandler {
         log.error("NullPointerException 발생: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(ErrorCode.NULL_POINTER_EXCEPTION.getStatus())
-                .errorCode(ErrorCode.NULL_POINTER_EXCEPTION.name())
-                .message(ErrorCode.NULL_POINTER_EXCEPTION.getMessage())
+                .status(NULL_POINTER_EXCEPTION.getStatus())
+                .errorCode(NULL_POINTER_EXCEPTION.name())
+                .message(NULL_POINTER_EXCEPTION.getMessage())
                 .build();
 
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * SQL Exception 처리
+     * @param ex SQLException
+     * @return ResponseEntity<ErrorResponse>
+     */
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<ErrorResponse> handleSQLException(SQLException ex) {
+        log.error("SQLException 발생: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status(DATABASE_ERROR.getStatus())
+                .errorCode(DATABASE_ERROR.name())
+                .message(DATABASE_ERROR.getMessage())
+                .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -71,9 +93,9 @@ public class GlobalExceptionHandler {
         log.error("Unhandled Exception 발생: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(ErrorCode.INTERNAL_SERVER_ERROR.getStatus())
-                .errorCode(ErrorCode.INTERNAL_SERVER_ERROR.name())
-                .message(ErrorCode.INTERNAL_SERVER_ERROR.getMessage())
+                .status(INTERNAL_SERVER_ERROR.getStatus())
+                .errorCode(INTERNAL_SERVER_ERROR.name())
+                .message(INTERNAL_SERVER_ERROR.getMessage())
                 .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
