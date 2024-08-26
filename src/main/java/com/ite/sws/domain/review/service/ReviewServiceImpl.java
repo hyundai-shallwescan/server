@@ -1,12 +1,12 @@
 package com.ite.sws.domain.review.service;
 
-import com.ite.sws.domain.review.constant.S3Constant.Review;
+import com.ite.sws.constant.S3Constant.Review;
 import com.ite.sws.domain.review.dto.GetReviewDetailRes;
 import com.ite.sws.domain.review.dto.GetReviewRes;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
-import com.ite.sws.domain.review.exception.ReviewErrorCode;
-import com.ite.sws.domain.review.exception.ReviewException;
 import com.ite.sws.domain.review.mapper.ReviewMapper;
+import com.ite.sws.exception.CustomException;
+import com.ite.sws.exception.ErrorCode;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -63,13 +63,13 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public GetReviewDetailRes getReviewDetail(Long reviewId) {
         return reviewMapper.getReviewDetail(reviewId)
-            .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_IS_NOT_EXIST));
+            .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_IS_NOT_EXIST));
     }
 
     @Override
     public void deleteReview(Long reviewId) {
         reviewMapper.getReviewDetail(reviewId)
-            .orElseThrow(() -> new ReviewException(ReviewErrorCode.REVIEW_IS_NOT_EXIST));
+            .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_IS_NOT_EXIST));
         reviewMapper.deleteReview(reviewId);
     }
 }
