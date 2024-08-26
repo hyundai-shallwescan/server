@@ -1,10 +1,10 @@
 package com.ite.sws.domain.member.controller;
 
+import com.ite.sws.domain.member.dto.GetMemberRes;
 import com.ite.sws.domain.member.dto.JwtToken;
 import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
 import com.ite.sws.domain.member.service.MemberService;
-import com.ite.sws.domain.member.vo.MemberVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorResponse;
 import com.ite.sws.util.SecurityUtil;
@@ -34,6 +34,8 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
  * 2024.08.24  	정은지        아이디 중복 확인 및 회원가입 API 생성
+ * 2024.08.25   정은지        로그인 API 생성
+ * 2024.08.26   정은지        회원 정보 조회 API 생성
  * </pre>
  */
 
@@ -48,7 +50,7 @@ public class MemberController {
     private final MemberService memberService;
 
     /**
-     * 로그인 아이디 중복 체크
+     * 로그인 아이디 중복 체크 API
      * @param loginId 로그인 아이디
      * @return 중복 여부 응답
      */
@@ -64,7 +66,7 @@ public class MemberController {
     }
 
     /**
-     * 회원가입
+     * 회원가입 API
      * @param postMemberReq 회원 정보 객체
      * @param bindingResult 유효성 검사 결과
      * @return 회원가입 결과 응답
@@ -100,7 +102,7 @@ public class MemberController {
     }
 
     /**
-     * 로그인
+     * 로그인 API
      * @param postLoginReq 로그인 아이디, 비밀번호
      * @return JwtToken 객체
      */
@@ -114,13 +116,13 @@ public class MemberController {
     }
 
     /**
-     * 회원 정보 조회 테스트
-     * @return MemberVO
+     * 회원 정보 조회 API
+     * @return GetMemberRes 객체
      */
-    @GetMapping("/test")
-    public ResponseEntity<MemberVO> test() {
+    @GetMapping
+    public ResponseEntity<GetMemberRes> findMemberByMemberId() {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        MemberVO member = memberService.getMemberById(memberId);
+        GetMemberRes member = memberService.findMemberByMemberId(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(member);
     }
 }
