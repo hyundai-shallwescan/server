@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+ * 채팅 Mybatis 매퍼
+ * @author 남진수
+ * @since 2024.08.26
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일        수정자        수정내용
+ * ==========  =========    =========
+ * 2024.08.26  남진수        최초 생성
+ * 2024.08.26  남진수        채팅 메시지 저장
+ * 2024.08.26  남진수        채팅 메시지 조회
+ * </pre>
+ -->
+
+<mapper namespace="com.ite.sws.domain.chat.mapper.ChatMapper">
+
+    <insert id="insertMessage">
+        INSERT INTO   CHAT_MESSAGE
+                     (CHAT_MESSAGE_ID,
+                      CART_MEMBER_ID,
+                      PAYLOAD,
+                      CREATED_AT,
+                      STATUS)
+        VALUES       (SEQ_CHAT_MESSAGE_ID.NEXTVAL,
+                      #{cartMemberId},
+                      #{payload},
+                      #{createdAt},
+                      #{status})
+    </insert>
+
+    <select id="selectMessagesByCartId" resultType="com.ite.sws.domain.chat.dto.GetChatRes">
+        SELECT MSG.CHAT_MESSAGE_ID,
+               MSG.CART_MEMBER_ID,
+               MSG.PAYLOAD,
+               MSG.CREATED_AT,
+               MSG.STATUS,
+               MEM.CART_ID
+        FROM   CHAT_MESSAGE MSG
+                   JOIN CART_MEMBER MEM
+                        ON MSG.CART_MEMBER_ID = MEM.CART_MEMBER_ID
+        WHERE  MEM.CART_ID = #{cartId}
+        ORDER  BY MSG.CREATED_AT ASC
+    </select>
+
+</mapper>
