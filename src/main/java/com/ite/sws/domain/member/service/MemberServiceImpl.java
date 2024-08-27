@@ -1,5 +1,6 @@
 package com.ite.sws.domain.member.service;
 
+import com.ite.sws.domain.member.dto.GetMemberRes;
 import com.ite.sws.domain.member.dto.JwtToken;
 import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
@@ -127,7 +128,8 @@ public class MemberServiceImpl implements MemberService {
      * @return MemberVO 객체
      */
     @Override
-    public MemberVO getMemberById(Long memberId) {
+    public GetMemberRes findMemberByMemberId(Long memberId) {
+
         return memberMapper.selectMemberByMemberId(memberId);
     }
 }

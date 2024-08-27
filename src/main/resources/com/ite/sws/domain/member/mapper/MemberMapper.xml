@@ -67,16 +67,14 @@
 
     <!-- 회원 정보 조회 -->
     <select id="selectMemberByMemberId">
-        SELECT MEMBER_ID,
-               NAME,
-               GENDER,
-               AGE,
-               PHONE_NUMBER,
-               CAR_NUMBER,
-               IS_DELETED,
-               CREATED_AT,
-               UPDATED_AT
-        FROM   MEMBER
-        WHERE  MEMBER_ID = #{memberId}
+        SELECT A.LOGIN_ID,
+               M.NAME,
+               M.GENDER,
+               M.AGE,
+               M.PHONE_NUMBER,
+               M.CAR_NUMBER
+        FROM   AUTH A
+                   JOIN MEMBER M ON A.MEMBER_ID = M.MEMBER_ID
+        WHERE  M.MEMBER_ID = #{memberId}
     </select>
 </mapper>
