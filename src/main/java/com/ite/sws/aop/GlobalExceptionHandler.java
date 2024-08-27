@@ -1,17 +1,18 @@
 package com.ite.sws.aop;
 
+import static com.ite.sws.exception.ErrorCode.DATABASE_ERROR;
+import static com.ite.sws.exception.ErrorCode.INTERNAL_SERVER_ERROR;
+import static com.ite.sws.exception.ErrorCode.NULL_POINTER_EXCEPTION;
+
+import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.ite.sws.exception.CustomException;
-import com.ite.sws.exception.ErrorCode;
 import com.ite.sws.exception.ErrorResponse;
+import java.sql.SQLException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.sql.SQLException;
-
-import static com.ite.sws.exception.ErrorCode.*;
 
 /**
  * 전역 예외 처리 클래스
@@ -96,10 +97,22 @@ public class GlobalExceptionHandler {
         log.error("Unhandled Exception 발생: {}", ex.getMessage(), ex);
 
         ErrorResponse errorResponse = ErrorResponse.builder()
-                .status(INTERNAL_SERVER_ERROR.getStatus())
-                .errorCode(INTERNAL_SERVER_ERROR.name())
-                .message(INTERNAL_SERVER_ERROR.getMessage())
-                .build();
+            .status(INTERNAL_SERVER_ERROR.getStatus())
+            .errorCode(INTERNAL_SERVER_ERROR.name())
+            .message(INTERNAL_SERVER_ERROR.getMessage())
+            .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(AmazonS3Exception.class)
+    public ResponseEntity<ErrorResponse> handleS3Exception(AmazonS3Exception ex) {
+        log.error("AmazonS3Exception 발생: {}", ex.getMessage(), ex);
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .status(INTERNAL_SERVER_ERROR.getStatus())
+            .errorCode(INTERNAL_SERVER_ERROR.name())
+            .message(INTERNAL_SERVER_ERROR.getMessage())
+            .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -50,7 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.httpBasic().disable()
                 .formLogin().disable()
                 .authorizeRequests()
-                .antMatchers("/members/test").hasRole("USER")
+                .antMatchers("/members").hasRole("USER")
                 .antMatchers("/**").permitAll();
 //                .antMatchers("/members/signup", "/members/check-id", "/members/login", "/members/logout").permitAll()
 //                .antMatchers("/admins/**").hasRole("ADMIN")

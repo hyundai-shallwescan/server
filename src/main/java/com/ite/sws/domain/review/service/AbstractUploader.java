@@ -1,12 +1,15 @@
 package com.ite.sws.domain.review.service;
 
 import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.ite.sws.exception.CustomException;
+import com.ite.sws.exception.ErrorCode;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.apache.ibatis.exceptions.PersistenceException;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 public abstract class AbstractUploader<T> {
@@ -19,6 +22,7 @@ public abstract class AbstractUploader<T> {
         this.bucketName = bucketName;
     }
 
+    @Transactional
     public void upload(T createRequest, String filePrefixName, List<MultipartFile> files) {
         List<String> fileIdentifiers = new ArrayList<>();
         List<File> convertedFiles = new ArrayList<>();
@@ -42,26 +46,31 @@ public abstract class AbstractUploader<T> {
                 );
             }
 
-        } catch (IOException e) {
-            handleUploadException(e, files, filePrefixName);
+        } catch (AmazonS3Exception e) {
+            handleUploadException(files,filePrefixName);
         } catch (PersistenceException e) {
             cleanupOnFailure(files, filePrefixName);
-            handlePersistenceException(e);
+            handlePersistenceException();
         } catch (Exception e) {
-            handleGeneralException(e);
+            handleGeneralException();
         }
     }
 
     protected abstract void processDomain(T createRequest, List<String> fileIdentifiers);
 
-    protected abstract void handlePersistenceException(PersistenceException e);
+    protected void handlePersistenceException() {
+        throw new CustomException(ErrorCode.DATABASE_ERROR);
+    }
 
-    protected abstract void handleGeneralException(Exception e);
 
-    protected void handleUploadException(IOException e, List<MultipartFile> files,
+    protected void handleGeneralException() {
+        throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    protected void handleUploadException(List<MultipartFile> files,
         String filePrefixName) {
         cleanupOnFailure(files, filePrefixName);
-        throw new AmazonS3Exception("S3 upload error", e);
+        throw new CustomException(ErrorCode.S3_PERSIST_EXCEPTION);
     }
 
     protected void cleanupOnFailure(List<MultipartFile> files, String filePrefixName) {

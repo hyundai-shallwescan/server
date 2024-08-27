@@ -25,6 +25,7 @@ public interface ReviewBindingMapper {
 
     ReviewBindingMapper INSTANCE = Mappers.getMapper(ReviewBindingMapper.class);
 
+
     @Mapping(target = "shortFormId", ignore = true)
     Review toEntity(PostCreateReviewReq postCreateReviewReq, String thumbnailImage,
         String shortFormUrl);

@@ -3,15 +3,13 @@ package com.ite.sws.domain.review.service;
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
 import com.ite.sws.domain.review.mapper.ReviewBindingMapper;
 import com.ite.sws.domain.review.mapper.ReviewMapper;
-import com.ite.sws.exception.CustomException;
-import com.ite.sws.exception.ErrorCode;
 import java.util.List;
-import org.apache.ibatis.exceptions.PersistenceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-@Service
+@Component
 public class ReviewUploader extends AbstractUploader<PostCreateReviewReq> {
 
     private final ReviewMapper reviewMapper;
@@ -32,13 +30,4 @@ public class ReviewUploader extends AbstractUploader<PostCreateReviewReq> {
         );
     }
 
-    @Override
-    protected void handlePersistenceException(PersistenceException e) {
-        throw new CustomException(ErrorCode.DATABASE_ERROR);
-    }
-
-    @Override
-    protected void handleGeneralException(Exception e) {
-        throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
-    }
 }

@@ -30,14 +30,5 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class ProductController {
 
-    @Autowired
-    private ProductService service;
 
-    @GetMapping("/test")
-    public ProductVO getProduct() throws Exception {
-
-        log.info("getProduct");
-        ProductVO productVO = service.getProduct();
-        return productVO;
-    }
 }
