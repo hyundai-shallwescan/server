@@ -1,9 +1,6 @@
 package com.ite.sws.domain.member.service;
 
-import com.ite.sws.domain.member.dto.GetMemberRes;
-import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
-import com.ite.sws.domain.member.dto.PostMemberReq;
+import com.ite.sws.domain.member.dto.*;
 import com.ite.sws.domain.member.mapper.MemberMapper;
 import com.ite.sws.domain.member.vo.AuthVO;
 import com.ite.sws.domain.member.vo.MemberVO;
@@ -33,6 +30,8 @@ import java.util.Optional;
  * 2024.08.24  	정은지        최초 생성
  * 2024.08.24   정은지        중복 아이디 체크 및 회원가입 기능 추가
  * 2024.08.25   정은지        로그인 기능 추가
+ * 2024.08.26   정은지        회원 정보 조회 기능 추가
+ * 2024.08.26   정은지        회원 정보 수정 기능 추가
  * </pre>
  */
 
@@ -131,5 +130,21 @@ public class MemberServiceImpl implements MemberService {
     public GetMemberRes findMemberByMemberId(Long memberId) {
 
         return memberMapper.selectMemberByMemberId(memberId);
+    }
+
+    /**
+     * 회원 정보 수정
+     * @param patchMemberReq 회원 수정 정보
+     */
+    @Override
+    public void modifyMember(PatchMemberReq patchMemberReq) {
+
+        PatchMemberReq member = PatchMemberReq.builder()
+                .memberId(patchMemberReq.getMemberId())
+                .password(passwordEncoder.encode(patchMemberReq.getPassword()))
+                .phoneNumber(patchMemberReq.getPhoneNumber())
+                .carNumber(patchMemberReq.getCarNumber())
+                .build();
+        memberMapper.updateMember(member);
     }
 }
