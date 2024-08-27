@@ -34,7 +34,7 @@ public class ShareCheckListController {
      * @param cartId 장바구니 ID
      * @return 공유 체크리스트 조회 결과 응답
      */
-    @GetMapping
+    @GetMapping("/{cartId}")
     public ResponseEntity<GetShareCheckListRes> findShareCheckList(@PathVariable Long cartId) {
         return ResponseEntity.ok(shareCheckListService.findShareCheckList(cartId));
     }

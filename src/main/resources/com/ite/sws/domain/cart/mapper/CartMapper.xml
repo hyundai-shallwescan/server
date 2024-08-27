@@ -42,9 +42,10 @@
 			   P.PRICE           AS productPrice,
 			   P.THUMBNAIL_IMAGE AS productThumbnail
 		FROM   CART_ITEM CI
-			   JOIN PRODUCT P ON CI.PRODUCT_ID = P.PRODUCT_ID
+			   JOIN PRODUCT ON CI.PRODUCT_ID = P.PRODUCT_ID
 		WHERE  CI.CART_ID = #{cartId}
-       	AND CI.IS_DELETED = 0
+			   AND CI.IS_DELETED = 0
+		ORDER  BY CI.CREATED_AT DESC
 	</select>
 
 	<!-- 새로운 장바구니 생성 -->

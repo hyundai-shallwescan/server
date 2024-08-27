@@ -14,6 +14,7 @@
  * 2024.08.27  김민정        최초 생성
  * 2024.08.27  김민정        장바구니가 존재하는지 확인
  * 2024.08.27  김민정        상품이 존재하는지 확인
+ * 2024.08.27  김민정        cartId에 해당하는 공유 체크리스트 아이템 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.checklist.mapper.ShareCheckListMapper">
@@ -32,4 +33,16 @@
 		WHERE  PRODUCT_ID = #{productId}
 	</select>
 
+	<!-- cartId에 해당하는 공유 체크리스트 아이템 조회 -->
+	<select id="selectShareCheckListByCartId" resultType="com.ite.sws.domain.checklist.vo.ShareCheckListVO">
+		SELECT SI.PRODUCT_ID     AS productId,
+			   P.NAME            AS productName,
+			   P.PRICE           AS productPrice,
+			   P.THUMBNAIL_IMAGE AS productThumbnail
+		FROM   SHARE_CHECK_LIST_ITEM SI
+			   JOIN PRODUCT P ON SI.PRODUCT_ID = P.PRODUCT_ID
+		WHERE  SI.CART_ID = #{cartId}
+			   AND SI.IS_DELETED = 0
+		ORDER  BY SI.CREATED_AT DESC
+	</select>
 </mapper>

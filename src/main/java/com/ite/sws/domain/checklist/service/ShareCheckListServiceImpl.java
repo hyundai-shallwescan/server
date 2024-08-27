@@ -2,11 +2,13 @@ package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
 import com.ite.sws.domain.checklist.mapper.ShareCheckListMapper;
+import com.ite.sws.domain.checklist.vo.ShareCheckListVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 /**
  * 공유 체크리스트 서비스 구현체
@@ -39,9 +41,10 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
         if (shareCheckListMapper.selectCountByCartId(cartId) == 0) {
             throw new CustomException(ErrorCode.CART_NOT_FOUND);
         }
-
-
-
-        return null;
+        List<ShareCheckListVO> items = shareCheckListMapper.selectShareCheckListByCartId(cartId);
+        return GetShareCheckListRes.builder()
+                .cartId(cartId)
+                .items(items)
+                .build();
     }
 }
