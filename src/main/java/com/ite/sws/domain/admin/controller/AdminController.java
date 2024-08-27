@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,12 +30,13 @@ import org.springframework.web.multipart.MultipartFile;
  *
  */
 @RequiredArgsConstructor
+@RequestMapping("/admins")
 @RestController
 public class AdminController {
 
   private final AdminService adminService;
 
-  @PutMapping(produces = {"multipart/form-data"}, value = "/admins/products")
+  @PutMapping(produces = {"multipart/form-data"}, value = "/products")
   public ResponseEntity<Void> addProduct(
       @RequestPart @Valid PostCreateProductReq postCreateReviewReq,
       @RequestPart MultipartFile thumbnail, @RequestPart MultipartFile descriptionImage) {
@@ -43,14 +45,14 @@ public class AdminController {
     return ResponseEntity.status(201).build();
   }
 
-  @DeleteMapping("/admins/products/{productId}")
+  @DeleteMapping("/products/{productId}")
   public ResponseEntity<Void> deleteProduct(
       @PathVariable Long productId) {
     adminService.deleteProduct(productId);
     return ResponseEntity.status(200).build();
   }
 
-  @PatchMapping("/admins/products/{productId}")
+  @PatchMapping("/products/{productId}")
   public ResponseEntity<Void> modifyProduct(
       @PathVariable Long productId,
       @RequestPart @Valid PatchProductReq patchProductReq,

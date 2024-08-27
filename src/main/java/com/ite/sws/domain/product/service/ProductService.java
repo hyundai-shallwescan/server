@@ -12,6 +12,7 @@ import com.ite.sws.domain.product.vo.ProductVO;
  * 수정일        	수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.23  	정은지        최초 생성
+ * 2024.08.27  	구지웅        기능 담당자 구지웅 작성
  * </pre>
  */
 public interface ProductService {
