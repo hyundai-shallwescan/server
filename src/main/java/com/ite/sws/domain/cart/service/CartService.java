@@ -1,6 +1,8 @@
 package com.ite.sws.domain.cart.service;
 
 import com.ite.sws.domain.cart.dto.GetCartRes;
+import com.ite.sws.domain.member.dto.JwtToken;
+import com.ite.sws.domain.member.dto.PostLoginReq;
 
 /**
  * 장바구니 서비스
@@ -23,4 +25,11 @@ public interface CartService {
      * @return 장바구니 아이템 리스트
      */
     GetCartRes findCartItemListByMemberId(Long memberId);
+
+    /**
+     * 장바구니 로그인 및 회원가입
+     * @param postLoginReq 아이디, 비밀번호
+     * @return JwtToken 객체
+     */
+    JwtToken findCartMemberByLoginId(PostLoginReq postLoginReq);
 }
