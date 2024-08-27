@@ -5,6 +5,8 @@ import com.ite.sws.domain.cart.dto.PostCartItemReq;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartVO;
+import com.ite.sws.exception.CustomException;
+import com.ite.sws.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +27,8 @@ import java.util.List;
  * 2024.08.26   김민정       새로운 장바구니 생성 기능 추가
  * 2024.08.26   김민정       MemberId로 장바구니 조회 기능 추가
  * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 수량 변경 기능 추가
+ * 2024.08.26  	김민정       장바구니 아이템 삭제
  * </pre>
  */
 @Service
@@ -66,6 +70,9 @@ public class CartServiceImpl implements CartService {
 
         // 바코드 번호로 상품 아이디 조회
         Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());
+        if (productId == null) {
+            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
 
         // 장바구니 아이템 생성 시 필요한 데이터 설정
         CartItemVO newCartItem = CartItemVO.builder()
@@ -108,5 +115,55 @@ public class CartServiceImpl implements CartService {
 
         // 새로 생성된 장바구니의 ID 반환
         return newCart.getCartId();
+    }
+
+    /**
+     * 장바구니 아이템 수량 변경
+     * @param cartId 장바구니 ID
+     * @param productId 상품 ID
+     * @param delta 수량 변화량 (+1, -1)
+     */
+    @Transactional
+    public void modifyCartItemQuantity(Long cartId, Long productId, int delta) {
+        // cartId가 유효한지 확인
+        if (cartMapper.selectCountByCartId(cartId) == 0) {
+            throw new CustomException(ErrorCode.CART_NOT_FOUND);
+        }
+
+        // productId가 유효한지 확인
+        if (cartMapper.selectProductByProductId(productId) == 0) {
+            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
+        CartItemVO modifyCartItem = CartItemVO.builder()
+                .cartId(cartId)
+                .productId(productId)
+                .quantity(delta)
+                .build();
+        cartMapper.updateCartItemQuantity(modifyCartItem);
+    }
+
+    /**
+     * 장바구니 아이템 삭제
+     * @param cartId 장바구니 ID
+     * @param productId 상품 ID
+     */
+    @Transactional
+    public void removeCartItem(Long cartId, Long productId) {
+        // cartId가 유효한지 확인
+        if (cartMapper.selectCountByCartId(cartId) == 0) {
+            throw new CustomException(ErrorCode.CART_NOT_FOUND);
+        }
+
+        // productId가 유효한지 확인
+        if (cartMapper.selectProductByProductId(productId) == 0) {
+            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
+        CartItemVO deleteCartItem = CartItemVO.builder()
+                .cartId(cartId)
+                .productId(productId)
+                .build();
+        cartMapper.deleteCartItem(deleteCartItem);
     }
 }

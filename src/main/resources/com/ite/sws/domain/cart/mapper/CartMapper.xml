@@ -16,6 +16,11 @@
  * 2024.08.26  김민정        Cart ID에 해당하는 장바구니 아이템 가져오기
  * 2024.08.26  김민정        새로운 장바구니 생성
  * 2024.08.26  김민정        장바구니 아이템 추가 및 수량 증가
+ * 2024.08.26  김민정        바코드로 상품 조회
+ * 2024.08.26  김민정        장바구니 아이템 수량 업데이트를 위한 프로시저 호출
+ * 2024.08.26  김민정        장바구니 아이템 삭제
+ * 2024.08.26  김민정        장바구니가 존재하는지 확인
+ * 2024.08.26  김민정        상품이 존재하는지 확인
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -55,19 +60,27 @@
 					 #{memberId})
 	</insert>
 
-	<!-- 장바구니 아이템 추가 및 수량 증가
+	<!-- 장바구니 아이템 추가 및 수량 증가 처리:
 	 	 (1) 새로운 아이템 생성
-     	 (2) 기존에 장바군에 해당 상품이 존재할 시, 수량 증가 -->
+     	 (2) 기존에 장바구니에 해당 상품이 존재할 시, 수량 증가
+     	  	- `IS_DELETED`가 0인 경우: 상품이 활성화된 상태이므로 수량을 증가
+     	  	- `IS_DELETED`가 1인 경우: 상품이 삭제된 상태였으므로, 수량을 1로 초기화하고 다시 활성화 -->
 	<update id="insertCartItem">
 		MERGE INTO CART_ITEM CI
-		USING (SELECT #{cartId}   AS cartId,
-					  #{productId} AS productId
+		USING (SELECT #{cartId}   AS CARTID,
+              		  #{productId} AS PRODUCTID
 			   FROM   DUAL) INPUT
-		ON ( CI.CART_ID = INPUT.cartId
-			AND CI.PRODUCT_ID = INPUT.productId )
+		ON (CI.CART_ID = INPUT.CARTID
+			AND CI.PRODUCT_ID = INPUT.PRODUCTID)
 		WHEN MATCHED THEN
-			UPDATE SET CI.QUANTITY = CI.QUANTITY + 1
+		-- 이미 존재하는 경우: IS_DELETED가 0일 경우에만 수량을 증가시킴
+			UPDATE SET CI.QUANTITY = CASE
+										WHEN CI.IS_DELETED = 0 THEN CI.QUANTITY + 1
+										ELSE 1  -- IS_DELETED가 1인 경우, 수량을 1로 초기화
+									END,
+					   CI.IS_DELETED = 0 -- 삭제된 상태에서 다시 활성화
 		WHEN NOT MATCHED THEN
+		  -- 존재하지 않는 경우 새로운 레코드 삽입
 			INSERT (CART_ID,
 					PRODUCT_ID)
 			VALUES (INPUT.CARTID,
@@ -77,8 +90,36 @@
 	<!-- 바코드로 상품 조회 -->
 	<select id="selectProductByBarcode" resultType="java.lang.Long">
 		SELECT PRODUCT_ID
-		FROM PRODUCT
-		WHERE BARCODE = #{barcode}
+		FROM   PRODUCT
+		WHERE  BARCODE = #{barcode}
+		  	   AND IS_DELETED = 0
+	</select>
+
+	<!-- 장바구니 아이템 수량 업데이트를 위한 프로시저 호출 -->
+	<update id="updateCartItemQuantity">
+		CALL PROC_UPDATE_CART_ITEM_QUANTITY(#{cartId}, #{productId}, #{quantity})
+	</update>
+
+	<!-- 장바구니 아이템 삭제 -->
+	<update id="deleteCartItem">
+		UPDATE CART_ITEM
+		SET    IS_DELETED = 1
+		WHERE  CART_ID = #{cartId}
+        	   AND PRODUCT_ID = #{productId}
+	</update>
+
+	<!-- 장바구니가 존재하는지 확인 -->
+	<select id="selectCountByCartId" resultType="int">
+		SELECT COUNT(1)
+		FROM   CART
+		WHERE  CART_ID = #{cartId}
+	</select>
+
+	<!-- 상품이 존재하는지 확인 -->
+	<select id="selectProductByProductId" resultType="int">
+		SELECT COUNT(1)
+		FROM   PRODUCT
+		WHERE  PRODUCT_ID = #{productId}
 	</select>
 
 </mapper>
