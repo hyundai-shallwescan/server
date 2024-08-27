@@ -2,6 +2,7 @@ package com.ite.sws.domain.product.service;
 
 import com.ite.sws.domain.product.dto.GetProductDetailRes;
 import com.ite.sws.domain.product.vo.ProductVO;
+import java.util.List;
 
 /**
  * 상품 서비스 인터페이스
@@ -19,4 +20,5 @@ import com.ite.sws.domain.product.vo.ProductVO;
 public interface ProductService {
     ProductVO findProduct(Long productId);
     GetProductDetailRes findProductDetail(Long productId);
+    List<ProductVO> findProductsByProductName(String productName);
 }
