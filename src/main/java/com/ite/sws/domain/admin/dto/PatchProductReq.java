@@ -1,14 +1,13 @@
 package com.ite.sws.domain.admin.dto;
 
+
 import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 /**
- * Product를 생성하기 위한 DTO
+ * Product를 업데이트하기 위한 Dto
  * @since 2024.08.26
  * @author 구지웅
  * @version 1.0
@@ -20,11 +19,11 @@ import lombok.NoArgsConstructor;
  *
  */
 
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class PostCreateProductReq {
+public class PatchProductReq {
+
   @NotNull
   private String name;
   @NotNull

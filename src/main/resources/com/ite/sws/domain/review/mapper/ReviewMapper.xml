@@ -4,7 +4,7 @@
 
 <mapper namespace="com.ite.sws.domain.review.mapper.ReviewMapper">
 
-    <insert id="createReview" parameterType="com.ite.sws.domain.review.vo.Review">
+    <insert id="createReview" parameterType="com.ite.sws.domain.review.vo.ReviewVO">
         INSERT INTO SHORT_FORM (
         SHORT_FORM_ID,
         PAYMENT_ITEM_ID,
@@ -53,5 +53,31 @@
         SET IS_DELETED = '1'
         WHERE SHORT_FORM_ID = #{shortFormId}
     </update>
+
+    <select id="findProductReviews" parameterType="java.util.Map"
+      resultType="com.ite.sws.domain.product.dto.GetProductReviewRes">
+        SELECT
+        r.SHORT_FORM_ID AS shortFormId,
+        r.PRODUCT_ID AS productId,
+        r.SHORT_FORM_URL AS shortFormUrl,
+        r.THUMBNAIL_IMAGE AS shortFormThumbnailImage,
+        r.CREATED_AT AS createdAt,
+        p.PRICE AS price,
+        p.NAME AS name,
+        p.THUMBNAIL_IMAGE AS productThumbnailImage,
+        p.DESCRIPTION_IMAGE AS descriptionImage,
+        p.BARCODE AS barcode,
+        p.DESCRIPTION AS description
+        FROM
+        SHORT_FORM r
+        JOIN
+        PRODUCT p ON r.PRODUCT_ID = p.PRODUCT_ID
+        WHERE
+        r.PRODUCT_ID = #{productId}
+        AND r.IS_DELETED = 0
+        ORDER BY
+        r.CREATED_AT DESC
+        OFFSET #{page} * #{size} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
 
 </mapper>

@@ -1,9 +1,16 @@
 package com.ite.sws.domain.product.service;
 
+import com.ite.sws.domain.product.dto.GetProductDetailRes;
+import com.ite.sws.domain.product.dto.GetProductReviewRes;
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.domain.product.vo.ProductVO;
+import com.ite.sws.domain.review.mapper.ReviewMapper;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -26,12 +33,34 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-    private final ProductMapper mapper;
+    private final ProductMapper productMapper;
+    private final ReviewMapper reviewMapper;
 
     @Override
     public ProductVO findProduct(Long productId) {
-        return mapper.selectProduct(productId).orElseThrow(() -> {
-            throw new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND);
-        });
+        Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);
+
+        return optionalProduct.orElseThrow(() ->
+            new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+    }
+
+    @Override
+    public GetProductDetailRes findProductDetail(Long productId) {
+        return productMapper.selectProductDetail(productId)
+            .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+    }
+
+    @Override
+    public List<ProductVO> findProductsByProductName(String productName) {
+        return productMapper.selectProductsByProductName(productName);
+    }
+
+    @Override
+    public List<GetProductReviewRes> findProductReviews(Long productId, int page, int size) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("productId", productId);
+        params.put("size", size);
+        params.put("page", page);
+        return reviewMapper.findProductReviews(params);
     }
 }
