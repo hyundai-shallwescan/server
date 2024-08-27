@@ -97,7 +97,7 @@
 
 	<!-- 장바구니 아이템 수량 업데이트를 위한 프로시저 호출 -->
 	<update id="updateCartItemQuantity">
-		CALL update_cart_item_quantity(#{cartId}, #{productId}, #{quantity})
+		CALL PROC_UPDATE_CART_ITEM_QUANTITY(#{cartId}, #{productId}, #{quantity})
 	</update>
 
 	<!-- 장바구니 아이템 삭제 -->
