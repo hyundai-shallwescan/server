@@ -1,5 +1,6 @@
 package com.ite.sws.domain.member.mapper;
 
+import com.ite.sws.domain.cart.vo.CartVO;
 import com.ite.sws.domain.member.dto.GetMemberRes;
 import com.ite.sws.domain.member.dto.PatchMemberReq;
 import com.ite.sws.domain.member.vo.AuthVO;
@@ -22,6 +23,7 @@ import java.util.Optional;
  * 2024.08.26   정은지        회원 정보 조회 기능 추가
  * 2024.08.26   정은지        회원 정보 수정 기능 추가
  * 2024.08.26   정은지        회원 탈퇴 기능 추가
+ * 2024.08.27   정은지        장바구니 생성 기능 추가
  * </pre>
  */
 
@@ -45,6 +47,13 @@ public interface MemberMapper {
      * @param auth 인증 정보
      */
     void insertAuth(AuthVO auth);
+
+
+    /**
+     * 장바구니 생성
+     * @param cart 장바구니
+     */
+    void insertCart(CartVO cart);
 
     /**
      * 로그인
@@ -71,4 +80,5 @@ public interface MemberMapper {
      * @param memberId 멤버 ID (PK)
      */
     void updateMemberStatus(Long memberId);
+
 }

@@ -1,5 +1,6 @@
 package com.ite.sws.domain.member.service;
 
+import com.ite.sws.domain.cart.vo.CartVO;
 import com.ite.sws.domain.member.dto.*;
 import com.ite.sws.domain.member.mapper.MemberMapper;
 import com.ite.sws.domain.member.vo.AuthVO;
@@ -15,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Optional;
 
 /**
@@ -63,6 +65,8 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public void addMember(PostMemberReq postMemberReq) {
+
+        // Member 테이블에 데이터 생성
         MemberVO member = MemberVO.builder()
                 .name(postMemberReq.getName())
                 .gender(postMemberReq.getGender())
@@ -73,6 +77,7 @@ public class MemberServiceImpl implements MemberService {
 
         memberMapper.insertMember(member);
 
+        // Auth 테이블에 데이터 생성
         AuthVO auth = AuthVO.builder()
                 .memberId(member.getMemberId())
                 .loginId(postMemberReq.getLoginId())
@@ -80,6 +85,13 @@ public class MemberServiceImpl implements MemberService {
                 .build();
 
         memberMapper.insertAuth(auth);
+
+        // Cart 테이블에 데이터 생성
+        CartVO cart = CartVO.builder()
+                .memberId(member.getMemberId())
+                .build();
+
+        memberMapper.insertCart(cart);
     }
 
     /**
@@ -157,5 +169,4 @@ public class MemberServiceImpl implements MemberService {
     public void modifyMemberStatus(Long memberId) {
         memberMapper.updateMemberStatus(memberId);
     }
-
 }

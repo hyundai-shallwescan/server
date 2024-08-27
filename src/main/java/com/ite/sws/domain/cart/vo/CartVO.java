@@ -27,6 +27,7 @@ public class CartVO {
     private Long cartId;
     private Long memberId;
     private String status;
+    private String cartUri;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
