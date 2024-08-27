@@ -1,5 +1,6 @@
 package com.ite.sws.domain.product.service;
 
+import com.ite.sws.domain.product.dto.GetProductDetailRes;
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
@@ -31,6 +32,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductVO findProduct(Long productId) {
         return mapper.selectProduct(productId).orElseThrow(() -> {
+            throw new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND);
+        });
+    }
+
+    @Override
+    public GetProductDetailRes findProductDetail(Long productId) {
+        return mapper.selectProductDetail(productId).orElseThrow(() -> {
             throw new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND);
         });
     }

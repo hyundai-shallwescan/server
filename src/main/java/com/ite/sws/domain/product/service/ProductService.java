@@ -1,5 +1,6 @@
 package com.ite.sws.domain.product.service;
 
+import com.ite.sws.domain.product.dto.GetProductDetailRes;
 import com.ite.sws.domain.product.vo.ProductVO;
 
 /**
@@ -17,4 +18,5 @@ import com.ite.sws.domain.product.vo.ProductVO;
  */
 public interface ProductService {
     ProductVO findProduct(Long productId);
+    GetProductDetailRes findProductDetail(Long productId);
 }
