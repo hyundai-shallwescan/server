@@ -12,22 +12,59 @@
  * 수정일        	수정자        수정내용
  * ==========  =========    =========
  * 2024.08.23  	정은지        최초 생성
+ * 2024.08.23  	구지웅        select query 수정
  * </pre>
  -->
  
 <mapper namespace="com.ite.sws.domain.product.mapper.ProductMapper">
  	<select id="selectProduct" resultType="com.ite.sws.domain.product.vo.ProductVO">
-		SELECT PRODUCT_ID,
-		       NAME,
-		       PRICE,
-		       THUMBNAIL_IMAGE,
-		       DESCRIPTION_IMAGE,
-		       BARCODE,
-		       DESCRIPTION,
-		       CREATED_AT,
-		       UPDATED_AT
-		FROM   PRODUCT
-		FETCH FIRST 1 ROWS ONLY
+		SELECT
+		PRODUCT_ID,
+		NAME,
+		PRICE,
+		THUMBNAIL_IMAGE,
+		DESCRIPTION_IMAGE,
+		BARCODE,
+		DESCRIPTION,
+		CREATED_AT,
+		UPDATED_AT
+		FROM PRODUCT
+		WHERE IS_DELETED NOT IN ('1') AND PRODUCT_ID = #{productId}
 	</select>
-	
+
+
+	<select id="selectProductDetail" parameterType="java.lang.Long"
+		resultType="com.ite.sws.domain.product.dto.GetProductDetailRes">
+		SELECT
+		PRODUCT_ID AS productId,
+		NAME AS name,
+		PRICE AS price,
+		THUMBNAIL_IMAGE AS thumbnailImage,
+		DESCRIPTION_IMAGE AS descriptionImage,
+		BARCODE AS barcode,
+		DESCRIPTION AS description,
+		CREATED_AT AS createdAt,
+		UPDATED_AT AS updatedAt
+		FROM
+		PRODUCT
+		WHERE
+		PRODUCT_ID = #{productId} AND IS_DELETED NOT IN ('1')
+	</select>
+<select id="selectProductsByProductName" parameterType="java.lang.String"
+	resultType="com.ite.sws.domain.product.vo.ProductVO">
+	SELECT
+	PRODUCT_ID AS productId,
+	NAME AS name,
+	PRICE AS price,
+	THUMBNAIL_IMAGE AS thumbnailImage,
+	DESCRIPTION_IMAGE AS descriptionImage,
+	BARCODE AS barcode,
+	DESCRIPTION AS description,
+	CREATED_AT AS createdAt,
+	UPDATED_AT AS updatedAt
+	FROM
+	PRODUCT
+	WHERE NAME LIKE CONCAT(#{productName}, '%') AND IS_DELETED NOT IN ('1')
+</select>
+
 </mapper>

@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * Review Detail을 얻기 위한 DTO
+ * ReviewVO Detail을 얻기 위한 DTO
  *
  * @author 구지웅
  * @version 1.0

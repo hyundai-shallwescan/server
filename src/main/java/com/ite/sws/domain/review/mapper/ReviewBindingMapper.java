@@ -2,7 +2,7 @@ package com.ite.sws.domain.review.mapper;
 
 
 import com.ite.sws.domain.review.dto.PostCreateReviewReq;
-import com.ite.sws.domain.review.vo.Review;
+import com.ite.sws.domain.review.vo.ReviewVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -25,9 +25,12 @@ public interface ReviewBindingMapper {
 
     ReviewBindingMapper INSTANCE = Mappers.getMapper(ReviewBindingMapper.class);
 
-    @Mapping(target = "shortFormId", ignore = true)
-    Review toEntity(PostCreateReviewReq postCreateReviewReq, String thumbnailImage,
+    @Mapping(target = "shortFormUrl", source = "shortFormUrl")
+    @Mapping(target = "thumbnailImage", source = "thumbnailImage")
+    ReviewVO combineIntoReviewVo(ReviewVO reviewReq, String thumbnailImage,
         String shortFormUrl);
+
+    ReviewVO toReviewVo(PostCreateReviewReq reviewReq);
 
 
 }

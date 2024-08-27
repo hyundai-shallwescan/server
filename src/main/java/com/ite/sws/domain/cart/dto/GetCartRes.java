@@ -1,12 +1,10 @@
 package com.ite.sws.domain.cart.dto;
 
-import com.ite.sws.domain.cart.vo.CartItemVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -27,6 +25,17 @@ import java.util.List;
 @Getter
 public class GetCartRes {
     private Long cartId;
-    private LocalDateTime createdAt;
-    private List<CartItemVO> items;
+    private List<GetCartItemRes> items;
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Getter
+    public static class GetCartItemRes {
+        private Long productId;
+        private int quantity;
+        private String productName;
+        private int productPrice;
+        private String productThumbnail;
+    }
 }
