@@ -54,4 +54,23 @@
         WHERE SHORT_FORM_ID = #{shortFormId}
     </update>
 
+    <select id="findProductReviews" parameterType="java.util.Map"
+      resultType="com.ite.sws.domain.review.dto.GetProductReviewRes">
+        SELECT
+        SHORT_FORM_ID AS shortFormId,
+        PAYMENT_ITEM_ID AS paymentItemId,
+        PRODUCT_ID AS productId,
+        SHORT_FORM_URL AS shortFormUrl,
+        THUMBNAIL_IMAGE AS thumbnailImage,
+        CREATED_AT AS createdAt
+        FROM
+        REVIEW
+        WHERE
+        PRODUCT_ID = #{productId}
+        AND IS_DELETED = 0
+        ORDER BY
+        CREATED_AT DESC
+        OFFSET #{page} * #{size} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
+
 </mapper>

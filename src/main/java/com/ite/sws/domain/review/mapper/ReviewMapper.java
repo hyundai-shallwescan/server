@@ -1,5 +1,6 @@
 package com.ite.sws.domain.review.mapper;
 
+import com.ite.sws.domain.product.dto.GetProductReviewRes;
 import com.ite.sws.domain.review.dto.GetReviewDetailRes;
 import com.ite.sws.domain.review.dto.GetReviewRes;
 import com.ite.sws.domain.review.vo.ReviewVO;
@@ -25,10 +26,11 @@ public interface ReviewMapper {
 
     void createReview(ReviewVO reviewVO);
 
-    List<GetReviewRes> getReviews(Map<String, Object> params);
+    List<GetReviewRes> getReviews(Map<String, Object> pagination);
 
     Optional<GetReviewDetailRes> getReviewDetail(Long reviewId);
 
     void deleteReview(Long reviewId);
 
+    List<GetProductReviewRes> findProductReviews(Long productId,Map<String,Object> pagination);
 }

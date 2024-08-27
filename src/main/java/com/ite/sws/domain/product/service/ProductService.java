@@ -1,6 +1,7 @@
 package com.ite.sws.domain.product.service;
 
 import com.ite.sws.domain.product.dto.GetProductDetailRes;
+import com.ite.sws.domain.product.dto.GetProductReviewRes;
 import com.ite.sws.domain.product.vo.ProductVO;
 import java.util.List;
 
@@ -21,4 +22,5 @@ public interface ProductService {
     ProductVO findProduct(Long productId);
     GetProductDetailRes findProductDetail(Long productId);
     List<ProductVO> findProductsByProductName(String productName);
+    List<GetProductReviewRes>findProductReviews(Long productId, int page, int size);
 }
