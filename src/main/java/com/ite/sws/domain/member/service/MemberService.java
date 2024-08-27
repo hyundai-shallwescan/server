@@ -16,6 +16,7 @@ import com.ite.sws.domain.member.dto.*;
  * 2024.08.25   정은지        로그인 기능 추가
  * 2024.08.26   정은지        회원 정보 조회 기능 추가
  * 2024.08.26   정은지        회원 정보 수정 기능 추가
+ * 2024.08.26   정은지        회원 탈퇴 기능 추가
  * </pre>
  */
 
@@ -43,7 +44,7 @@ public interface MemberService {
 
     /**
      * 멤버 아이디로 회원 정보 조회
-     * @param memberId 멤버 아이디
+     * @param memberId 멤버 ID (PK)
      * @return GetMemberRes 객체
      */
     GetMemberRes findMemberByMemberId(Long memberId);
@@ -53,4 +54,10 @@ public interface MemberService {
      * @param patchMemberReq 회원 수정 정보
      */
     void modifyMember(PatchMemberReq patchMemberReq);
+
+    /**
+     * 회원 탈퇴
+     * @param memberId 멤버 ID (PK)
+     */
+    void modifyMemberStatus(Long memberId);
 }

@@ -33,6 +33,7 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * 2024.08.25   정은지        로그인 API 생성
  * 2024.08.26   정은지        회원 정보 조회 API 생성
  * 2024.08.26   정은지        회원 정보 수정 API 생성
+ * 2024.08.26   정은지        회원 탈퇴 기능 API 생성
  * </pre>
  */
 
@@ -121,6 +122,18 @@ public class MemberController {
         Long memberId = SecurityUtil.getCurrentMemberId();
         patchMemberReq.setMemberId(memberId);
         memberService.modifyMember(patchMemberReq);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 회원 탈퇴 API
+     * @return 회원 탈퇴 처리 결과 응답
+     */
+    @DeleteMapping
+    public ResponseEntity<Void> modifyMemberStatus() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        memberService.modifyMemberStatus(memberId);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
