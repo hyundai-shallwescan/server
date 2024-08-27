@@ -1,6 +1,7 @@
 package com.ite.sws.domain.admin.service;
 
 
+import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
 import com.ite.sws.domain.admin.dto.PatchProductReq;
 import com.ite.sws.domain.admin.dto.PostCreateProductReq;
 import java.util.List;
@@ -19,9 +20,12 @@ import org.springframework.web.multipart.MultipartFile;
  */
 
 public interface AdminService {
-   void addProduct(PostCreateProductReq postCreateProductReq,List<MultipartFile> fileList);
 
-   void deleteProduct(Long productId);
+  void addProduct(PostCreateProductReq postCreateProductReq, List<MultipartFile> fileList);
 
-   void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
+  void deleteProduct(Long productId);
+
+  void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
+
+  List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long memberId);
 }

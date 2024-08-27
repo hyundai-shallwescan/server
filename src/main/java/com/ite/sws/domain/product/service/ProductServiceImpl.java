@@ -41,13 +41,13 @@ public class ProductServiceImpl implements ProductService {
         Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);
 
         return optionalProduct.orElseThrow(() ->
-            new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+            new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
     @Override
     public GetProductDetailRes findProductDetail(Long productId) {
         return productMapper.selectProductDetail(productId)
-            .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+            .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
     @Override
