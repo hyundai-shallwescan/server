@@ -32,5 +32,5 @@ public interface ReviewMapper {
 
     void deleteReview(Long reviewId);
 
-    List<GetProductReviewRes> findProductReviews(Long productId,Map<String,Object> pagination);
+    List<GetProductReviewRes> findProductReviews(Map<String,Object> pagination);
 }

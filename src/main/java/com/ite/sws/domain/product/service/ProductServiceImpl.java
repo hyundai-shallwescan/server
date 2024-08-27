@@ -10,6 +10,7 @@ import com.ite.sws.exception.ErrorCode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
@@ -37,16 +38,16 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductVO findProduct(Long productId) {
-        return productMapper.selectProduct(productId).orElseThrow(() -> {
-            throw new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND);
-        });
+        Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);
+
+        return optionalProduct.orElseThrow(() ->
+            new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
     }
 
     @Override
     public GetProductDetailRes findProductDetail(Long productId) {
-        return productMapper.selectProductDetail(productId).orElseThrow(() -> {
-            throw new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND);
-        });
+        return productMapper.selectProductDetail(productId)
+            .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
     }
 
     @Override
@@ -56,9 +57,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<GetProductReviewRes> findProductReviews(Long productId, int page, int size) {
-        Map<String, Object> pagination = new HashMap<>();
-        pagination.put("size", size);
-        pagination.put("page", page);
-        return reviewMapper.findProductReviews(productId, pagination);
+        Map<String, Object> params = new HashMap<>();
+        params.put("productId", productId);
+        params.put("size", size);
+        params.put("page", page);
+        return reviewMapper.findProductReviews(params);
     }
 }

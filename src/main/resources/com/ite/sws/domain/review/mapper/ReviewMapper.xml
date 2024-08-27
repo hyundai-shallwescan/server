@@ -55,21 +55,28 @@
     </update>
 
     <select id="findProductReviews" parameterType="java.util.Map"
-      resultType="com.ite.sws.domain.review.dto.GetProductReviewRes">
+      resultType="com.ite.sws.domain.product.dto.GetProductReviewRes">
         SELECT
-        SHORT_FORM_ID AS shortFormId,
-        PAYMENT_ITEM_ID AS paymentItemId,
-        PRODUCT_ID AS productId,
-        SHORT_FORM_URL AS shortFormUrl,
-        THUMBNAIL_IMAGE AS thumbnailImage,
-        CREATED_AT AS createdAt
+        r.SHORT_FORM_ID AS shortFormId,
+        r.PRODUCT_ID AS productId,
+        r.SHORT_FORM_URL AS shortFormUrl,
+        r.THUMBNAIL_IMAGE AS shortFormThumbnailImage,
+        r.CREATED_AT AS createdAt,
+        p.PRICE AS price,
+        p.NAME AS name,
+        p.THUMBNAIL_IMAGE AS productThumbnailImage,
+        p.DESCRIPTION_IMAGE AS descriptionImage,
+        p.BARCODE AS barcode,
+        p.DESCRIPTION AS description
         FROM
-        REVIEW
+        SHORT_FORM r
+        JOIN
+        PRODUCT p ON r.PRODUCT_ID = p.PRODUCT_ID
         WHERE
-        PRODUCT_ID = #{productId}
-        AND IS_DELETED = 0
+        r.PRODUCT_ID = #{productId}
+        AND r.IS_DELETED = 0
         ORDER BY
-        CREATED_AT DESC
+        r.CREATED_AT DESC
         OFFSET #{page} * #{size} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 

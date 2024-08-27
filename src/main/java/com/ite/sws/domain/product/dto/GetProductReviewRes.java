@@ -11,10 +11,14 @@ import lombok.NoArgsConstructor;
 public class GetProductReviewRes {
 
   private Long shortFormId;
-  private Long paymentItemId;
   private Long productId;
   private String shortFormUrl;
-  private String thumbnailImage;
+  private String shortFormThumbnailImage;
   private LocalDateTime createdAt;
-
+  private Long price;
+  private String name;
+  private String productThumbnailImage;
+  private String descriptionImage;
+  private String barcode;
+  private String description;
 }

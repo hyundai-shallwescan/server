@@ -10,6 +10,7 @@ import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -53,16 +54,17 @@ public class AdminServiceImpl implements AdminService {
       List<MultipartFile> fileList) {
     findProductHelper(productId);
     productUploader.upload(
-        AdminBindingMapper.INSTANCE.toWithoutThumbnailAndDescriptionImage(patchProductReq,productId),
+        AdminBindingMapper.INSTANCE.toWithoutThumbnailAndDescriptionImage(patchProductReq,
+            productId),
         fileList, UploadCommand.UPDATE);
 
   }
 
+  private void findProductHelper(Long productId) {
+    Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);
 
-  private ProductVO findProductHelper(Long productId) {
-    return productMapper.selectProduct(productId).orElseThrow(() -> {
-      throw new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND);
-    });
+    optionalProduct.orElseThrow(() ->
+        new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
 
   }
 
