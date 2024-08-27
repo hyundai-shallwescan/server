@@ -21,6 +21,7 @@ import java.util.Optional;
  * 2024.08.25   정은지        로그인 기능 추가
  * 2024.08.26   정은지        회원 정보 조회 기능 추가
  * 2024.08.26   정은지        회원 정보 수정 기능 추가
+ * 2024.08.26   정은지        회원 탈퇴 기능 추가
  * </pre>
  */
 
@@ -64,4 +65,10 @@ public interface MemberMapper {
      * @param patchMemberReq 회원 수정 정보
      */
     void updateMember(PatchMemberReq patchMemberReq);
+
+    /**
+     * 회원 탈퇴
+     * @param memberId 멤버 ID (PK)
+     */
+    void updateMemberStatus(Long memberId);
 }
