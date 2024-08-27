@@ -28,6 +28,9 @@ import org.springframework.web.multipart.support.MissingServletRequestPartExcept
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	김민정      최초 생성
+ * 2024.08.24  	김민정      커스텀 예외 처리
+ * 2024.08.24  	김민정      NullPointerException 처리
+ * 2024.08.24  	김민정      그 외의 모든 예외 처리
  * 2024.08.25   김민정      SQL Exception 처리
  * </pre>
  */

@@ -1,13 +1,10 @@
 package com.ite.sws.exception;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * 에러 코드
@@ -20,6 +17,7 @@ import org.springframework.http.HttpStatus;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	김민정      최초 생성
+ * 2024.08.25   정은지      로그인 필요 에러 코드 추가
  * </pre>
  */
 @Getter
@@ -32,19 +30,20 @@ public enum ErrorCode {
     ALL_FILE_AND_INFO_SHOULD_BE_IN_REQUEST(BAD_REQUEST.value(), "파일과 모든 정보를 입력해야합니다."),
     NO_COMMAND(BAD_REQUEST.value(), "존재하지 않은 명령어입니다."),
 
-
-    /* 403: Forbidden */
-    FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),
-
     /* 401: Unauthorized */
+    REQUIRED_LOGIN(UNAUTHORIZED.value(), "로그인이 필요합니다."),
     UNAUTHORIZED_ACCESS(UNAUTHORIZED.value(), "인증이 필요합니다."),
     FCM_TOKEN_EXPIRED(UNAUTHORIZED.value(), "FCM 토큰이 만료되었습니다."),
     MEMBER_NOT_FOUND(UNAUTHORIZED.value(), "회원 정보를 찾을 수 없습니다."),
 
-    /* NOT FOUND*/
+    /* 403: Forbidden */
+    FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),
+
+    /* 404: NOT FOUND*/
+    PRODUCT_NOT_FOUND(NOT_FOUND.value(), "상품이 존재하지 않습니다."),
+    CART_NOT_FOUND(NOT_FOUND.value(), "장바구니가 존재하지 않습니다."),
     REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(), "리뷰가 존재하지 않습니다."),
     PRODUCT_IS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "상품이 존재하지 않습니다."),
-
 
     /* 409: Conflict */
     LOGIN_ID_ALREADY_EXISTS(CONFLICT.value(), "이미 존재하는 아이디입니다."),

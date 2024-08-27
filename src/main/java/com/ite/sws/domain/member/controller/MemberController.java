@@ -1,20 +1,24 @@
 package com.ite.sws.domain.member.controller;
 
+import com.ite.sws.domain.member.dto.GetMemberRes;
+import com.ite.sws.domain.member.dto.JwtToken;
+import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.member.dto.PostMemberReq;
 import com.ite.sws.domain.member.service.MemberService;
 import com.ite.sws.exception.CustomException;
-import com.ite.sws.exception.ErrorResponse;
+import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.ite.sws.exception.ErrorCode.INTERNAL_SERVER_ERROR;
 import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
@@ -30,6 +34,8 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
  * 2024.08.24  	정은지        아이디 중복 확인 및 회원가입 API 생성
+ * 2024.08.25   정은지        로그인 API 생성
+ * 2024.08.26   정은지        회원 정보 조회 API 생성
  * </pre>
  */
 
@@ -44,12 +50,12 @@ public class MemberController {
     private final MemberService memberService;
 
     /**
-     * 로그인 아이디 중복 체크
+     * 로그인 아이디 중복 체크 API
      * @param loginId 로그인 아이디
      * @return 중복 여부 응답
      */
     @GetMapping("/check-id")
-    public ResponseEntity<String> checkLoginId(@RequestParam("login-id") String loginId) {
+    public ResponseEntity<?> isLoginIdAvailable(@RequestParam("login-id") String loginId) {
         boolean isAvailable = memberService.isLoginIdAvailable(loginId);
 
         if (isAvailable) {
@@ -60,36 +66,55 @@ public class MemberController {
     }
 
     /**
-     * 회원가입
+     * 회원가입 API
      * @param postMemberReq 회원 정보 객체
      * @param bindingResult 유효성 검사 결과
      * @return 회원가입 결과 응답
      */
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@Valid @RequestBody PostMemberReq postMemberReq, BindingResult bindingResult) {
+    public ResponseEntity<?> addMember(@Valid @RequestBody PostMemberReq postMemberReq, BindingResult bindingResult) {
 
         // 유효성 검사 실패 시
         if (bindingResult.hasErrors()) {
-            String errors = bindingResult.getFieldErrors().stream()
-                    .map(error -> String.format("{\"field\":\"%s\", \"message\":\"%s\"}", error.getField(), error.getDefaultMessage()))
-                    .collect(Collectors.joining(", "));
-
-            ErrorResponse errorResponse = ErrorResponse.builder()
-                    .status(HttpStatus.BAD_REQUEST.value())
-                    .errorCode("VALIDATION_ERROR")
-                    .message(String.format("[%s]", errors))
-                    .build();
-
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
         }
 
         try {
-            memberService.registerMember(postMemberReq);
+            memberService.addMember(postMemberReq);
             log.info("회원가입 성공 : {}", postMemberReq.getLoginId());
             return ResponseEntity.status(HttpStatus.OK).build();
         } catch (Exception e) {
             log.error("회원가입 실패: {}", e.getMessage());
             throw new CustomException(INTERNAL_SERVER_ERROR);
         }
+    }
+
+    /**
+     * 로그인 API
+     * @param postLoginReq 로그인 아이디, 비밀번호
+     * @return JwtToken 객체
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> findMemberByLoginId(@RequestBody PostLoginReq postLoginReq) {
+
+        log.info("LOGIN 정보", postLoginReq);
+
+        JwtToken token = memberService.findMemberByLoginId(postLoginReq);
+        return ResponseEntity.ok(token);
+    }
+
+    /**
+     * 회원 정보 조회 API
+     * @return GetMemberRes 객체
+     */
+    @GetMapping
+    public ResponseEntity<GetMemberRes> findMemberByMemberId() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        GetMemberRes member = memberService.findMemberByMemberId(memberId);
+        return ResponseEntity.status(HttpStatus.OK).body(member);
     }
 }

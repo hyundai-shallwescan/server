@@ -13,7 +13,7 @@ import lombok.Getter;
  * <pre>
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
- * 2024.08.24  	김민정      최초 생성
+ * 2024.08.24  	김민정       최초 생성
  * </pre>
  */
 @Getter
@@ -23,4 +23,5 @@ public class ErrorResponse {
     private final int status;
     private final String errorCode;
     private final String message;
+
 }

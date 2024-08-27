@@ -1,5 +1,6 @@
 package com.ite.sws.domain.member.mapper;
 
+import com.ite.sws.domain.member.dto.GetMemberRes;
 import com.ite.sws.domain.member.vo.AuthVO;
 import com.ite.sws.domain.member.vo.MemberVO;
 
@@ -16,6 +17,8 @@ import java.util.Optional;
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
  * 2024.08.24   정은지        중복 아이디 체크 및 회원가입 기능 추가
+ * 2024.08.25   정은지        로그인 기능 추가
+ * 2024.08.26   정은지        회원 정보 조회 기능 추가
  * </pre>
  */
 
@@ -24,4 +27,6 @@ public interface MemberMapper {
     int selectCountByLoginId(String loginId);
     void insertMember(MemberVO member);
     void insertAuth(AuthVO auth);
+    Optional<AuthVO> selectMemberByLoginId(String loginId);
+    GetMemberRes selectMemberByMemberId(Long memberId);
 }
