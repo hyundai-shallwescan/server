@@ -1,7 +1,18 @@
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "classpath:/org/apache/ibatis/builder/xml/mybatis-3-mapper.dtd">
-
+<!--
+* Payment 관련 Mybatis Mapper
+* @since 2024.08.26
+* @author 구지웅
+* @version 1.0
+* <pre>
+* 수정일        수정자        수정내용
+* 2024.08.26  	구지웅      최초 생성 및 유저 결제 내역 조회 기능 추가
+* </pre>
+* -->
 <mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
 
   <select id="selectMemberPaymentHistory" parameterType="java.lang.Long"
