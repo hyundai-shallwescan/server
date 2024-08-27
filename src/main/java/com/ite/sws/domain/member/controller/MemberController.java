@@ -1,9 +1,6 @@
 package com.ite.sws.domain.member.controller;
 
-import com.ite.sws.domain.member.dto.GetMemberRes;
-import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
-import com.ite.sws.domain.member.dto.PostMemberReq;
+import com.ite.sws.domain.member.dto.*;
 import com.ite.sws.domain.member.service.MemberService;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.util.SecurityUtil;
@@ -20,7 +17,6 @@ import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.ite.sws.exception.ErrorCode.INTERNAL_SERVER_ERROR;
 import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
 
 /**
@@ -36,6 +32,7 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * 2024.08.24  	정은지        아이디 중복 확인 및 회원가입 API 생성
  * 2024.08.25   정은지        로그인 API 생성
  * 2024.08.26   정은지        회원 정보 조회 API 생성
+ * 2024.08.26   정은지        회원 정보 수정 API 생성
  * </pre>
  */
 
@@ -74,23 +71,13 @@ public class MemberController {
     @PostMapping("/signup")
     public ResponseEntity<?> addMember(@Valid @RequestBody PostMemberReq postMemberReq, BindingResult bindingResult) {
 
-        // 유효성 검사 실패 시
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            for (FieldError error : bindingResult.getFieldErrors()) {
-                errors.put(error.getField(), error.getDefaultMessage());
-            }
-            return ResponseEntity.badRequest().body(errors);
+        ResponseEntity<?> errorResponse = handleValidationErrors(bindingResult);
+        if (errorResponse != null) {
+            return errorResponse;
         }
 
-        try {
-            memberService.addMember(postMemberReq);
-            log.info("회원가입 성공 : {}", postMemberReq.getLoginId());
-            return ResponseEntity.status(HttpStatus.OK).build();
-        } catch (Exception e) {
-            log.error("회원가입 실패: {}", e.getMessage());
-            throw new CustomException(INTERNAL_SERVER_ERROR);
-        }
+        memberService.addMember(postMemberReq);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**
@@ -116,5 +103,41 @@ public class MemberController {
         Long memberId = SecurityUtil.getCurrentMemberId();
         GetMemberRes member = memberService.findMemberByMemberId(memberId);
         return ResponseEntity.status(HttpStatus.OK).body(member);
+    }
+
+    /**
+     * 회원 정보 수정 API
+     * @param patchMemberReq 회원 수정 정보
+     * @param bindingResult 유효성 검사 결과
+     */
+    @PatchMapping
+    public ResponseEntity<?> modifyMember(@Valid @RequestBody PatchMemberReq patchMemberReq, BindingResult bindingResult) {
+
+        ResponseEntity<?> errorResponse = handleValidationErrors(bindingResult);
+        if (errorResponse != null) {
+            return errorResponse;
+        }
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        patchMemberReq.setMemberId(memberId);
+        memberService.modifyMember(patchMemberReq);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 유효성 검사 실패 처리 메서드
+     * @param bindingResult
+     * @return
+     */
+    private ResponseEntity<?> handleValidationErrors(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+        return null;
     }
 }
