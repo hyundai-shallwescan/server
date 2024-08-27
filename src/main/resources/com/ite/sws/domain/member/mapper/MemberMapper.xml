@@ -14,6 +14,8 @@
 * 2024.08.24  	정은지        최초 생성
 * 2024.08.24    정은지        중복 아이디 체크 및 회원가입 기능 추가
 * 2024.08.25    정은지        로그인 기능 추가
+* 2024.08.26    정은지        회원 정보 조회 기능 추가
+* 2024.08.26    정은지        회원 정보 수정 기능 추가
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.member.mapper.MemberMapper">
@@ -77,4 +79,14 @@
                    JOIN MEMBER M ON A.MEMBER_ID = M.MEMBER_ID
         WHERE  M.MEMBER_ID = #{memberId}
     </select>
+
+    <!-- 회원 정보 수정 -->
+    <update id="updateMember">
+        CALL PROC_UPDATE_MEMBER_AND_AUTH(
+                #{memberId, jdbcType=NUMERIC},
+                #{phoneNumber, jdbcType=VARCHAR},
+                #{carNumber, jdbcType=VARCHAR},
+                #{password, jdbcType=VARCHAR}
+             )
+    </update>
 </mapper>
