@@ -15,6 +15,8 @@
  * 2024.08.26  김민정        ACTIVE 상태인 가장 최신의 Cart ID를 가져오기
  * 2024.08.26  김민정        Cart ID에 해당하는 장바구니 아이템 가져오기
  * 2024.08.26  김민정        새로운 장바구니 생성
+ * 2024.08.26  남진수        장바구니 회원가입
+ * 2024.08.26  남진수        장바구니 로그인
  * 2024.08.26  김민정        장바구니 아이템 추가 및 수량 증가
  * 2024.08.26  김민정        바코드로 상품 조회
  * 2024.08.26  김민정        장바구니 아이템 수량 업데이트를 위한 프로시저 호출
@@ -59,6 +61,30 @@
 		VALUES      (#{cartId},
 					 #{memberId})
 	</insert>
+
+	<!-- 장바구니 회원가입 -->
+	<insert id="insertCartMember">
+		INSERT INTO CART_MEMBER
+					(CART_MEMBER_ID,
+					 CART_ID,
+					 NAME,
+					 PASSWORD)
+		VALUES      (SEQ_CART_MEMBER_ID.NEXTVAL,
+		             #{cartId},
+					 #{name},
+					 #{password})
+	</insert>
+
+	<!-- 장바구니 로그인 -->
+	<select id="selectCartMemberByLoginId">
+		SELECT CART_MEMBER_ID,
+			   CART_ID,
+			   NAME,
+			   PASSWORD,
+			   CREATED_AT
+		FROM   CART_MEMBER
+		WHERE  NAME = #{loginId}
+	</select>
 
 	<!-- 장바구니 아이템 추가 및 수량 증가 처리:
 	 	 (1) 새로운 아이템 생성

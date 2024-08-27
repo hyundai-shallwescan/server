@@ -1,9 +1,13 @@
 package com.ite.sws.config.security;
 
+import com.ite.sws.domain.cart.service.CartUserDetailsService;
+import com.ite.sws.domain.member.service.CustomUserDetailsService;
 import com.ite.sws.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -21,6 +25,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * 수정일        	수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
+ * 2024.08.27  	남진수        HttpSecurity 장바구니 설정 추가
  * </pre>
  */
 
@@ -29,6 +34,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final CustomUserDetailsService customUserDetailsService;
+    private final CartUserDetailsService cartUserDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
@@ -36,6 +43,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    /**
+     * AuthenticationManagerBuilder 설정
+     * 사용자 인증을 위한 UserDetailsService와 PasswordEncoder 설정
+     * @param auth AuthenticationManagerBuilder 객체
+     * @throws Exception exception
+     */
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.userDetailsService(customUserDetailsService)
+                .passwordEncoder(passwordEncoder());
+
+        auth.userDetailsService(cartUserDetailsService)
+                .passwordEncoder(passwordEncoder());
     }
 
     /**
@@ -54,6 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/**").permitAll();
 //                .antMatchers("/members/signup", "/members/check-id", "/members/login", "/members/logout").permitAll()
 //                .antMatchers("/admins/**").hasRole("ADMIN")
+//                .antMatchers("/carts/**").hasRole("CART_USER")
 //                .anyRequest().hasAnyRole("ADMIN", "USER");
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -62,5 +85,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .accessDeniedHandler(customAccessDeniedHandler)
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+    }
+
+    /**
+     * AuthenticationManager 빈 등록
+     * @return AuthenticationManager
+     * @throws Exception exception
+     */
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 }
