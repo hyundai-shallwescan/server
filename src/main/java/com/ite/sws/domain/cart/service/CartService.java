@@ -1,6 +1,8 @@
 package com.ite.sws.domain.cart.service;
 
 import com.ite.sws.domain.cart.dto.GetCartRes;
+import com.ite.sws.domain.member.dto.JwtToken;
+import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.cart.dto.PostCartItemReq;
 
 /**
@@ -17,6 +19,7 @@ import com.ite.sws.domain.cart.dto.PostCartItemReq;
  * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
  * 2024.08.26  	김민정       장바구니 아이템 수량 변경
  * 2024.08.26  	김민정       장바구니 아이템 삭제
+ * 2024.08.26   남진수       장바구니 로그인 및 회원가입 기능 추가
  * </pre>
  */
 public interface CartService {
@@ -48,4 +51,11 @@ public interface CartService {
      * @param productId 상품 ID
      */
     void removeCartItem(Long cartId, Long productId);
+  
+    /**
+     * 장바구니 로그인 및 회원가입
+     * @param postLoginReq 아이디, 비밀번호
+     * @return JwtToken 객체
+     */
+    JwtToken findCartMemberByLoginId(PostLoginReq postLoginReq);
 }

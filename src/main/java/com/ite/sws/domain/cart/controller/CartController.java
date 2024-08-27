@@ -3,9 +3,12 @@ package com.ite.sws.domain.cart.controller;
 import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.cart.dto.PostCartItemReq;
 import com.ite.sws.domain.cart.service.CartService;
+import com.ite.sws.domain.member.dto.JwtToken;
+import com.ite.sws.domain.member.dto.PostLoginReq;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  * ----------  --------    ---------------------------
  * 2024.08.26  	김민정       최초 생성
  * 2024.08.26  	김민정       장바구니 조회 API 생성
+ * 2024.08.26   남진수       장바구니 로그인 API 생성
  * 2024.08.26  	김민정       장바구니 항목 추가 및 수량 증가 API 생성
  * 2024.08.26  	김민정       장바구니 수량 변경 API 생성
  * 2024.08.26  	김민정       장바구니 아이템 삭제 API 생성
@@ -48,6 +52,17 @@ public class CartController {
     public ResponseEntity<GetCartRes> findCartItemList(@RequestParam Long memberId) {
         // TODO: memberId 파라미터 제거
         return ResponseEntity.ok(cartService.findCartItemList(memberId));
+    }
+  
+    /**
+     * 장바구니 로그인 및 회원가입
+     * @param postLoginReq 아이디, 비밀번호
+     * @return JwtToken 객체
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> findMemberByLoginId(@RequestBody PostLoginReq postLoginReq) {
+        JwtToken token = cartService.findCartMemberByLoginId(postLoginReq);
+        return ResponseEntity.ok(token);
     }
 
     /**

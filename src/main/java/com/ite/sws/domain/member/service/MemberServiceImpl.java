@@ -9,13 +9,12 @@ import com.ite.sws.exception.ErrorCode;
 import com.ite.sws.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Optional;
 
 /**
@@ -33,6 +32,7 @@ import java.util.Optional;
  * 2024.08.26   정은지        회원 정보 조회 기능 추가
  * 2024.08.26   정은지        회원 정보 수정 기능 추가
  * 2024.08.26   정은지        회원 탈퇴 기능 추가
+ * 2024.08.27   남진수        AuthenticationManager로 변경
  * </pre>
  */
 
@@ -43,7 +43,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberMapper memberMapper;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
@@ -114,7 +114,7 @@ public class MemberServiceImpl implements MemberService {
 
         // 실제 검증
         // authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
         // 인증 정보를 기반으로 JWT 토큰 생성
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId());
