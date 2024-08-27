@@ -126,12 +126,12 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void modifyCartItemQuantity(Long cartId, Long productId, int delta) {
         // cartId가 유효한지 확인
-        if (cartMapper.existsCart(cartId) == 0) {
+        if (cartMapper.selectCountByCartId(cartId) == 0) {
             throw new CustomException(ErrorCode.CART_NOT_FOUND);
         }
 
         // productId가 유효한지 확인
-        if (cartMapper.existsProduct(productId) == 0) {
+        if (cartMapper.selectProductByProductId(productId) == 0) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 
@@ -151,12 +151,12 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public void removeCartItem(Long cartId, Long productId) {
         // cartId가 유효한지 확인
-        if (cartMapper.existsCart(cartId) == 0) {
+        if (cartMapper.selectCountByCartId(cartId) == 0) {
             throw new CustomException(ErrorCode.CART_NOT_FOUND);
         }
 
         // productId가 유효한지 확인
-        if (cartMapper.existsProduct(productId) == 0) {
+        if (cartMapper.selectProductByProductId(productId) == 0) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 

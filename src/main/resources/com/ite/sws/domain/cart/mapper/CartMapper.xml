@@ -109,14 +109,14 @@
 	</update>
 
 	<!-- 장바구니가 존재하는지 확인 -->
-	<select id="existsCart" resultType="int">
+	<select id="selectCountByCartId" resultType="int">
 		SELECT COUNT(1)
 		FROM   CART
 		WHERE  CART_ID = #{cartId}
 	</select>
 
 	<!-- 상품이 존재하는지 확인 -->
-	<select id="existsProduct" resultType="int">
+	<select id="selectProductByProductId" resultType="int">
 		SELECT COUNT(1)
 		FROM   PRODUCT
 		WHERE  PRODUCT_ID = #{productId}

@@ -80,12 +80,12 @@ public interface CartMapper {
      * @param cartId 장바구니 ID
      * @return
      */
-    int existsCart(@Param("cartId") Long cartId);
+    int selectCountByCartId(@Param("cartId") Long cartId);
 
     /**
      * 상품이 존재하는지 확인
      * @param productId 상품 ID
      * @return
      */
-    int existsProduct(@Param("productId") Long productId);
+    int selectProductByProductId(@Param("productId") Long productId);
 }
