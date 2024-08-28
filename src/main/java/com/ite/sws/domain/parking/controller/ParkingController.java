@@ -57,7 +57,7 @@ public class ParkingController {
      * @return ResponseEntity<GetParkingRes>
      */
     @GetMapping
-    public ResponseEntity<GetParkingRes> timeout() {
+    public ResponseEntity<GetParkingRes> findMyParkingPaymentInformation() {
         Long memberId = SecurityUtil.getCurrentMemberId();
         GetParkingRes getParkingRes = parkingService.findParkingInformation(memberId);
         return ResponseEntity.ok(getParkingRes);
