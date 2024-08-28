@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
@@ -136,6 +137,18 @@ public class MemberController {
         memberService.modifyMemberStatus(memberId);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 구매 내역 조회 API
+     * @return List<GetMemberPaymentRes> 구매 내역 리스트
+     */
+    @GetMapping("/payments")
+    public ResponseEntity<List<GetMemberPaymentRes>> findPaymentItemListByPaymentId() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<GetMemberPaymentRes> paymentHistory = memberService.findPaymentItemListByPaymentId(memberId);
+
+        return ResponseEntity.ok(paymentHistory);
     }
 
     /**

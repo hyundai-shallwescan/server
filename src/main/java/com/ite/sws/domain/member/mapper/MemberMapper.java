@@ -1,11 +1,13 @@
 package com.ite.sws.domain.member.mapper;
 
 import com.ite.sws.domain.cart.vo.CartVO;
+import com.ite.sws.domain.member.dto.GetMemberPaymentRes;
 import com.ite.sws.domain.member.dto.GetMemberRes;
 import com.ite.sws.domain.member.dto.PatchMemberReq;
 import com.ite.sws.domain.member.vo.AuthVO;
 import com.ite.sws.domain.member.vo.MemberVO;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -81,4 +83,17 @@ public interface MemberMapper {
      */
     void updateMemberStatus(Long memberId);
 
+    /**
+     * 회원 구매 내역 조회
+     * @param memberId 멤버 ID
+     * @return GetMemberPaymentRes 객체
+     */
+    List<GetMemberPaymentRes> selectPaymentListByMemberID(Long memberId);
+
+    /**
+     * 회원 구매 내역 아이템 조회
+     * @param paymentId 결제 ID
+     * @return GetMemberPaymentItemRes 객체
+     */
+    List<GetMemberPaymentRes.GetMemberPaymentItemRes> selectPaymentItemByPaymentId(Long paymentId);
 }

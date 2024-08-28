@@ -2,6 +2,8 @@ package com.ite.sws.domain.member.service;
 
 import com.ite.sws.domain.member.dto.*;
 
+import java.util.List;
+
 /**
  * 회원 서비스
  * @author 정은지
@@ -60,4 +62,12 @@ public interface MemberService {
      * @param memberId 멤버 ID (PK)
      */
     void modifyMemberStatus(Long memberId);
+
+
+    /**
+     * 구매 내역 조회
+     * @param memberId 멤버 ID
+     * @return 구매 내역 리스트
+     */
+    List<GetMemberPaymentRes> findPaymentItemListByPaymentId(Long memberId);
 }
