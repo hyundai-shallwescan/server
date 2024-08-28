@@ -1,13 +1,14 @@
 package com.ite.sws.domain.parking.service;
 
-import com.ite.sws.domain.parking.dto.PatchParkingReq;
-import com.ite.sws.domain.parking.dto.PostParkingReq;
+import com.ite.sws.domain.parking.dto.*;
 import com.ite.sws.domain.parking.mapper.ParkingMapper;
 import com.ite.sws.domain.parking.vo.ParkingHistoryVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 주차 서비스 구현체
@@ -21,6 +22,8 @@ import java.time.LocalDateTime;
  * 2024.08.28  	남진수       최초 생성
  * 2024.08.28  	남진수       주차 기록 추가 메서드 추가
  * 2024.08.28  	남진수       주차 기록 수정 메서드 추가
+ * 2024.08.28  	남진수       주차 정산 정보 조회 메서드 추가
+ * 2024.08.28  	남진수       무료 주차 시간 계산 메서드 추가
  * </pre>
  */
 @Service
@@ -56,6 +59,86 @@ public class ParkingServiceImpl implements ParkingService{
                 .exitAt(LocalDateTime.now())
                 .build();
         parkingMapper.updateParkingHistory(parkingHistoryVO);
+    }
+
+    /**
+     * 주차 정산 정보 조회
+     * @param memberId 회원 ID
+     * @return GetParkingRes
+     */
+    public GetParkingRes findParkingInformation(Long memberId){
+
+        ParkingHistoryDTO parkingHistoryDTO = parkingMapper.selectParkingHistoryByMemberId(memberId);
+        // 현재 시간과 입차 시간의 차이(주차 시간)
+        Duration parkingTime = Duration.between(parkingHistoryDTO.getEntranceAt(), LocalDateTime.now());
+
+        int totalPrice;
+        String parkingPaymentStatus;
+
+        // 회원의 결제 금액 조회
+        Integer paymentAmount = parkingMapper.selectPaymentAmountByMemberId(memberId);
+        // 당일 결제 금액이 존재할 경우
+        if (paymentAmount != null) {
+            totalPrice = paymentAmount;
+            parkingPaymentStatus = "PAID";
+        } else {
+            // 회원의 장바구니 목록 조회
+            List<CartItemListDTO> cartItemList = parkingMapper.selectCartItemListByMemberId(memberId);
+
+            // 장바구니 총 가격 계산
+            totalPrice = cartItemList.stream()
+                    .filter(item -> item.getIsDeleted() == 0)
+                    .mapToInt(item -> item.getQuantity() * item.getPrice())
+                    .sum();
+
+            // 장바구니가 비어있을 경우
+            if (totalPrice == 0) {
+                parkingPaymentStatus = "EMPTY";
+            } else {
+                parkingPaymentStatus = "CART";
+            }
+        }
+
+        // 영수증 할인 시간 계산
+        Duration discountParkingDuration = calculateFreeParkingTimeToDurationType(totalPrice);
+        Long discountParkingHours = discountParkingDuration.toHours();
+
+        // 유료 주차 시간 계산 (총 주차 시간 - 무료 주차 시간)
+        Duration paidParkingTime = parkingTime.minus(discountParkingDuration);
+
+        // 주차 요금 계산 (10분당 1,000원)
+        Long parkingFee = (paidParkingTime.toMinutes() / 10 + (paidParkingTime.toMinutes() % 10 > 0 ? 1L : 0L)) * 1000L;
+
+        return GetParkingRes.builder()
+                .entranceAt(parkingHistoryDTO.getEntranceAt())
+                .carNumber(parkingHistoryDTO.getCarNumber())
+                .discountParkingHour(discountParkingHours)
+                .parkingPaymentStatus(parkingPaymentStatus)
+                .parkingHour(parkingTime.toHours())
+                .parkingMinute(parkingTime.toMinutes() % 60)
+                .paymentHour(paidParkingTime.toHours())
+                .paymentMinute(paidParkingTime.toMinutes() % 60)
+                .parkingFee(parkingFee)
+                .build();
+    }
+
+    /**
+     * 무료 주차 시간 계산(주차 정산 정책)
+     * @param totalPrice 총 주문 금액
+     * @return Duration
+     */
+    private Duration calculateFreeParkingTimeToDurationType(int totalPrice) {
+        if (totalPrice >= 60000) {
+            return Duration.ofHours(5); // 6만원 이상 구매 시 5시간
+        } else if (totalPrice >= 40000) {
+            return Duration.ofHours(3); // 4만원 이상 구매 시 3시간
+        } else if (totalPrice >= 30000) {
+            return Duration.ofHours(2); // 3만원 이상 구매 시 2시간
+        } else if (totalPrice >= 20000) {
+            return Duration.ofHours(1); // 2만원 이상 구매 시 1시간
+        } else {
+            return Duration.ZERO; // 그 외에는 무료 주차 없음
+        }
     }
 
 }
