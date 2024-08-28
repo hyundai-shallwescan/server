@@ -56,6 +56,7 @@
                         END,
                UPDATED_AT = CURRENT_TIMESTAMP
         WHERE  MY_CHECK_LIST_ITEM_ID = #{myCheckListItemId}
+               AND IS_DELETED = 0
     </update>
 
     <!-- 아이템 삭제 -->
