@@ -19,7 +19,12 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface ProductMapper {
+
     Optional<ProductVO> selectProduct(Long productId);
+
     Optional<GetProductDetailRes> selectProductDetail(Long productId);
+
     List<ProductVO> selectProductsByProductName(String productName);
+
+
 }

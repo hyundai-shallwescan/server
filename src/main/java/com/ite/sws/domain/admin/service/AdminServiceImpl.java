@@ -2,13 +2,14 @@ package com.ite.sws.domain.admin.service;
 
 import com.ite.sws.constant.UploadCommand;
 import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
+import com.ite.sws.domain.admin.dto.GetPaymentHistoryRes;
 import com.ite.sws.domain.admin.dto.GetSalesRes;
 import com.ite.sws.domain.admin.dto.PatchProductReq;
+import com.ite.sws.domain.admin.dto.PaymentHistoryCriteria;
 import com.ite.sws.domain.admin.dto.PostCreateProductReq;
+import com.ite.sws.domain.admin.dto.SalesCriteria;
 import com.ite.sws.domain.admin.mapper.AdminBindingMapper;
 import com.ite.sws.domain.admin.mapper.AdminMapper;
-import com.ite.sws.domain.admin.dto.SalesCriteria;
-import com.ite.sws.domain.payment.mapper.PaymentMapper;
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
@@ -40,7 +41,6 @@ public class AdminServiceImpl implements AdminService {
   private final ProductPersistenceHelper productUploader;
   private final AdminMapper adminMapper;
   private final ProductMapper productMapper;
-  private final PaymentMapper paymentMapper;
 
   @Override
   public void addProduct(PostCreateProductReq postCreateProductReq, List<MultipartFile> fileList) {
@@ -68,13 +68,20 @@ public class AdminServiceImpl implements AdminService {
 
   @Override
   public List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long memberId) {
-    return paymentMapper.selectMemberPaymentHistory(memberId);
+    return adminMapper.selectMemberPaymentHistory(memberId);
   }
 
   @Override
   public List<GetSalesRes> findSalesByCriteria(SalesCriteria criteria) {
-    return paymentMapper.selectSalesByCriteria(criteria);
+    return adminMapper.selectSalesByCriteria(criteria);
   }
+
+  @Override
+  public List<GetPaymentHistoryRes> findPaymentHistoryOnThatDay(
+      PaymentHistoryCriteria paymentHistoryCriteria) {
+    return adminMapper.selectPaymentHistory(paymentHistoryCriteria);
+  }
+
 
   private void findProductHelper(Long productId) {
     Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);

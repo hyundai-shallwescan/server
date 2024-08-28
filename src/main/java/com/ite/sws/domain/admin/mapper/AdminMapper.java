@@ -1,6 +1,12 @@
 package com.ite.sws.domain.admin.mapper;
 
+import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
+import com.ite.sws.domain.admin.dto.GetPaymentHistoryRes;
+import com.ite.sws.domain.admin.dto.GetSalesRes;
+import com.ite.sws.domain.admin.dto.PaymentHistoryCriteria;
+import com.ite.sws.domain.admin.dto.SalesCriteria;
 import com.ite.sws.domain.product.vo.ProductVO;
+import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 
 
@@ -18,7 +24,16 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface AdminMapper {
+
       void insertProduct(ProductVO productVO);
+
       void updateProductIsDeleted(Long productId);
+
       void updateProduct(ProductVO productVO);
+
+      List<GetMemberPaymentHistoryRes> selectMemberPaymentHistory(Long memberId);
+
+      List<GetSalesRes> selectSalesByCriteria(SalesCriteria criteria);
+
+      List<GetPaymentHistoryRes> selectPaymentHistory(PaymentHistoryCriteria criteria);
 }

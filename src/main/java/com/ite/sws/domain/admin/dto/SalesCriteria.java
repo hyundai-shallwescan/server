@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
  *
  */
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 public class SalesCriteria {
     private int year;
