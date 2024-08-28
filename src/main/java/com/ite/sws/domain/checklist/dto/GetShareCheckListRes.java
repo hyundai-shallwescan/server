@@ -37,5 +37,6 @@ public class GetShareCheckListRes {
         private String productName;
         private int productPrice;
         private String productThumbnail;
+        private String status;
     }
 }

@@ -41,7 +41,8 @@
 		SELECT SI.PRODUCT_ID     AS productId,
 			   P.NAME            AS productName,
 			   P.PRICE           AS productPrice,
-			   P.THUMBNAIL_IMAGE AS productThumbnail
+			   P.THUMBNAIL_IMAGE AS productThumbnail,
+			   SI.STATUS			 AS status
 		FROM   SHARE_CHECK_LIST_ITEM SI
 			   JOIN PRODUCT P ON SI.PRODUCT_ID = P.PRODUCT_ID
 		WHERE  SI.CART_ID = #{cartId}
