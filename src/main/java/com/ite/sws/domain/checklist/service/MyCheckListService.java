@@ -1,6 +1,7 @@
 package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.checklist.dto.GetMyCheckListRes;
+import com.ite.sws.domain.checklist.dto.PostMyCheckListReq;
 import com.ite.sws.domain.checklist.dto.PutMyCheckListReq;
 
 import java.util.List;
@@ -19,6 +20,7 @@ import java.util.List;
  * 2024.08.28   정은지       마이 체크리스트 아이템 추가
  * 2024.08.28   정은지       마이 체크리스트 아이템 체크 상태 변경
  * 2024.08.28   정은지       마이 체크리스트 아이템 삭제
+ * 2024.08.28   정은지       마이 체크리스트 아이템 변경
  * </pre>
  */
 
@@ -33,9 +35,9 @@ public interface MyCheckListService {
 
     /**
      * 마이 체크리스트 아이템 추가
-     * @param putMyCheckListReq 추가 아이템
+     * @param postMyCheckListReq 추가 아이템
      */
-    void addMyCheckListItem(PutMyCheckListReq putMyCheckListReq);
+    void addMyCheckListItem(PostMyCheckListReq postMyCheckListReq);
 
     /**
      * 마이 체크리스트 아이템 체크 상태 변경
@@ -48,4 +50,11 @@ public interface MyCheckListService {
      * @param myCheckListItemId 아이템 ID
      */
     void removeMyCheckListItem(Long myCheckListItemId);
+
+    /**
+     * * 마이 체크리스트 아이템 변경
+     * @param myCheckListItemId 마이 체크리스트 ID
+     * @param putMyCheckListReq 아이템 변경 정보
+     */
+    void modifyMyCheckListItem(Long myCheckListItemId, PutMyCheckListReq putMyCheckListReq);
 }

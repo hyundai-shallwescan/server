@@ -1,6 +1,7 @@
 package com.ite.sws.domain.checklist.controller;
 
 import com.ite.sws.domain.checklist.dto.GetMyCheckListRes;
+import com.ite.sws.domain.checklist.dto.PostMyCheckListReq;
 import com.ite.sws.domain.checklist.dto.PutMyCheckListReq;
 import com.ite.sws.domain.checklist.service.MyCheckListService;
 import com.ite.sws.util.SecurityUtil;
@@ -27,6 +28,7 @@ import java.util.List;
  * 2024.08.28   정은지        마이 체크리스트 아이템 추가 API 생성
  * 2024.08.28   정은지        마이 체크리스트 아이템 체크 상태 변경 API 생성
  * 2024.08.28   정은지        마이 체크리스트 아이템 삭제 API 생성
+ * 2024.08.28   정은지        마이 체크리스트 아이템 변경 API 생성
  * </pre>
  */
 
@@ -55,16 +57,16 @@ public class MyCheckListController {
 
     /**
      * 마이 체크리스트 아이템 추가 API
-     * @param putMyCheckListReq 마이 체크리스트 아이템
+     * @param postMyCheckListReq 마이 체크리스트 아이템
      * @return 아이템 추가 성공 여부
      */
-    @PutMapping
-    public ResponseEntity<Void> addMyCheckListItem(@RequestBody PutMyCheckListReq putMyCheckListReq) {
+    @PostMapping
+    public ResponseEntity<Void> addMyCheckListItem(@RequestBody PostMyCheckListReq postMyCheckListReq) {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
-        putMyCheckListReq.setMemberId(memberId);
+        postMyCheckListReq.setMemberId(memberId);
 
-        myCheckListService.addMyCheckListItem(putMyCheckListReq);
+        myCheckListService.addMyCheckListItem(postMyCheckListReq);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -90,6 +92,20 @@ public class MyCheckListController {
     public ResponseEntity<Void> deleteMyCheckListItem(@PathVariable Long myCheckListItemId) {
 
         myCheckListService.removeMyCheckListItem(myCheckListItemId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 마이 체크리스트 아이템 변경 API
+     * @param myCheckListItemId 마이 체크리스트 아이템 ID
+     * @param putMyCheckListReq 아이템 변경 정보
+     * @return 아이템 변경 성공 여부
+     */
+    @PutMapping("/{myCheckListItemId}")
+    public ResponseEntity<Void> modifyMyCheckListItem(@PathVariable Long myCheckListItemId,
+                                                      @RequestBody PutMyCheckListReq putMyCheckListReq) {
+
+        myCheckListService.modifyMyCheckListItem(myCheckListItemId, putMyCheckListReq);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
