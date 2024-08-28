@@ -7,6 +7,7 @@ import com.ite.sws.domain.checklist.mapper.MyCheckListMapper;
 import com.ite.sws.domain.checklist.vo.MyCheckListVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,7 +22,8 @@ import java.util.List;
  * ----------  --------    ---------------------------
  * 2024.08.28  	정은지       최초 생성
  * 2024.08.28  	정은지       마이 체크리스트 조회
- * 2024.08.28   정은지       마이 체크리스트 아이템 추가
+ * 2024.08.28   정은지       아이템 추가
+ * 2024.08.28   정은지       아이템 체크 상태 변경
  * </pre>
  */
 
@@ -36,6 +38,7 @@ public class MyCheckListServiceImpl implements MyCheckListService{
      * @param memberId 멤버 ID
      * @return List<GetMyCheckListRes>
      */
+    @Transactional(readOnly = true)
     @Override
     public List<GetMyCheckListRes> findMyCheckList(Long memberId) {
 
@@ -46,6 +49,7 @@ public class MyCheckListServiceImpl implements MyCheckListService{
      * 마이 체크리스트 아이템 추가
      * @param putMyCheckListReq 추가 아이템
      */
+    @Transactional
     @Override
     public void addMyCheckListItem(PutMyCheckListReq putMyCheckListReq) {
 
@@ -56,5 +60,16 @@ public class MyCheckListServiceImpl implements MyCheckListService{
                     .build();
 
         myCheckListMapper.insertMyCheckListItem(myCheckList);
+    }
+
+    /**
+     * 아이템 체크 상태 변경
+     * @param myCheckListItemId 아이템 ID
+     */
+    @Transactional
+    @Override
+    public void modifyItemStatus(Long myCheckListItemId) {
+
+        myCheckListMapper.updateItemStatus(myCheckListItemId);
     }
 }

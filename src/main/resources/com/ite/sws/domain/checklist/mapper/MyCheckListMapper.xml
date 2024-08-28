@@ -14,6 +14,7 @@
 * 2024.08.28  	정은지        최초 생성
 * 2024.08.28    정은지        마이 체크리스트 조회
 * 2024.08.28    정은지        마이 체크리스트 아이템 추가
+* 2024.08.28    정은지        마이 체크리스트 체크 상태 변경
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.checklist.mapper.MyCheckListMapper">
@@ -44,4 +45,15 @@
                      #{myCheckListCategoryId},
                      #{item})
     </insert>
+
+    <!-- 체크 상태 변경 -->
+    <update id="updateItemStatus">
+        UPDATE MY_CHECK_LIST_ITEM
+        SET    STATUS = CASE
+                            WHEN STATUS = 'UNCHECKED' THEN 'CHECKED'
+                            WHEN STATUS = 'CHECKED' THEN 'UNCHECKED'
+                        END,
+               UPDATED_AT = CURRENT_TIMESTAMP
+        WHERE  MY_CHECK_LIST_ITEM_ID = #{myCheckListItemId}
+    </update>
 </mapper>

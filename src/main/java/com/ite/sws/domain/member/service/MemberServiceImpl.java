@@ -59,6 +59,7 @@ public class MemberServiceImpl implements MemberService {
      * @param loginId 아이디
      * @return 아이디 중복 여부
      */
+    @Transactional(readOnly = true)
     @Override
     public boolean isLoginIdAvailable(String loginId) {
         return memberMapper.selectCountByLoginId(loginId) == 0;
@@ -145,6 +146,7 @@ public class MemberServiceImpl implements MemberService {
      * @param memberId 멤버 아이디
      * @return MemberVO 객체
      */
+    @Transactional(readOnly = true)
     @Override
     public GetMemberRes findMemberByMemberId(Long memberId) {
 
@@ -155,6 +157,7 @@ public class MemberServiceImpl implements MemberService {
      * 회원 정보 수정
      * @param patchMemberReq 회원 수정 정보
      */
+    @Transactional
     @Override
     public void modifyMember(PatchMemberReq patchMemberReq) {
 
@@ -171,6 +174,7 @@ public class MemberServiceImpl implements MemberService {
      * 회원 탈퇴
      * @param memberId 멤버 ID (PK)
      */
+    @Transactional
     @Override
     public void modifyMemberStatus(Long memberId) {
         memberMapper.updateMemberStatus(memberId);
@@ -204,6 +208,7 @@ public class MemberServiceImpl implements MemberService {
      * @param memberId 멤버 ID
      * @return 리뷰 리스트
      */
+    @Transactional(readOnly = true)
     @Override
     public List<GetMemberReviewRes> findReviewList(Long memberId, int page, int size) {
         int offset = page * size;

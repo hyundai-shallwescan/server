@@ -16,7 +16,8 @@ import java.util.List;
  * ----------  --------    ---------------------------
  * 2024.08.28  	정은지       최초 생성
  * 2024.08.28  	정은지       마이 체크리스트 조회 추가
- * 2024.08.28   정은지       마이 체크리스트 아이템 추가
+ * 2024.08.28   정은지       아이템 추가
+ * 2024.08.28   정은지       아이템 체크 상태 변경
  * </pre>
  */
 
@@ -34,4 +35,11 @@ public interface MyCheckListService {
      * @param putMyCheckListReq 추가 아이템
      */
     void addMyCheckListItem(PutMyCheckListReq putMyCheckListReq);
+
+    /**
+     * 아이템 체크 상태 변경
+     * @param myCheckListItemId 아이템 ID
+     */
+    void modifyItemStatus(Long myCheckListItemId);
+
 }
