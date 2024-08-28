@@ -44,6 +44,7 @@
         UPDATE PARKING_HISTORY
         SET    EXIT_AT = #{exitAt}
         WHERE  CAR_NUMBER = #{carNumber}
+               AND EXIT_AT IS NULL
     </update>
 
 </mapper>
