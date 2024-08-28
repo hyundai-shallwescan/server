@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 
 /**
  * 주차 서비스 구현체
@@ -35,12 +34,11 @@ public class ParkingServiceImpl implements ParkingService{
     @Transactional
     public void addParkingHistory(PostParkingReq postParkingReq){
         Long memberId = parkingMapper.selectMemberIdByCarNumber(postParkingReq.getCarNumber());
-        LocalDateTime kstLocalDateTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
 
         ParkingHistoryVO parkingHistoryVO = ParkingHistoryVO.builder()
                 .memberId(memberId)
                 .carNumber(postParkingReq.getCarNumber())
-                .entranceAt(kstLocalDateTime)
+                .entranceAt(LocalDateTime.now())
                 .build();
         parkingMapper.insertParkingHistory(parkingHistoryVO);
     }
