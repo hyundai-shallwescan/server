@@ -35,7 +35,8 @@
 	</select>
 
 	<!-- cartId에 해당하는 공유 체크리스트 아이템 조회 -->
-	<select id="selectShareCheckListByCartId" resultType="com.ite.sws.domain.checklist.vo.ShareCheckListItemVO">
+	<select id="selectShareCheckListByCartId"
+			resultType="com.ite.sws.domain.checklist.dto.GetShareCheckListRes$GetShareCheckRes">
 		SELECT SI.PRODUCT_ID     AS productId,
 			   P.NAME            AS productName,
 			   P.PRICE           AS productPrice,

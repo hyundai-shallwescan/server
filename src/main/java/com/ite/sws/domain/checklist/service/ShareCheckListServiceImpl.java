@@ -43,7 +43,7 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
         if (shareCheckListMapper.selectCountByCartId(cartId) == 0) {
             throw new CustomException(ErrorCode.CART_NOT_FOUND);
         }
-        List<ShareCheckListItemVO> items = shareCheckListMapper.selectShareCheckListByCartId(cartId);
+        List<GetShareCheckListRes.GetShareCheckRes> items = shareCheckListMapper.selectShareCheckListByCartId(cartId);
         return GetShareCheckListRes.builder()
                 .cartId(cartId)
                 .items(items)

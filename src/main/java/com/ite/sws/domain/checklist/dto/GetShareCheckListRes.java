@@ -1,6 +1,6 @@
 package com.ite.sws.domain.checklist.dto;
 
-import com.ite.sws.domain.checklist.vo.ShareCheckListVO;
+import com.ite.sws.domain.checklist.vo.ShareCheckListItemVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,5 +26,16 @@ import java.util.List;
 @Getter
 public class GetShareCheckListRes {
     private Long cartId;
-    private List<ShareCheckListVO> items;
+    private List<GetShareCheckRes> items;
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Getter
+    public static class GetShareCheckRes {
+        private Long productId;
+        private String productName;
+        private int productPrice;
+        private String productThumbnail;
+    }
 }

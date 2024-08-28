@@ -1,5 +1,6 @@
 package com.ite.sws.domain.checklist.mapper;
 
+import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
 import com.ite.sws.domain.checklist.vo.ShareCheckListItemVO;
 import org.apache.ibatis.annotations.Param;
 
@@ -42,7 +43,7 @@ public interface ShareCheckListMapper {
      * @param cartId 장바구니 ID
      * @return
      */
-    List<ShareCheckListItemVO> selectShareCheckListByCartId(Long cartId);
+    List<GetShareCheckListRes.GetShareCheckRes> selectShareCheckListByCartId(Long cartId);
 
     /**
      * 공유 체크리스트 아이템 생성을 위한 프로시저 호출
