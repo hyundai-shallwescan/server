@@ -1,8 +1,10 @@
 package com.ite.sws.domain.parking.controller;
 
+import com.ite.sws.domain.parking.dto.GetParkingRes;
 import com.ite.sws.domain.parking.dto.PatchParkingReq;
 import com.ite.sws.domain.parking.dto.PostParkingReq;
 import com.ite.sws.domain.parking.service.ParkingService;
+import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,5 +50,16 @@ public class ParkingController {
     public ResponseEntity<Void> updateParkingHistory(@RequestBody PatchParkingReq patchParkingReq) {
         parkingService.modifyParkingHistory(patchParkingReq);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 주차 정산 정보 조회
+     * @return ResponseEntity<GetParkingRes>
+     */
+    @GetMapping
+    public ResponseEntity<GetParkingRes> timeout() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        GetParkingRes getParkingRes = parkingService.findParkingInformation(memberId);
+        return ResponseEntity.ok(getParkingRes);
     }
 }
