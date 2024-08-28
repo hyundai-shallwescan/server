@@ -24,9 +24,9 @@ import java.util.List;
  * ----------  --------    ---------------------------
  * 2024.08.28  	정은지        최초 생성
  * 2024.08.28   정은지        마이 체크리스트 조회 API 생성
- * 2024.08.28   정은지        아이템 추가 API 생성
- * 2024.08.28   정은지        아이템 체크 상태 변경 API 생성
- * 2024.08.28   정은지        아이템 삭제 API 생성
+ * 2024.08.28   정은지        마이 체크리스트 아이템 추가 API 생성
+ * 2024.08.28   정은지        마이 체크리스트 아이템 체크 상태 변경 API 생성
+ * 2024.08.28   정은지        마이 체크리스트 아이템 삭제 API 생성
  * </pre>
  */
 
@@ -54,7 +54,7 @@ public class MyCheckListController {
     }
 
     /**
-     * 아이템 추가 API
+     * 마이 체크리스트 아이템 추가 API
      * @param putMyCheckListReq 마이 체크리스트 아이템
      * @return 아이템 추가 성공 여부
      */
@@ -70,8 +70,8 @@ public class MyCheckListController {
     }
 
     /**
-     * 아이템 상태 변경 API (CHECK -> UNCHECK, UNCHECK -> CHECK)
-     * @param myCheckListItemId
+     * 마이 체크리스트 아이템 상태 변경 API (CHECK -> UNCHECK, UNCHECK -> CHECK)
+     * @param myCheckListItemId 마이 체크리스트 아이템 ID
      * @return 아이템 상태 변경 성공 여부
      */
     @PatchMapping("/{myCheckListItemId}")
@@ -82,8 +82,8 @@ public class MyCheckListController {
     }
 
     /**
-     * 아이템 삭제 API
-     * @param myCheckListItemId
+     * 마이 체크리스트 아이템 삭제 API
+     * @param myCheckListItemId 마이 체크리스트 아이템 ID
      * @return 아이템 삭제 성공 여부
      */
     @DeleteMapping("/{myCheckListItemId}")
