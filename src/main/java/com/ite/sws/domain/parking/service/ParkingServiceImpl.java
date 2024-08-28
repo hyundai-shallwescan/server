@@ -1,5 +1,6 @@
 package com.ite.sws.domain.parking.service;
 
+import com.ite.sws.domain.parking.dto.PatchParkingReq;
 import com.ite.sws.domain.parking.dto.PostParkingReq;
 import com.ite.sws.domain.parking.mapper.ParkingMapper;
 import com.ite.sws.domain.parking.vo.ParkingHistoryVO;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
  * ----------  --------    ---------------------------
  * 2024.08.28  	남진수       최초 생성
  * 2024.08.28  	남진수       주차 기록 추가 메서드 추가
+ * 2024.08.28  	남진수       주차 기록 수정 메서드 추가
  * </pre>
  */
 @Service
@@ -41,6 +43,19 @@ public class ParkingServiceImpl implements ParkingService{
                 .entranceAt(LocalDateTime.now())
                 .build();
         parkingMapper.insertParkingHistory(parkingHistoryVO);
+    }
+
+    /**
+     * 주차 기록 수정(출차 처리)
+     * @param patchParkingReq 차량 번호
+     */
+    @Transactional
+    public void modifyParkingHistory(PatchParkingReq patchParkingReq) {
+        ParkingHistoryVO parkingHistoryVO = ParkingHistoryVO.builder()
+                .carNumber(patchParkingReq.getCarNumber())
+                .exitAt(LocalDateTime.now())
+                .build();
+        parkingMapper.updateParkingHistory(parkingHistoryVO);
     }
 
 }
