@@ -32,12 +32,15 @@ import java.util.stream.Collectors;
  * 수정일        	수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
- * 2024.08.24   정은지        중복 아이디 체크 및 회원가입 기능 추가
- * 2024.08.25   정은지        로그인 기능 추가
- * 2024.08.26   정은지        회원 정보 조회 기능 추가
- * 2024.08.26   정은지        회원 정보 수정 기능 추가
- * 2024.08.26   정은지        회원 탈퇴 기능 추가
+ * 2024.08.24   정은지        중복 아이디 체크 및 회원가입 추가
+ * 2024.08.25   정은지        로그인 추가
+ * 2024.08.26   정은지        회원 정보 조회 추가
+ * 2024.08.26   정은지        회원 정보 수정 추가
+ * 2024.08.26   정은지        회원 탈퇴 추가
  * 2024.08.27   남진수        AuthenticationManager로 변경
+ * 2024.08.27   정은지        회원가입 로직 수정
+ * 2024.08.27   정은지        구매 내역 조회 추가
+ * 2024.08.27   정은지        작성 리뷰 조회 추가
  * </pre>
  */
 
@@ -180,7 +183,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Transactional(readOnly = true)
     @Override
-    public List<GetMemberPaymentRes> findPaymentItemListByPaymentId(Long memberId) {
+    public List<GetMemberPaymentRes> findPaymentItemList(Long memberId) {
         List<GetMemberPaymentRes> paymentList = memberMapper.selectPaymentListByMemberID(memberId);
 
         return paymentList.stream()
@@ -194,5 +197,16 @@ public class MemberServiceImpl implements MemberService {
                             .build();
                 })
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 작성 리뷰 조회
+     * @param memberId 멤버 ID
+     * @return 리뷰 리스트
+     */
+    @Override
+    public List<GetMemberReviewRes> findReviewList(Long memberId, int page, int size) {
+        int offset = page * size;
+        return memberMapper.selectReviewListByMemberId(memberId, offset, size);
     }
 }

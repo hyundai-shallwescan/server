@@ -12,12 +12,14 @@
 * 수정일        	수정자        수정내용
 * ==========  =========    =========
 * 2024.08.24  	정은지        최초 생성
-* 2024.08.24    정은지        중복 아이디 체크 및 회원가입 기능 추가
-* 2024.08.25    정은지        로그인 기능 추가
-* 2024.08.26    정은지        회원 정보 조회 기능 추가
-* 2024.08.26    정은지        회원 정보 수정 기능 추가
-* 2024.08.26    정은지        회원 탈퇴 기능 추가
-* 2024.08.27    정은지        장바구니 생성 기능 추가
+* 2024.08.24    정은지        중복 아이디 체크 및 회원가입 추가
+* 2024.08.25    정은지        로그인 추가
+* 2024.08.26    정은지        회원 정보 조회 추가
+* 2024.08.26    정은지        회원 정보 수정 추가
+* 2024.08.26    정은지        회원 탈퇴 추가
+* 2024.08.27    정은지        장바구니 생성 추가
+* 2024.08.27    정은지        구매 내역 아이템 조회 추가
+* 2024.08.27    정은지        작성 리뷰 조회 추가
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.member.mapper.MemberMapper">
@@ -81,7 +83,7 @@
         FROM   AUTH A
                    JOIN MEMBER M ON A.MEMBER_ID = M.MEMBER_ID
         WHERE  A.LOGIN_ID = #{loginId}
-          AND M.IS_DELETED = 0
+               AND M.IS_DELETED = 0
     </select>
 
     <!-- 회원 정보 조회 -->
@@ -140,5 +142,25 @@
                         ON PI.PAYMENT_ID = P.PAYMENT_ID
         WHERE  P.PAYMENT_ID = #{paymentId}
         ORDER  BY PI.PAYMENT_ITEM_ID DESC
+    </select>
+
+    <!-- 작성 리뷰 조회 -->
+    <select id="selectReviewListByMemberId">
+        SELECT SF.SHORT_FORM_ID,
+               SF.SHORT_FORM_URL,
+               SF.THUMBNAIL_IMAGE
+        FROM   MEMBER M
+                   JOIN CART C
+                        ON M.MEMBER_ID = C.MEMBER_ID
+                   JOIN PAYMENT P
+                        ON C.CART_ID = P.CART_ID
+                   JOIN PAYMENT_ITEM PI
+                        ON PI.PAYMENT_ID = P.PAYMENT_ID
+                   JOIN SHORT_FORM SF
+                        ON SF.PAYMENT_ITEM_ID = PI.PAYMENT_ITEM_ID
+        WHERE  M.MEMBER_ID = #{memberId}
+               AND SF.IS_DELETED = 0
+        ORDER  BY SF.CREATED_AT DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
 </mapper>
