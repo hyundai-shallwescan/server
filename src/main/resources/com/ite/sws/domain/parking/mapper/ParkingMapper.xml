@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+ * 주차 Mybatis 매퍼
+ * @author 남진수
+ * @since 2024.08.28
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일        수정자        수정내용
+ * ==========  =========    =========
+ * 2024.08.28  남진수        최초 생성
+ * 2024.08.28  남진수        차량번호로 회원 아이디 조회
+ * 2024.08.28  남진수        주차 기록 생성(입차처리)
+ * 2024.08.28  남진수        주차 기록 수정(출차처리)
+ * </pre>
+ -->
+
+<mapper namespace="com.ite.sws.domain.parking.mapper.ParkingMapper">
+
+    <!-- 차량번호로 회원 아이디 조회 -->
+    <select id= "selectMemberIdByCarNumber" resultType="Long">
+        SELECT MEMBER_ID
+        FROM   MEMBER
+        WHERE  CAR_NUMBER = #{carNumber}
+    </select>
+
+    <!-- 주차 기록 생성(입차처리) -->
+    <insert id="insertParkingHistory" parameterType="ParkingHistoryVO">
+        INSERT INTO   PARKING_HISTORY
+                     (PARKING_HISTORY_ID,
+                      MEMBER_ID,
+                      CAR_NUMBER,
+                      ENTRANCE_AT)
+        VALUES       (SEQ_PARKING_HISTORY_ID.NEXTVAL,
+                      #{memberId},
+                      #{carNumber},
+                      #{entranceAt})
+    </insert>
+
+    <!-- 주차 기록 수정(출차처리) -->
+    <update id="updateParkingHistory" parameterType="ParkingHistoryVO">
+        UPDATE PARKING_HISTORY
+        SET    EXIT_AT = #{exitAt}
+        WHERE  CAR_NUMBER = #{carNumber}
+               AND EXIT_AT IS NULL
+    </update>
+
+</mapper>

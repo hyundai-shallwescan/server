@@ -12,10 +12,14 @@
 * 수정일        	수정자        수정내용
 * ==========  =========    =========
 * 2024.08.24  	정은지        최초 생성
-* 2024.08.24    정은지        중복 아이디 체크 및 회원가입 기능 추가
-* 2024.08.25    정은지        로그인 기능 추가
-* 2024.08.26    정은지        회원 정보 조회 기능 추가
-* 2024.08.26    정은지        회원 정보 수정 기능 추가
+* 2024.08.24    정은지        중복 아이디 체크 및 회원가입 추가
+* 2024.08.25    정은지        로그인 추가
+* 2024.08.26    정은지        회원 정보 조회 추가
+* 2024.08.26    정은지        회원 정보 수정 추가
+* 2024.08.26    정은지        회원 탈퇴 추가
+* 2024.08.27    정은지        장바구니 생성 추가
+* 2024.08.27    정은지        구매 내역 아이템 조회 추가
+* 2024.08.27    정은지        작성 리뷰 조회 추가
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.member.mapper.MemberMapper">
@@ -55,6 +59,21 @@
                      #{password})
     </insert>
 
+    <!-- 장바구니 생성 (회원가입) -->
+    <insert id="insertCart">
+        <selectKey keyProperty="cartId" resultType="long" order="BEFORE">
+            SELECT SEQ_CART_ID.NEXTVAL
+            FROM   DUAL
+        </selectKey>
+        INSERT INTO CART
+                    (CART_ID,
+                     MEMBER_ID,
+                     CART_URI)
+        VALUES      (#{cartId},
+                     #{memberId},
+                     'scanandgo://deeplink?cartId=' || #{cartId})
+    </insert>
+
     <!-- 로그인 -->
     <select id="selectMemberByLoginId">
         SELECT A.MEMBER_ID,
@@ -64,7 +83,7 @@
         FROM   AUTH A
                    JOIN MEMBER M ON A.MEMBER_ID = M.MEMBER_ID
         WHERE  A.LOGIN_ID = #{loginId}
-          AND M.IS_DELETED = 0
+               AND M.IS_DELETED = 0
     </select>
 
     <!-- 회원 정보 조회 -->
@@ -89,4 +108,59 @@
                 #{password, jdbcType=VARCHAR}
              )
     </update>
+
+    <!-- 회원 탈퇴 -->
+    <update id="updateMemberStatus">
+        CALL PROC_UPDATE_MEMBER_STATUS(
+                #{memberId, jdbcType=NUMERIC}
+             )
+    </update>
+
+    <!-- 구매내역 조회 -->
+    <select id="selectPaymentListByMemberID">
+        SELECT P.PAYMENT_ID,
+               P.CREATED_AT,
+               P.AMOUNT
+        FROM   MEMBER M
+                   JOIN CART C
+                        ON M.MEMBER_ID = C.MEMBER_ID
+                   JOIN PAYMENT P
+                        ON C.CART_ID = P.CART_ID
+        WHERE  M.MEMBER_ID = #{memberId}
+        ORDER  BY P.PAYMENT_ID DESC
+    </select>
+
+    <!-- 구매 내역 아이템 조회 -->
+    <select id="selectPaymentItemByPaymentId">
+        SELECT PI.PAYMENT_ITEM_ID,
+               PI.NAME,
+               PI.PRICE,
+               PI.QUANTITY,
+               PI.THUMBNAIL_IMAGE
+        FROM   PAYMENT P
+                   JOIN PAYMENT_ITEM PI
+                        ON PI.PAYMENT_ID = P.PAYMENT_ID
+        WHERE  P.PAYMENT_ID = #{paymentId}
+        ORDER  BY PI.PAYMENT_ITEM_ID DESC
+    </select>
+
+    <!-- 작성 리뷰 조회 -->
+    <select id="selectReviewListByMemberId">
+        SELECT SF.SHORT_FORM_ID,
+               SF.SHORT_FORM_URL,
+               SF.THUMBNAIL_IMAGE
+        FROM   MEMBER M
+                   JOIN CART C
+                        ON M.MEMBER_ID = C.MEMBER_ID
+                   JOIN PAYMENT P
+                        ON C.CART_ID = P.CART_ID
+                   JOIN PAYMENT_ITEM PI
+                        ON PI.PAYMENT_ID = P.PAYMENT_ID
+                   JOIN SHORT_FORM SF
+                        ON SF.PAYMENT_ITEM_ID = PI.PAYMENT_ITEM_ID
+        WHERE  M.MEMBER_ID = #{memberId}
+               AND SF.IS_DELETED = 0
+        ORDER  BY SF.CREATED_AT DESC
+        OFFSET #{offset} ROWS FETCH NEXT #{size} ROWS ONLY
+    </select>
 </mapper>

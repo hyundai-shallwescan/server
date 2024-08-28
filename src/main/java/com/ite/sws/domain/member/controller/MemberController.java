@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
@@ -33,6 +34,9 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * 2024.08.25   정은지        로그인 API 생성
  * 2024.08.26   정은지        회원 정보 조회 API 생성
  * 2024.08.26   정은지        회원 정보 수정 API 생성
+ * 2024.08.26   정은지        회원 탈퇴 기능 API 생성
+ * 2024.08.27   정은지        구매 내역 조회 API 생성
+ * 2024.08.27   정은지        작성 리뷰 조회 API 생성
  * </pre>
  */
 
@@ -123,6 +127,45 @@ public class MemberController {
         memberService.modifyMember(patchMemberReq);
 
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 회원 탈퇴 API
+     * @return 회원 탈퇴 처리 결과 응답
+     */
+    @DeleteMapping
+    public ResponseEntity<Void> modifyMemberStatus() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        memberService.modifyMemberStatus(memberId);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 구매 내역 조회 API
+     * @return List<GetMemberPaymentRes> 구매 내역 리스트
+     */
+    @GetMapping("/payments")
+    public ResponseEntity<List<GetMemberPaymentRes>> findPaymentItemList() {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<GetMemberPaymentRes> paymentHistory = memberService.findPaymentItemList(memberId);
+
+        return ResponseEntity.ok(paymentHistory);
+    }
+
+    /**
+     * 작성 리뷰 조회 API
+     * @param page 페이지 번호 (기본값: 0)
+     * @param size 페이지 당 항목 개수 (기본값: 10)
+     * @return List<GetMemberReviewRes> 작성한 리뷰 리스트
+     */
+    @GetMapping("/reviews")
+    public ResponseEntity<List<GetMemberReviewRes>> findReviewListByMemberId(@RequestParam(defaultValue = "0") int page,
+                                                                             @RequestParam(defaultValue = "10") int size) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        List<GetMemberReviewRes> reviews = memberService.findReviewList(memberId, page, size);
+
+        return ResponseEntity.ok(reviews);
     }
 
     /**
