@@ -1,10 +1,14 @@
 package com.ite.sws.domain.admin.service;
 
 import com.ite.sws.constant.UploadCommand;
+import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
+import com.ite.sws.domain.admin.dto.GetSalesRes;
 import com.ite.sws.domain.admin.dto.PatchProductReq;
 import com.ite.sws.domain.admin.dto.PostCreateProductReq;
 import com.ite.sws.domain.admin.mapper.AdminBindingMapper;
 import com.ite.sws.domain.admin.mapper.AdminMapper;
+import com.ite.sws.domain.admin.dto.SalesCriteria;
+import com.ite.sws.domain.payment.mapper.PaymentMapper;
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
@@ -24,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.26  	구지웅      최초 생성
+ * 2024.08.27   구지웅      유저 결제 내역 조회 기능 구현, sales 조회 기능 구현
  * </pre>
  *
  */
@@ -35,6 +40,7 @@ public class AdminServiceImpl implements AdminService {
   private final ProductPersistenceHelper productUploader;
   private final AdminMapper adminMapper;
   private final ProductMapper productMapper;
+  private final PaymentMapper paymentMapper;
 
   @Override
   public void addProduct(PostCreateProductReq postCreateProductReq, List<MultipartFile> fileList) {
@@ -60,11 +66,21 @@ public class AdminServiceImpl implements AdminService {
 
   }
 
+  @Override
+  public List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long memberId) {
+    return paymentMapper.selectMemberPaymentHistory(memberId);
+  }
+
+  @Override
+  public List<GetSalesRes> findSalesByCriteria(SalesCriteria criteria) {
+    return paymentMapper.selectSalesByCriteria(criteria);
+  }
+
   private void findProductHelper(Long productId) {
     Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);
 
     optionalProduct.orElseThrow(() ->
-        new CustomException(ErrorCode.PRODUCT_IS_NOT_FOUND));
+        new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
   }
 

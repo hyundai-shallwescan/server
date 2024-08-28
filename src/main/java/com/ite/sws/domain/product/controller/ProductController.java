@@ -5,7 +5,6 @@ import com.ite.sws.domain.product.dto.GetProductReviewRes;
 import com.ite.sws.domain.product.service.ProductService;
 import com.ite.sws.domain.product.vo.ProductVO;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,8 +49,10 @@ public class ProductController {
   public ResponseEntity<List<GetProductReviewRes>> findProductReview(@PathVariable Long productId,
       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
     return ResponseEntity.ok()
-        .body(productService.findProductReviews(productId,page,size));
+        .body(productService.findProductReviews(productId, page, size));
   }
+
+
 
 
 }

@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.26  	구지웅      최초 생성
+ * 2024.08.26  	구지웅      MediaPersistLocationStrategy 의존성 추가
  * </pre>
  *
  */

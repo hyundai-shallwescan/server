@@ -47,6 +47,7 @@ public enum ErrorCode {
     REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(), "리뷰가 존재하지 않습니다."),
     PRODUCT_IS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "상품이 존재하지 않습니다."),
     SHARE_CHECK_LIST_ITEM_NOT_FOUND(NOT_FOUND.value(), "공유체크리스트 아이템이 존재하지 않습니다."),
+    REVIEW_IS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "리뷰가 존재하지 않습니다."),
 
     /* 409: Conflict */
     LOGIN_ID_ALREADY_EXISTS(CONFLICT.value(), "이미 존재하는 아이디입니다."),
@@ -56,7 +57,6 @@ public enum ErrorCode {
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
     NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다."),
     PERSIST_EXCEPTION_TO_THIRD_PARTY(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 저장소에 저장을 실패했습니다.");
-
 
     private final int status;
     private final String message;

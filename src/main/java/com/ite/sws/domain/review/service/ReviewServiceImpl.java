@@ -61,13 +61,13 @@ public class ReviewServiceImpl implements ReviewService {
     @Override
     public GetReviewDetailRes getReviewDetail(Long reviewId) {
         return reviewMapper.getReviewDetail(reviewId)
-            .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_IS_NOT_EXIST));
+            .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_IS_NOT_FOUND));
     }
 
     @Override
     public void deleteReview(Long reviewId) {
         reviewMapper.getReviewDetail(reviewId)
-            .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_IS_NOT_EXIST));
+            .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_IS_NOT_FOUND));
         reviewMapper.deleteReview(reviewId);
     }
 }
