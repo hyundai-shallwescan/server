@@ -1,6 +1,7 @@
 package com.ite.sws.domain.checklist.mapper;
 
 import com.ite.sws.domain.checklist.dto.GetMyCheckListRes;
+import com.ite.sws.domain.checklist.vo.MyCheckListVO;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * ----------  --------    ---------------------------
  * 2024.08.28  	정은지        최초 생성
  * 2024.08.28   정은지        마이 체크리스트 조회 추가
+ * 2024.08.28   정은지        마이 체크리스트 아이템 추가
  * </pre>
  */
 
@@ -26,4 +28,11 @@ public interface MyCheckListMapper {
      * @return List<GetMyCheckListRes>
      */
     List<GetMyCheckListRes> selectMyCheckListByMemberId(Long memberId);
+
+    /**
+     * 마이 체크리스트 아이템 추가
+     * @param myCheckList MyCheckListVO 객체
+     */
+    void insertMyCheckListItem(MyCheckListVO myCheckList);
+
 }

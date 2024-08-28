@@ -1,6 +1,7 @@
 package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.checklist.dto.GetMyCheckListRes;
+import com.ite.sws.domain.checklist.dto.PutMyCheckListReq;
 
 import java.util.List;
 
@@ -11,19 +12,26 @@ import java.util.List;
  * @version 1.0
  *
  * <pre>
- * 수정일        수정자       수정내용
+ * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.28  	정은지       최초 생성
  * 2024.08.28  	정은지       마이 체크리스트 조회 추가
+ * 2024.08.28   정은지       마이 체크리스트 아이템 추가
  * </pre>
  */
 
 public interface MyCheckListService {
 
     /**
-     * 마이 체크리스트 아이템 조회 기능
+     * 마이 체크리스트 아이템 조회
      * @param memberId 멤버 ID
      * @return List<GetMyCheckListRes>
      */
     List<GetMyCheckListRes> findMyCheckList(Long memberId);
+
+    /**
+     * 마이 체크리스트 아이템 추가
+     * @param putMyCheckListReq 추가 아이템
+     */
+    void addMyCheckListItem(PutMyCheckListReq putMyCheckListReq);
 }
