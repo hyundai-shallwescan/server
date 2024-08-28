@@ -47,7 +47,7 @@
 			   JOIN PRODUCT ON CI.PRODUCT_ID = P.PRODUCT_ID
 		WHERE  CI.CART_ID = #{cartId}
 			   AND CI.IS_DELETED = 0
-		ORDER  BY CI.CREATED_AT DESC
+		ORDER  BY CI.UPDATED_AT DESC
 	</select>
 
 	<!-- 새로운 장바구니 생성 -->
@@ -105,7 +105,8 @@
 										WHEN CI.IS_DELETED = 0 THEN CI.QUANTITY + 1
 										ELSE 1  -- IS_DELETED가 1인 경우, 수량을 1로 초기화
 									END,
-					   CI.IS_DELETED = 0 -- 삭제된 상태에서 다시 활성화
+					   CI.IS_DELETED = 0, -- 삭제된 상태에서 다시 활성화
+					   CI.UPDATED_AT = CURRENT_TIMESTAMP
 		WHEN NOT MATCHED THEN
 		  -- 존재하지 않는 경우 새로운 레코드 삽입
 			INSERT (CART_ID,
