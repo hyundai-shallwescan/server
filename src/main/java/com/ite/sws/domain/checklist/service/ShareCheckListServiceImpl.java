@@ -1,8 +1,9 @@
 package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
+import com.ite.sws.domain.checklist.dto.PostShareCheckListReq;
 import com.ite.sws.domain.checklist.mapper.ShareCheckListMapper;
-import com.ite.sws.domain.checklist.vo.ShareCheckListVO;
+import com.ite.sws.domain.checklist.vo.ShareCheckListItemVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
  * ----------  --------    ---------------------------
  * 2024.08.27  	김민정       최초 생성
  * 2024.08.27  	김민정       cartId로 공유 체크리스트 아이템 조회 기능 추가
+ * 2024.08.27  	김민정       공유 체크리스트에 아이템 생성 기능 추가
  * </pre>
  */
 @Service
@@ -41,10 +43,32 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
         if (shareCheckListMapper.selectCountByCartId(cartId) == 0) {
             throw new CustomException(ErrorCode.CART_NOT_FOUND);
         }
-        List<ShareCheckListVO> items = shareCheckListMapper.selectShareCheckListByCartId(cartId);
+        List<ShareCheckListItemVO> items = shareCheckListMapper.selectShareCheckListByCartId(cartId);
         return GetShareCheckListRes.builder()
                 .cartId(cartId)
                 .items(items)
                 .build();
+    }
+
+    /**
+     * 공유 체크리스트에 아이템 생성
+     * @param postShareCheckListReq 공유 체크리스트 아이템 객체
+     */
+    @Override
+    @Transactional
+    public void addShareCheckListItem(PostShareCheckListReq postShareCheckListReq) {
+        // cartId, productId가 유효한지 확인
+        if (shareCheckListMapper.selectCountByCartId(postShareCheckListReq.getCartId()) == 0) {
+            throw new CustomException(ErrorCode.CART_NOT_FOUND);
+        }
+        if (shareCheckListMapper.selectCountByProductId(postShareCheckListReq.getProductId()) == 0) {
+            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
+        }
+
+        ShareCheckListItemVO newItem = ShareCheckListItemVO.builder()
+                .cartId(postShareCheckListReq.getCartId())
+                .productId(postShareCheckListReq.getProductId())
+                .build();
+        shareCheckListMapper.insertShareCheckListItem(newItem);
     }
 }

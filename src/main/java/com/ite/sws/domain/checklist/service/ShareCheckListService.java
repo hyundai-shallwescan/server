@@ -1,6 +1,7 @@
 package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
+import com.ite.sws.domain.checklist.dto.PostShareCheckListReq;
 
 /**
  * 공유 체크리스트 서비스
@@ -13,6 +14,7 @@ import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
  * ----------  --------    ---------------------------
  * 2024.08.27  	김민정       최초 생성
  * 2024.08.27  	김민정       cartId로 공유 체크리스트 아이템 조회 기능 추가
+ * 2024.08.27  	김민정       공유 체크리스트에 아이템 생성 기능 추가
  * </pre>
  */
 public interface ShareCheckListService {
@@ -23,4 +25,10 @@ public interface ShareCheckListService {
      * @return 공유 체크리스트 아이템 리스트
      */
     GetShareCheckListRes findShareCheckList(Long cartId);
+
+    /**
+     * 공유 체크리스트에 아이템 생성
+     * @param postShareCheckListReq 공유 체크리스트 아이템 객체
+     */
+    void addShareCheckListItem(PostShareCheckListReq postShareCheckListReq);
 }

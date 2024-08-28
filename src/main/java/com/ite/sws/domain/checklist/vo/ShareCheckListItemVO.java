@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 공유 체크리스트 조회 VO
+ * 공유 체크리스트 VO
  * @author 김민정
  * @since 2024.08.27
  * @version 1.0
@@ -21,7 +21,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @Getter
-public class ShareCheckListVO {
+public class ShareCheckListItemVO {
+    private Long cartId;
     private Long productId;
     private String productName;
     private int productPrice;
