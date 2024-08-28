@@ -16,6 +16,7 @@
  * 2024.08.27  김민정        상품이 존재하는지 확인
  * 2024.08.27  김민정        cartId에 해당하는 공유 체크리스트 아이템 조회
  * 2024.08.27  김민정        공유 체크리스트 아이템 생성을 위한 프로시저 호출
+ * 2024.08.28  김민정        공유 체크리스트 아이템 삭제를 위한 프로시저 호출
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.checklist.mapper.ShareCheckListMapper">
@@ -40,7 +41,8 @@
 		SELECT SI.PRODUCT_ID     AS productId,
 			   P.NAME            AS productName,
 			   P.PRICE           AS productPrice,
-			   P.THUMBNAIL_IMAGE AS productThumbnail
+			   P.THUMBNAIL_IMAGE AS productThumbnail,
+			   SI.STATUS			 AS status
 		FROM   SHARE_CHECK_LIST_ITEM SI
 			   JOIN PRODUCT P ON SI.PRODUCT_ID = P.PRODUCT_ID
 		WHERE  SI.CART_ID = #{cartId}
@@ -52,4 +54,9 @@
 	<insert id="insertShareCheckListItem">
 		CALL PROC_INSERT_SHARE_CHECK_LIST_ITEM(#{cartId}, #{productId})
 	</insert>
+
+	<!-- 공유 체크리스트 아이템 삭제를 위한 프로시저 호출 -->
+	<update id="deleteShareCheckListItem">
+		CALL PROC_DELETE_SHARE_CHECK_LIST_ITEM(#{cartId}, #{productId})
+	</update>
 </mapper>

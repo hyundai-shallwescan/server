@@ -20,6 +20,7 @@ import java.util.List;
  * 2024.08.27  	김민정       상품이 존재하는지 확인
  * 2024.08.27  	김민정       cartId에 해당하는 공유 체크리스트 아이템 조회
  * 2024.08.27  	김민정       공유 체크리스트 아이템 생성을 위한 프로시저 호출
+ * 2024.08.27  	김민정       공유 체크리스트 아이템 삭제를 위한 프로시저 호출
  * </pre>
  */
 public interface ShareCheckListMapper {
@@ -50,4 +51,10 @@ public interface ShareCheckListMapper {
      * @param newItem 공유 체크리스트 아이템 생성 객체
      */
     void insertShareCheckListItem(ShareCheckListItemVO newItem);
+
+    /**
+     * 공유 체크리스트 아이템 삭제를 위한 프로시저 호출
+     * @param deleteItem 공유 체크리스트 아이템 삭제 객체
+     */
+    void deleteShareCheckListItem(ShareCheckListItemVO deleteItem);
 }
