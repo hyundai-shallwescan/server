@@ -1,5 +1,6 @@
 package com.ite.sws.domain.parking.service;
 
+import com.ite.sws.domain.parking.dto.PatchParkingReq;
 import com.ite.sws.domain.parking.dto.PostParkingReq;
 
 /**
@@ -13,6 +14,7 @@ import com.ite.sws.domain.parking.dto.PostParkingReq;
  * ----------  --------    ---------------------------
  * 2024.08.28  	남진수       최초 생성
  * 2024.08.28  	남진수       주차 기록 추가 메서드 추가
+ * 2024.08.28  	남진수       주차 기록 수정 메서드 추가
  * </pre>
  */
 public interface ParkingService {
@@ -22,4 +24,10 @@ public interface ParkingService {
      * @param postParkingReq 차량 번호
      */
     void addParkingHistory(PostParkingReq postParkingReq);
+
+    /**
+     * 주차 기록 수정(출차 처리)
+     * @param patchParkingReq 차량 번호
+     */
+    void modifyParkingHistory(PatchParkingReq patchParkingReq);
 }

@@ -13,6 +13,7 @@
  * 2024.08.28  남진수        최초 생성
  * 2024.08.28  남진수        차량번호로 회원 아이디 조회
  * 2024.08.28  남진수        주차 기록 생성(입차처리)
+ * 2024.08.28  남진수        주차 기록 수정(출차처리)
  * </pre>
  -->
 
@@ -37,5 +38,13 @@
                       #{carNumber},
                       #{entranceAt})
     </insert>
+
+    <!-- 주차 기록 수정(출차처리) -->
+    <update id="updateParkingHistory" parameterType="ParkingHistoryVO">
+        UPDATE PARKING_HISTORY
+        SET    EXIT_AT = #{exitAt}
+        WHERE  CAR_NUMBER = #{carNumber}
+               AND EXIT_AT IS NULL
+    </update>
 
 </mapper>

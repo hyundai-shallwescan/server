@@ -1,5 +1,6 @@
 package com.ite.sws.domain.parking.controller;
 
+import com.ite.sws.domain.parking.dto.PatchParkingReq;
 import com.ite.sws.domain.parking.dto.PostParkingReq;
 import com.ite.sws.domain.parking.service.ParkingService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * ----------  --------    ---------------------------
  * 2024.08.28  	남진수       최초 생성
  * 2024.08.28  	남진수       주차 기록 추가 API 생성
+ * 2024.08.28  	남진수       주차 기록 수정 API 생성
  * </pre>
  */
 @RestController
@@ -34,6 +36,17 @@ public class ParkingController {
     @PostMapping
     public ResponseEntity<Void> addParkingHistory(@RequestBody PostParkingReq postParkingReq) {
         parkingService.addParkingHistory(postParkingReq);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 주차 기록 수정(출차 처리)
+     * @param patchParkingReq 차량 번호
+     * @return ResponseEntity<Void>
+     */
+    @PatchMapping
+    public ResponseEntity<Void> updateParkingHistory(@RequestBody PatchParkingReq patchParkingReq) {
+        parkingService.modifyParkingHistory(patchParkingReq);
         return ResponseEntity.ok().build();
     }
 }
