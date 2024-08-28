@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.08.27  	김민정       공유 체크리스트 조회 API 생성
  * 2024.08.27  	김민정       공유 체크리스트 아이템 추가 API 생성
  * 2024.08.27  	김민정       공유 체크리스트 아이템 삭제 API 생성
+ * 2024.08.28  	김민정       공유 체크리스트 아이템 체크 상태 변경 API 생성
  * </pre>
  */
 @RestController
@@ -66,6 +68,18 @@ public class ShareCheckListController {
     @DeleteMapping("/{cartId}/products/{productId}")
     public ResponseEntity<Void> removeShareCheckListItem(@PathVariable Long cartId, @PathVariable Long productId) {
         shareCheckListService.removeShareCheckListItem(cartId, productId);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 공유 체크리스트 아이템 체크 상태 변경 API
+     * @param cartId 장바구니 PK
+     * @param productId 상품 PK
+     * @return 공유 체크리스트 아이템 체크 상태 변경 결과 응답
+     */
+    @PatchMapping("/{cartId}/products/{productId}")
+    public ResponseEntity<Void> modifyShareCheckListItem(@PathVariable Long cartId, @PathVariable Long productId) {
+        shareCheckListService.modifyShareCheckListItem(cartId, productId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
