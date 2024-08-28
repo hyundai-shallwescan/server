@@ -57,6 +57,6 @@
 
 	<!-- 공유 체크리스트 아이템 삭제를 위한 프로시저 호출 -->
 	<update id="deleteShareCheckListItem">
-			CALL PROC_DELETE_SHARE_CHECK_LIST_ITEM(#{cartId}, #{productId})
+		CALL PROC_DELETE_SHARE_CHECK_LIST_ITEM(#{cartId}, #{productId})
 	</update>
 </mapper>

@@ -7,9 +7,14 @@ import com.ite.sws.domain.checklist.vo.ShareCheckListItemVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
+
+import static com.ite.sws.exception.ErrorCode.DATABASE_ERROR;
+import static com.ite.sws.exception.ErrorCode.SHARE_CHECK_LIST_ITEM_NOT_FOUND;
 
 /**
  * 공유 체크리스트 서비스 구현체
@@ -84,6 +89,15 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
                 .cartId(cartId)
                 .productId(productId)
                 .build();
-        shareCheckListMapper.deleteShareCheckListItem(deleteItem);
+
+        try {
+            shareCheckListMapper.deleteShareCheckListItem(deleteItem);
+        } catch (UncategorizedSQLException e) {
+            if (e.getSQLException().getErrorCode() == 20001) {
+                throw new CustomException(SHARE_CHECK_LIST_ITEM_NOT_FOUND);
+            }
+            // 다른 예외 처리
+            throw new CustomException(DATABASE_ERROR);
+        }
     }
 }
