@@ -2,12 +2,15 @@ package com.ite.sws.domain.admin.service;
 
 
 import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
+import com.ite.sws.domain.admin.dto.GetPaymentHistoryRes;
 import com.ite.sws.domain.admin.dto.GetSalesRes;
 import com.ite.sws.domain.admin.dto.PatchProductReq;
+import com.ite.sws.domain.admin.dto.PaymentHistoryCriteria;
 import com.ite.sws.domain.admin.dto.PostCreateProductReq;
 import com.ite.sws.domain.admin.dto.SalesCriteria;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
+
 /**
  * Admin 관련 서비스
  * @since 2024.08.26
@@ -30,6 +33,9 @@ public interface AdminService {
   void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
 
   List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long memberId);
+
   List<GetSalesRes> findSalesByCriteria(SalesCriteria criteria);
+
+  List<GetPaymentHistoryRes> findPaymentHistoryOnThatDay(PaymentHistoryCriteria paymentHistoryCriteria);
 
 }
