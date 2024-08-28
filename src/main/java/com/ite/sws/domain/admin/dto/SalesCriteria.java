@@ -23,7 +23,4 @@ import lombok.NoArgsConstructor;
 public class SalesCriteria {
     private int year;
     private int month;
-    private int day;
-    private char gender;
-    private int age;
 }

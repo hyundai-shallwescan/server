@@ -80,15 +80,12 @@ public class AdminController {
   @GetMapping("/sales")
   public ResponseEntity<List<GetSalesRes>> findSaleByCriteria(
       @RequestParam(defaultValue = "2024") int year,
-      @RequestParam(defaultValue = "08") int month,
-      @RequestParam(defaultValue = "1") int day,
-      @RequestParam(defaultValue = "M") char gender,
-      @RequestParam(defaultValue = "30") int age) {
+      @RequestParam(defaultValue = "08") int month
+) {
 
-    SalesCriteria criteria = new SalesCriteria(year, month,day,gender,age);
+    SalesCriteria criteria = new SalesCriteria(year, month);
 
     List<GetSalesRes> sales = adminService.findSalesByCriteria(criteria);
-
     return ResponseEntity.ok(sales);
   }
 
