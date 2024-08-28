@@ -23,7 +23,6 @@ public class PostMyCheckListReq {
 
     @Setter
     private Long memberId;
-
     private Long myCheckListCategoryId;
     private String item;
 }
