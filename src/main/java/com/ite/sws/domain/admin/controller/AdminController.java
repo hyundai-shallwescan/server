@@ -1,9 +1,11 @@
 package com.ite.sws.domain.admin.controller;
 
 import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
+import com.ite.sws.domain.admin.dto.GetSalesRes;
 import com.ite.sws.domain.admin.dto.PatchProductReq;
 import com.ite.sws.domain.admin.dto.PostCreateProductReq;
 import com.ite.sws.domain.admin.service.AdminService;
+import com.ite.sws.domain.admin.dto.SalesCriteria;
 import java.util.Arrays;
 import java.util.List;
 import javax.validation.Valid;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
  * ----------  --------    ---------------------------
  * 2024.08.26  	구지웅      최초 생성 및 상품 관련 기능 구현
  * 2024.08.27   구지웅      유저 결제 내역 조회 기능 구현
+ * 2024.08.28   구지웅      어드민 유저 sales 조회 기능 구현*
  * </pre>
  *
  */
@@ -73,11 +77,16 @@ public class AdminController {
     return ResponseEntity.ok().body(adminService.findUserPaymentHistory(memberId));
   }
 
-//  @GetMapping("//admins/sales?year=””&month=””)
-//  public ResponseEntity<List<GetMemberPaymentHistoryRes>> findMemberPaymentHistory(
-//      @PathVariable Long memberId) {
-//    return ResponseEntity.ok().body(adminService.findUserPaymentHistory(memberId));
-//  }
+  @GetMapping("/sales")
+  public ResponseEntity<List<GetSalesRes>> findSaleByCriteria(
+      @RequestParam(defaultValue = "2024") int year,
+      @RequestParam(defaultValue = "08") int month
+) {
 
+    SalesCriteria criteria = new SalesCriteria(year, month);
+
+    List<GetSalesRes> sales = adminService.findSalesByCriteria(criteria);
+    return ResponseEntity.ok(sales);
+  }
 
 }

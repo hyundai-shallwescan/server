@@ -9,28 +9,75 @@
 * <pre>
 * 수정일        수정자        수정내용
 * 2024.08.26  	구지웅      최초 생성 및 유저 결제 내역 조회 기능 추가
+* 2024.08.27  	구지웅      세일즈 조회 쿼리 생성
+* 2024.08.27  	구지웅      회원 구매내역 select 쿼리 수정
 * </pre>
 * -->
 <mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
 
-  <select id="selectMemberPaymentHistory" parameterType="java.lang.Long"
-    resultType="com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes">
-    SELECT
-    m.member_id AS memberId,
-    p.payment_id AS paymentId,
-    p.amount AS amount,
-    p.payment_card AS paymentCard,
-    p.created_at AS createdAt,
-    p.updated_at AS updatedAt
-    FROM
-    member m
-    JOIN
-    cart c ON m.member_id = c.member_id
-    JOIN
-    payment p ON c.cart_id = p.cart_id
-    WHERE
-    m.member_id = #{memberId}
-    ORDER BY
-    p.created_at DESC
-  </select>
+    <select id="selectMemberPaymentHistory" parameterType="java.lang.Long" resultMap="memberPaymentHistoryResultMap">
+        SELECT
+            M.MEMBER_ID AS memberId,
+            P.PAYMENT_ID AS paymentId,
+            SUM(P.AMOUNT) AS totalAmountSum,
+            P.CREATED_AT AS createdAt,
+            PI.PRODUCT_ID AS productId,
+            PI.NAME AS name,
+            PI.THUMBNAIL_IMAGE AS thumbnailImage,
+            PI.QUANTITY AS quantity,
+            PI.PRICE AS price
+        FROM
+            MEMBER M
+        JOIN
+            CART C ON M.MEMBER_ID = C.MEMBER_ID
+        JOIN
+            PAYMENT P ON C.CART_ID = P.CART_ID
+        JOIN
+            PAYMENT_ITEM PI ON P.PAYMENT_ID = PI.PAYMENT_ID
+        WHERE
+            M.MEMBER_ID = #{memberId}
+        GROUP BY
+            M.MEMBER_ID, P.PAYMENT_ID, P.CREATED_AT, PI.PRODUCT_ID, PI.NAME, PI.THUMBNAIL_IMAGE, PI.QUANTITY, PI.PRICE
+        ORDER BY
+            P.CREATED_AT DESC
+    </select>
+
+    <select id="selectSalesByCriteria" parameterType="com.ite.sws.domain.admin.dto.SalesCriteria" resultType="com.ite.sws.domain.admin.dto.GetSalesRes">
+        SELECT
+            SUM(P.AMOUNT) AS totalAmount,
+            ROUND(100 * SUM(CASE WHEN M.GENDER = 'M' THEN 1 ELSE 0 END) / COUNT(*), 2) AS maleRatio,
+            ROUND(100 * SUM(CASE WHEN M.GENDER = 'F' THEN 1 ELSE 0 END) / COUNT(*), 2) AS femaleRatio,
+            ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 0 AND 9 THEN 1 ELSE 0 END) / COUNT(*), 2) AS ageRange1Ratio,
+            ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 10 AND 19 THEN 1 ELSE 0 END) / COUNT(*), 2) AS ageRange2Ratio,
+            ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 20 AND 29 THEN 1 ELSE 0 END) / COUNT(*), 2) AS ageRange3Ratio,
+            ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 30 AND 39 THEN 1 ELSE 0 END) / COUNT(*), 2) AS ageRange4Ratio,
+            ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 40 AND 49 THEN 1 ELSE 0 END) / COUNT(*), 2) AS ageRange5Ratio,
+            ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 50 AND 59 THEN 1 ELSE 0 END) / COUNT(*), 2) AS ageRange6Ratio,
+            ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 60 AND 100 THEN 1 ELSE 0 END) / COUNT(*), 2) AS ageRangeSixtyToLastRatio
+        FROM
+            PAYMENT P
+        JOIN
+            CART C ON P.CART_ID = C.CART_ID
+        JOIN
+            MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+        WHERE
+            EXTRACT(YEAR FROM P.CREATED_AT) = #{year}
+        AND
+            EXTRACT(MONTH FROM P.CREATED_AT) = #{month}
+    </select>
+
+    <resultMap id="memberPaymentHistoryResultMap" type="com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes">
+        <id property="memberId" column="memberId" />
+        <result property="paymentId" column="paymentId" />
+        <result property="totalAmountSum" column="totalAmountSum" />
+        <result property="paymentCreatedAt" column="createdAt" />
+        <collection property="purchasedProducts" ofType="com.ite.sws.domain.admin.dto.PurchasedProduct">
+            <id property="productId" column="productId" />
+            <result property="productName" column="name" />
+            <result property="thumbnailImage" column="thumbnailImage" />
+            <result property="quantity" column="quantity" />
+            <result property="price" column="price" />
+        </collection>
+    </resultMap>
+
 </mapper>

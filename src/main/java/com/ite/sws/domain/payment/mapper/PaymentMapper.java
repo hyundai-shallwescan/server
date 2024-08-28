@@ -1,6 +1,8 @@
 package com.ite.sws.domain.payment.mapper;
 
 import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
+import com.ite.sws.domain.admin.dto.GetSalesRes;
+import com.ite.sws.domain.admin.dto.SalesCriteria;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 /**
@@ -17,5 +19,8 @@ import org.apache.ibatis.annotations.Mapper;
  */
 @Mapper
 public interface PaymentMapper {
+
   List<GetMemberPaymentHistoryRes> selectMemberPaymentHistory(Long memberId);
+
+  List<GetSalesRes> selectSalesByCriteria(SalesCriteria criteria);
 }
