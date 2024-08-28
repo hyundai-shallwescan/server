@@ -1,5 +1,3 @@
-
-
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "classpath:/org/apache/ibatis/builder/xml/mybatis-3-mapper.dtd">
@@ -11,6 +9,7 @@
 * <pre>
 * 수정일        수정자        수정내용
 * 2024.08.26  	구지웅      최초 생성 및 유저 결제 내역 조회 기능 추가
+* 2024.08.27  	구지웅      세일즈 조회 쿼리 수정 -> 오라클 내장 함수에는 MONTH(), DAY(), YEAR()가 없어서 EXTRACT하는 쿼리로 수정
 * </pre>
 * -->
 <mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
@@ -18,21 +17,76 @@
   <select id="selectMemberPaymentHistory" parameterType="java.lang.Long"
     resultType="com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes">
     SELECT
-    m.member_id AS memberId,
-    p.payment_id AS paymentId,
-    p.amount AS amount,
-    p.payment_card AS paymentCard,
-    p.created_at AS createdAt,
-    p.updated_at AS updatedAt
+    M.MEMBER_ID AS memberId,
+    P.PAYMENT_ID AS paymentId,
+    P.AMOUNT AS amount,
+    P.PAYMENT_CARD AS paymentCard,
+    P.CREATED_AT AS createdAt,
+    P.UPDATED_AT AS updatedAt
     FROM
-    member m
+    MEMBER M
     JOIN
-    cart c ON m.member_id = c.member_id
+    CART C ON M.MEMBER_ID = C.MEMBER_ID
     JOIN
-    payment p ON c.cart_id = p.cart_id
+    PAYMENT P ON C.CART_ID = P.CART_ID
     WHERE
-    m.member_id = #{memberId}
+    M.MEMBER_ID = #{memberId}
     ORDER BY
-    p.created_at DESC
+    P.CREATED_AT DESC
   </select>
+
+  <select id="selectSalesByCriteria" parameterType="com.ite.sws.domain.admin.dto.SalesCriteria"
+    resultType="com.ite.sws.domain.admin.dto.GetSalesRes">
+    SELECT
+    P.PAYMENT_ID AS paymentId,
+    P.AMOUNT AS amount,
+    P.CREATED_AT AS createdAt,
+    M.GENDER AS gender,
+    M.AGE AS age
+    FROM
+    PAYMENT P
+    JOIN CART C ON P.CART_ID = C.CART_ID
+    JOIN MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
+    WHERE
+    EXTRACT(YEAR FROM P.CREATED_AT) = #{year}
+    AND EXTRACT(MONTH FROM P.CREATED_AT) = #{month}
+    <if test="day != null">
+      AND EXTRACT(DAY FROM P.CREATED_AT) = #{day}
+    </if>
+    <if test="gender != null">
+      AND M.GENDER = #{gender}
+    </if>
+    <if test="age != null">
+      <choose>
+        <when test="age == 1">
+          AND M.AGE BETWEEN 0 AND 10
+        </when>
+        <when test="age == 2">
+          AND M.AGE BETWEEN 11 AND 20
+        </when>
+        <when test="age == 3">
+          AND M.AGE BETWEEN 21 AND 30
+        </when>
+        <when test="age == 4">
+          AND M.AGE BETWEEN 31 AND 40
+        </when>
+        <when test="age == 5">
+          AND M.AGE BETWEEN 41 AND 50
+        </when>
+        <when test="age == 6">
+          AND M.AGE BETWEEN 51 AND 60
+        </when>
+        <when test="age == 7">
+          AND M.AGE BETWEEN 61 AND 70
+        </when>
+        <when test="age == 8">
+          AND M.AGE BETWEEN 71 AND 80
+        </when>
+      </choose>
+    </if>
+    ORDER BY
+    P.CREATED_AT DESC
+  </select>
+
+
 </mapper>
