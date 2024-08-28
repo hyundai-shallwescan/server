@@ -17,6 +17,7 @@
 * 2024.08.26    정은지        회원 정보 조회 기능 추가
 * 2024.08.26    정은지        회원 정보 수정 기능 추가
 * 2024.08.26    정은지        회원 탈퇴 기능 추가
+* 2024.08.27    정은지        장바구니 생성 기능 추가
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.member.mapper.MemberMapper">
@@ -54,6 +55,21 @@
         VALUES      (#{memberId},
                      #{loginId},
                      #{password})
+    </insert>
+
+    <!-- 장바구니 생성 (회원가입) -->
+    <insert id="insertCart">
+        <selectKey keyProperty="cartId" resultType="long" order="BEFORE">
+            SELECT SEQ_CART_ID.NEXTVAL
+            FROM   DUAL
+        </selectKey>
+        INSERT INTO CART
+                    (CART_ID,
+                     MEMBER_ID,
+                     CART_URI)
+        VALUES      (#{cartId},
+                     #{memberId},
+                     'scanandgo://deeplink?cartId=' || #{cartId})
     </insert>
 
     <!-- 로그인 -->

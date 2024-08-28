@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.08.26  	김민정       최초 생성
+ * 2024.08.27   정은지       cartUri 필드 추가
  * </pre>
  */
 @AllArgsConstructor
@@ -27,6 +28,7 @@ public class CartVO {
     private Long cartId;
     private Long memberId;
     private String status;
+    private String cartUri;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
