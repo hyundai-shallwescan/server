@@ -24,6 +24,7 @@ import java.util.List;
  * 2024.08.28  	정은지       마이 체크리스트 조회
  * 2024.08.28   정은지       아이템 추가
  * 2024.08.28   정은지       아이템 체크 상태 변경
+ * 2024.08.28   정은지       아이템 삭제
  * </pre>
  */
 
@@ -68,8 +69,19 @@ public class MyCheckListServiceImpl implements MyCheckListService{
      */
     @Transactional
     @Override
-    public void modifyItemStatus(Long myCheckListItemId) {
+    public void modifyMyCheckListItemStatus(Long myCheckListItemId) {
 
-        myCheckListMapper.updateItemStatus(myCheckListItemId);
+        myCheckListMapper.updateMyCheckListItemStatus(myCheckListItemId);
+    }
+
+    /**
+     * 아이템 삭제
+     * @param myCheckListItemId 아이템 ID
+     */
+    @Transactional
+    @Override
+    public void removeMyCheckListItem(Long myCheckListItemId) {
+
+        myCheckListMapper.deleteMyCheckListItem(myCheckListItemId);
     }
 }

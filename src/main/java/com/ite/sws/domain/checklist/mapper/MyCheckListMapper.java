@@ -40,5 +40,7 @@ public interface MyCheckListMapper {
      * 아이템 체크 상태 변경
      * @param myCheckListItemId 아이템 ID
      */
-    void updateItemStatus(Long myCheckListItemId);
+    void updateMyCheckListItemStatus(Long myCheckListItemId);
+
+    void deleteMyCheckListItem(Long myCheckListItemId);
 }
