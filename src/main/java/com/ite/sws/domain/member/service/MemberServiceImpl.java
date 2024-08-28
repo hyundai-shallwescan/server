@@ -176,8 +176,8 @@ public class MemberServiceImpl implements MemberService {
      */
     @Transactional
     @Override
-    public void modifyMemberStatus(Long memberId) {
-        memberMapper.updateMemberStatus(memberId);
+    public void removeMember(Long memberId) {
+        memberMapper.deleteMember(memberId);
     }
 
     /**

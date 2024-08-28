@@ -63,7 +63,7 @@ public interface MemberService {
      * 회원 탈퇴
      * @param memberId 멤버 ID (PK)
      */
-    void modifyMemberStatus(Long memberId);
+    void removeMember(Long memberId);
 
 
     /**

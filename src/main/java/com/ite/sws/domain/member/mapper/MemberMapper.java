@@ -85,7 +85,7 @@ public interface MemberMapper {
      * 회원 탈퇴
      * @param memberId 멤버 ID (PK)
      */
-    void updateMemberStatus(Long memberId);
+    void deleteMember(Long memberId);
 
     /**
      * 회원 구매 내역 조회

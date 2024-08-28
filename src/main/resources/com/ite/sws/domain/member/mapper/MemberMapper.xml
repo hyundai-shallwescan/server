@@ -110,7 +110,7 @@
     </update>
 
     <!-- 회원 탈퇴 -->
-    <update id="updateMemberStatus">
+    <update id="deleteMember">
         CALL PROC_UPDATE_MEMBER_STATUS(
                 #{memberId, jdbcType=NUMERIC}
              )
