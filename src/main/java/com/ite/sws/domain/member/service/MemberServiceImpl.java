@@ -17,7 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 회원 서비스 구현체
@@ -168,5 +171,28 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void modifyMemberStatus(Long memberId) {
         memberMapper.updateMemberStatus(memberId);
+    }
+
+    /**
+     * 구매 내역 조회
+     * @param memberId 멤버 ID
+     * @return 구매 내역 리스트
+     */
+    @Transactional(readOnly = true)
+    @Override
+    public List<GetMemberPaymentRes> findPaymentItemListByPaymentId(Long memberId) {
+        List<GetMemberPaymentRes> paymentList = memberMapper.selectPaymentListByMemberID(memberId);
+
+        return paymentList.stream()
+                .map(payment -> {
+                    List<GetMemberPaymentRes.GetMemberPaymentItemRes> items = memberMapper.selectPaymentItemByPaymentId(payment.getPaymentId());
+                    return GetMemberPaymentRes.builder()
+                            .paymentId(payment.getPaymentId())
+                            .createdAt(payment.getCreatedAt())
+                            .amount(payment.getAmount())
+                            .items(items != null ? items : Collections.emptyList()) // items가 null이면 빈 리스트 설정
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }

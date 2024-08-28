@@ -114,4 +114,31 @@
              )
     </update>
 
+    <!-- 구매내역 조회 -->
+    <select id="selectPaymentListByMemberID">
+        SELECT P.PAYMENT_ID,
+               P.CREATED_AT,
+               P.AMOUNT
+        FROM   MEMBER M
+                   JOIN CART C
+                        ON M.MEMBER_ID = C.MEMBER_ID
+                   JOIN PAYMENT P
+                        ON C.CART_ID = P.CART_ID
+        WHERE  M.MEMBER_ID = #{memberId}
+        ORDER  BY P.PAYMENT_ID DESC
+    </select>
+
+    <!-- 구매 내역 아이템 조회 -->
+    <select id="selectPaymentItemByPaymentId">
+        SELECT PI.PAYMENT_ITEM_ID,
+               PI.NAME,
+               PI.PRICE,
+               PI.QUANTITY,
+               PI.THUMBNAIL_IMAGE
+        FROM   PAYMENT P
+                   JOIN PAYMENT_ITEM PI
+                        ON PI.PAYMENT_ID = P.PAYMENT_ID
+        WHERE  P.PAYMENT_ID = #{paymentId}
+        ORDER  BY PI.PAYMENT_ITEM_ID DESC
+    </select>
 </mapper>
