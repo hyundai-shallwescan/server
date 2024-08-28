@@ -84,6 +84,7 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
      * @param productId 상품 PK
      */
     @Override
+    @Transactional
     public void removeShareCheckListItem(Long cartId, Long productId) {
         ShareCheckListItemVO deleteItem = ShareCheckListItemVO.builder()
                 .cartId(cartId)
