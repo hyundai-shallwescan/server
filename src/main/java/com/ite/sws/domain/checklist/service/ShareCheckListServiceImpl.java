@@ -23,6 +23,7 @@ import java.util.List;
  * 2024.08.27  	김민정       최초 생성
  * 2024.08.27  	김민정       cartId로 공유 체크리스트 아이템 조회 기능 추가
  * 2024.08.27  	김민정       공유 체크리스트에 아이템 생성 기능 추가
+ * 2024.08.28  	김민정       공유 체크리스트 아이템 삭제 기능 추가
  * </pre>
  */
 @Service
@@ -70,5 +71,19 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
                 .productId(postShareCheckListReq.getProductId())
                 .build();
         shareCheckListMapper.insertShareCheckListItem(newItem);
+    }
+
+    /**
+     * 공유 체크리스트 아이템 삭제
+     * @param cartId 장바구니 PK
+     * @param productId 상품 PK
+     */
+    @Override
+    public void removeShareCheckListItem(Long cartId, Long productId) {
+        ShareCheckListItemVO deleteItem = ShareCheckListItemVO.builder()
+                .cartId(cartId)
+                .productId(productId)
+                .build();
+        shareCheckListMapper.deleteShareCheckListItem(deleteItem);
     }
 }
