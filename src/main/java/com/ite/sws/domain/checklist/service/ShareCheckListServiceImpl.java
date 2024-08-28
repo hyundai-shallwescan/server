@@ -29,6 +29,7 @@ import static com.ite.sws.exception.ErrorCode.SHARE_CHECK_LIST_ITEM_NOT_FOUND;
  * 2024.08.27  	김민정       cartId로 공유 체크리스트 아이템 조회 기능 추가
  * 2024.08.27  	김민정       공유 체크리스트에 아이템 생성 기능 추가
  * 2024.08.28  	김민정       공유 체크리스트 아이템 삭제 기능 추가
+ * 2024.08.28  	김민정       공유 체크리스트 아이템 체크 상태 변경 기능 추가
  * </pre>
  */
 @Service
@@ -93,6 +94,25 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
 
         try {
             shareCheckListMapper.deleteShareCheckListItem(deleteItem);
+        } catch (UncategorizedSQLException e) {
+            if (e.getSQLException().getErrorCode() == 20001) {
+                throw new CustomException(SHARE_CHECK_LIST_ITEM_NOT_FOUND);
+            }
+            // 다른 예외 처리
+            throw new CustomException(DATABASE_ERROR);
+        }
+    }
+
+    /**
+     * 공유 체크리스트 아이템 체크 상태 변경
+     * @param cartId 장바구니 PK
+     * @param productId 상품 PK
+     */
+    @Override
+    @Transactional
+    public void modifyShareCheckListItem(Long cartId, Long productId) {
+        try {
+            shareCheckListMapper.updateShareCheckListItem(cartId, productId);
         } catch (UncategorizedSQLException e) {
             if (e.getSQLException().getErrorCode() == 20001) {
                 throw new CustomException(SHARE_CHECK_LIST_ITEM_NOT_FOUND);
