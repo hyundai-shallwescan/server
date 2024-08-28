@@ -14,11 +14,13 @@ import java.util.List;
  * 수정일        	수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
- * 2024.08.24   정은지        중복 아이디 체크 및 회원가입 기능 추가
- * 2024.08.25   정은지        로그인 기능 추가
- * 2024.08.26   정은지        회원 정보 조회 기능 추가
- * 2024.08.26   정은지        회원 정보 수정 기능 추가
- * 2024.08.26   정은지        회원 탈퇴 기능 추가
+ * 2024.08.24   정은지        중복 아이디 체크 및 회원가입 추가
+ * 2024.08.25   정은지        로그인 추가
+ * 2024.08.26   정은지        회원 정보 조회 추가
+ * 2024.08.26   정은지        회원 정보 수정 추가
+ * 2024.08.26   정은지        회원 탈퇴 추가
+ * 2024.08.27   정은지        구매 내역 조회 추가
+ * 2024.08.27   정은지        작성 리뷰 조회 추가
  * </pre>
  */
 
@@ -69,5 +71,12 @@ public interface MemberService {
      * @param memberId 멤버 ID
      * @return 구매 내역 리스트
      */
-    List<GetMemberPaymentRes> findPaymentItemListByPaymentId(Long memberId);
+    List<GetMemberPaymentRes> findPaymentItemList(Long memberId);
+
+    /**
+     * 나의 전체 리뷰 조회
+     * @param memberId 멤버 ID
+     * @return 리뷰 리스트
+     */
+    List<GetMemberReviewRes> findReviewList(Long memberId, int page, int size);
 }
