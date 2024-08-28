@@ -1,6 +1,7 @@
 package com.ite.sws.domain.admin.service;
 
 
+import com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes;
 import com.ite.sws.domain.admin.dto.PatchProductReq;
 import com.ite.sws.domain.admin.dto.PostCreateProductReq;
 import java.util.List;
@@ -14,14 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.26  	구지웅      최초 생성
+ * 2024.08.27   구지웅      유저 결제 내역 조회 기능 구현
  * </pre>
  *
  */
-
 public interface AdminService {
-   void addProduct(PostCreateProductReq postCreateProductReq,List<MultipartFile> fileList);
 
-   void deleteProduct(Long productId);
+  void addProduct(PostCreateProductReq postCreateProductReq, List<MultipartFile> fileList);
 
-   void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
+  void deleteProduct(Long productId);
+
+  void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
+
+  List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long memberId);
 }
