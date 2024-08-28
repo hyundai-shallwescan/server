@@ -1,6 +1,7 @@
 package com.ite.sws.domain.checklist.mapper;
 
-import com.ite.sws.domain.checklist.vo.ShareCheckListVO;
+import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
+import com.ite.sws.domain.checklist.vo.ShareCheckListItemVO;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.List;
  * 2024.08.27  	김민정       장바구니가 존재하는지 확인
  * 2024.08.27  	김민정       상품이 존재하는지 확인
  * 2024.08.27  	김민정       cartId에 해당하는 공유 체크리스트 아이템 조회
+ * 2024.08.27  	김민정       공유 체크리스트 아이템 생성을 위한 프로시저 호출
  * </pre>
  */
 public interface ShareCheckListMapper {
@@ -34,12 +36,18 @@ public interface ShareCheckListMapper {
      * @param productId 상품 ID
      * @return
      */
-    int selectProductByProductId(@Param("productId") Long productId);
+    int selectCountByProductId(@Param("productId") Long productId);
 
     /**
      * cartId에 해당하는 공유 체크리스트 아이템 조회
      * @param cartId 장바구니 ID
      * @return
      */
-    List<ShareCheckListVO> selectShareCheckListByCartId(Long cartId);
+    List<GetShareCheckListRes.GetShareCheckRes> selectShareCheckListByCartId(Long cartId);
+
+    /**
+     * 공유 체크리스트 아이템 생성을 위한 프로시저 호출
+     * @param newItem 공유 체크리스트 아이템 생성 객체
+     */
+    void insertShareCheckListItem(ShareCheckListItemVO newItem);
 }
