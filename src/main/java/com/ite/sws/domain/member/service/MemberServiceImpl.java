@@ -117,14 +117,13 @@ public class MemberServiceImpl implements MemberService {
 
         // 사용자가 존재하지 않으면 예외 발생
         if(!authOptional.isPresent()) {
-            throw new CustomException(ErrorCode.FIND_FAIL_MEMBER_ID);
+            throw new CustomException(ErrorCode.LOGIN_FAIL);
         }
 
         // 비밀번호가 일치하지 않으면 예외 발생
         AuthVO auth = authOptional.get();
-
         if(!passwordEncoder.matches(postLoginReq.getPassword(), auth.getPassword())) {
-            throw new CustomException(ErrorCode.FIND_FAIL_MEMBER_ID);
+            throw new CustomException(ErrorCode.LOGIN_FAIL);
         }
 
         // 아이디와 비밀번호를 기반으로 Authentication 객체 생성
@@ -197,7 +196,7 @@ public class MemberServiceImpl implements MemberService {
                             .paymentId(payment.getPaymentId())
                             .createdAt(payment.getCreatedAt())
                             .amount(payment.getAmount())
-                            .items(items != null ? items : Collections.emptyList()) // items가 null이면 빈 리스트 설정
+                            .items(items != null ? items : Collections.emptyList())
                             .build();
                 })
                 .collect(Collectors.toList());
