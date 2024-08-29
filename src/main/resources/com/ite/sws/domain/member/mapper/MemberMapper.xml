@@ -136,10 +136,17 @@
                PI.NAME,
                PI.PRICE,
                PI.QUANTITY,
-               PI.THUMBNAIL_IMAGE
+               PI.THUMBNAIL_IMAGE,
+               CASE
+                   WHEN SF.SHORT_FORM_ID IS NULL
+                       OR SF.IS_DELETED = 1 THEN 'N'
+                   WHEN SF.SHORT_FORM_ID IS NOT NULL THEN 'Y'
+               END AS IS_REVIEW_WRITTEN
         FROM   PAYMENT P
                    JOIN PAYMENT_ITEM PI
                         ON PI.PAYMENT_ID = P.PAYMENT_ID
+                   LEFT JOIN SHORT_FORM SF
+                             ON SF.PAYMENT_ITEM_ID = PI.PAYMENT_ITEM_ID
         WHERE  P.PAYMENT_ID = #{paymentId}
         ORDER  BY PI.PAYMENT_ITEM_ID DESC
     </select>

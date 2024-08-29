@@ -18,6 +18,7 @@ import java.util.List;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.08.27   정은지       최초 생성
+ * 2024.08.29   정은지       리뷰 작성 여부 필드 추가
  * </pre>
  */
 
@@ -42,5 +43,6 @@ public class GetMemberPaymentRes {
         private Integer price;
         private Integer quantity;
         private String thumbnailImage;
+        private Character isReviewWritten;
     }
 }
