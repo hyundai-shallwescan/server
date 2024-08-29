@@ -106,7 +106,7 @@ public class CartServiceImpl implements CartService {
         // 아이디가 존재하나 비밀번호가 일치하지 않으면 예외 발생
         CartMemberVO auth = authOptional.get();
         if (!passwordEncoder.matches(postLoginReq.getPassword(), auth.getPassword())) {
-            throw new CustomException(ErrorCode.LOGIN_FAIL_CART_MEMBER);
+            throw new CustomException(ErrorCode.LOGIN_FAIL);
         }
 
         // 인증 후 토큰 생성

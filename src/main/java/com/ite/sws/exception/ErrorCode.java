@@ -27,7 +27,7 @@ public enum ErrorCode {
     /* 400: Bad Request */
     FIND_FAIL_MEMBER_ID(BAD_REQUEST.value(), "존재하지 않는 멤버입니다."),
     FIND_FAIL_CART_MEMBER_ID(BAD_REQUEST.value(), "존재하지 않는 장바구니 멤버입니다."),
-    LOGIN_FAIL_CART_MEMBER(BAD_REQUEST.value(), "아이디 또는 비밀번호가 잘못되었습니다."),
+    LOGIN_FAIL(BAD_REQUEST.value(), "아이디 또는 비밀번호가 잘못되었습니다."),
     REVIEW_FILE_TYPE_NOT_PERMITTED(BAD_REQUEST.value(), "올바르지 않은 파일 형식입니다."),
     ALL_FILE_AND_INFO_SHOULD_BE_IN_REQUEST(BAD_REQUEST.value(), "파일과 모든 정보를 입력해야합니다."),
     NO_COMMAND(BAD_REQUEST.value(), "존재하지 않은 명령어입니다."),
