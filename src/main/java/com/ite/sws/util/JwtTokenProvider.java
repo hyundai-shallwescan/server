@@ -49,6 +49,8 @@ public class JwtTokenProvider {
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14; // 14일
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;  // 14일
 
+    private RedisUtil redisUtil;
+
     /**
      *  secretKey를 이용해 HMAC-SHA 알고리즘용 키를 초기화하는 메서드
      */
@@ -94,7 +96,7 @@ public class JwtTokenProvider {
 
     /**
      * JWT 토큰에서 인증 정보를 조회 메서드
-     * @param accessToken JWT Access Token
+     * @param accessToken JWT 액세스토큰
      * @return Authentication 인증 정보 객체
      */
     public Authentication getAuthentication(String accessToken) {
@@ -119,22 +121,20 @@ public class JwtTokenProvider {
 
     /**
      * JWT 토큰의 유효성 검사 메서드
-     * @param token JWT 토큰
+     * @param accessToken JWT 액세스토큰
      * @return boolean 토큰 유효 여부
      */
-    public boolean validateToken(String token) {
+    public boolean validateToken(String accessToken) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token);
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
+
             return true;
         } catch (SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.", e);
+            log.info("잘못된 JWT 토큰입니다.", e);
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 서명입니다.", e);
+            log.info("만료된 JWT 토큰입니다.", e);
         } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 서명입니다.", e);
+            log.info("지원되지 않는 JWT 토큰입니다.", e);
         } catch (IllegalArgumentException e) {
             log.info("JWT 토큰이 잘못되었습니다.", e);
         }
@@ -143,7 +143,7 @@ public class JwtTokenProvider {
 
     /**
      * JWT 토큰에서 Claims 객체를 파싱하는 메서드
-     * @param accessToken JwtToken 객체
+     * @param accessToken 액세스토큰
      * @return Claims 객체
      */
     private Claims parseClaims(String accessToken) {
@@ -156,5 +156,28 @@ public class JwtTokenProvider {
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
+    }
+
+    /**
+     * 액세스 토큰의 유효시간을 반환하는 메서드
+     * @param accessToken JWT 액세스토큰
+     * @return
+     */
+    public Long getExpiration(String accessToken) {
+        // 액세스 토큰 남은 유효시간
+        Date expiration = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody().getExpiration();
+        // 현재 시간
+        Long now = new Date().getTime();
+        return (expiration.getTime() - now);
+    }
+
+    /**
+     * JWT 토큰에서 사용자 ID를 추출하는 메서드
+     * @param accessToken JWT 액세스토큰
+     * @return memberId 멤버 아이디
+     */
+    public Long getMemberIdFromToken(String accessToken) {
+        Claims claims = parseClaims(accessToken); // JWT 토큰에서 Claims를 파싱
+        return claims.get("memberId", Long.class); // Claims에서 memberId를 추출하여 반환
     }
 }

@@ -10,6 +10,7 @@ import com.ite.sws.exception.ErrorCode;
 import com.ite.sws.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,7 @@ import java.util.stream.Collectors;
  * 2024.08.27   정은지        회원가입 로직 수정
  * 2024.08.27   정은지        구매 내역 조회 추가
  * 2024.08.27   정은지        작성 리뷰 조회 추가
+ * 2024.08.29   정은지        로그아웃 추가
  * </pre>
  */
 
@@ -53,6 +55,7 @@ public class MemberServiceImpl implements MemberService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 로그인 아이디 중복 체크
@@ -108,9 +111,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Transactional
     @Override
-    public JwtToken findMemberByLoginId(PostLoginReq postLoginReq) {
-
-        log.info("로그인 요청 정보", postLoginReq);
+    public JwtToken login(PostLoginReq postLoginReq) {
 
         // 로그인 아이디로 사용자 조회
         Optional<AuthVO> authOptional = memberMapper.selectMemberByLoginId(postLoginReq.getLoginId());
@@ -137,6 +138,10 @@ public class MemberServiceImpl implements MemberService {
         // 인증 정보를 기반으로 JWT 토큰 생성
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId());
 
+        // Redis에 memberId를 키로 JWT 토큰 저장
+        String token = jwtToken.getAccessToken().toString();
+        int expirationMinutes = (int) (jwtTokenProvider.getExpiration(jwtToken.getAccessToken()) / 60000);
+        redisTemplate.opsForValue().set("JWT_TOKEN:" + auth.getMemberId(), token, expirationMinutes);
         return jwtToken;
     }
 
@@ -212,5 +217,20 @@ public class MemberServiceImpl implements MemberService {
     public List<GetMemberReviewRes> findReviewList(Long memberId, int page, int size) {
         int offset = page * size;
         return memberMapper.selectReviewListByMemberId(memberId, offset, size);
+    }
+
+    /**
+     * 로그아웃
+     * @param memberId 멤버 ID
+     */
+    @Transactional
+    @Override
+    public void logout(Long memberId) {
+        String key = "JWT_TOKEN:" + memberId;
+        // RedisUtil을 사용하여 해당 토큰이 존재하는지 확인
+        if (redisTemplate.hasKey(key)) {
+            // 해당 토큰이 존재하면 삭제하여 로그아웃 처리
+            redisTemplate.delete(key); // Token 삭제
+        }
     }
 }

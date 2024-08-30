@@ -21,6 +21,7 @@ import java.util.List;
  * 2024.08.26   정은지        회원 탈퇴 추가
  * 2024.08.27   정은지        구매 내역 조회 추가
  * 2024.08.27   정은지        작성 리뷰 조회 추가
+ * 2024.08.29   정은지        로그아웃 추가
  * </pre>
  */
 
@@ -44,7 +45,7 @@ public interface MemberService {
      * @param postLoginReq 아이디, 비밀번호
      * @return JwtToken 객체
      */
-    JwtToken findMemberByLoginId(PostLoginReq postLoginReq);
+    JwtToken login(PostLoginReq postLoginReq);
 
     /**
      * 멤버 아이디로 회원 정보 조회
@@ -79,4 +80,10 @@ public interface MemberService {
      * @return 리뷰 리스트
      */
     List<GetMemberReviewRes> findReviewList(Long memberId, int page, int size);
+
+    /**
+     * 로그아웃
+     * @param memberId 멤버 ID
+     */
+    void logout(Long memberId);
 }
