@@ -1,12 +1,12 @@
 package com.ite.sws.domain.chat.controller;
 
+import com.ite.sws.domain.chat.dto.ChatDTO;
 import com.ite.sws.domain.chat.dto.GetChatRes;
 import com.ite.sws.domain.chat.service.ChatService;
-import com.ite.sws.domain.chat.vo.ChatMessageVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -30,17 +30,26 @@ import java.util.List;
 public class ChatController {
 
     private final ChatService chatService;
+    private final SimpMessagingTemplate template;
+
+    /**
+     * 장바구니 입장 채팅 메시지 전송
+     * @param message 채팅 메시지
+     */
+    @MessageMapping(value = "/chat/enter")
+    public void enter(ChatDTO message){
+        System.out.println(message.getPayload());
+        template.convertAndSend("/sub/chat/room/" + message.getCartId(), message);
+    }
 
     /**
      * 채팅 메시지 전송
      * @param message 채팅 메시지
-     * @return ChatMessageVO
      */
-    @MessageMapping("/{cartId}/chats")  // 클라이언트가 "/ws/pub/{cartId}/chats"로 메시지를 전송하면 이 메서드가 호출됨
-    @SendTo("/sub/chat/{cartId}")  // 구독한 모든 클라이언트에게 "/sub/chat" 메시지 전송
-    public ChatMessageVO sendMessage(ChatMessageVO message) {
-        chatService.saveMessage(message);
-        return message;
+    @MessageMapping(value = "/chat/message")
+    public void message(ChatDTO message){
+        System.out.println(message.getPayload());
+        template.convertAndSend("/sub/chat/room/" + message.getCartId(), message);
     }
 
     /**
