@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  * ----------  --------    ---------------------------
  * 2024.08.26  	구지웅      최초 생성
  * 2024.08.26  	구지웅      MediaPersistLocationStrategy 의존성 추가
+ * 2024.08.30  	김민정      단일 파일 S3 업로드
  * </pre>
  *
  */
@@ -71,6 +72,26 @@ public abstract class AbstractPersistenceHelper<T> {
         }
     }
 
+    /**
+     * 단일 파일 S3 업로드
+     * @param file 업로드할 파일
+     * @return S3에 저장된 파일의 URI
+     */
+    @Transactional
+    protected String upload(File file) {
+        try {
+            String fileIdentifier = persistLocationStrategy.getPreAssignedUrl(file.getName(), bucketName);
+            persistLocationStrategy.save(file.getName(), bucketName, file);
+            return fileIdentifier;
+        } catch (AmazonS3Exception e) {
+            handleUploadException(file);
+            return null;  // Upload 실패 시 null 반환
+        } catch (Exception e) {
+            handleGeneralException();
+            return null;  // 예외 발생 시 null 반환
+        }
+    }
+
     protected abstract void processDomain(T createRequest, List<String> fileIdentifiers,
         UploadCommand uploadCommand);
 
@@ -88,10 +109,19 @@ public abstract class AbstractPersistenceHelper<T> {
         throw new CustomException(ErrorCode.PERSIST_EXCEPTION_TO_THIRD_PARTY);
     }
 
+    protected void handleUploadException(File file) {
+        cleanupOnFailure(file);
+        throw new CustomException(ErrorCode.PERSIST_EXCEPTION_TO_THIRD_PARTY);
+    }
+
     protected void cleanupOnFailure(List<MultipartFile> files) {
         for (MultipartFile file : files) {
             persistLocationStrategy.remove( file.getOriginalFilename(), bucketName);
         }
+    }
+
+    protected void cleanupOnFailure(File file) {
+        persistLocationStrategy.remove(file.getName(), bucketName);
     }
 
     private File convertMultipartFileToFile(MultipartFile file) throws IOException {

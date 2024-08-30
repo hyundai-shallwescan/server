@@ -44,6 +44,7 @@ public enum ErrorCode {
     /* 404: NOT FOUND*/
     PRODUCT_NOT_FOUND(NOT_FOUND.value(), "상품이 존재하지 않습니다."),
     CART_NOT_FOUND(NOT_FOUND.value(), "장바구니가 존재하지 않습니다."),
+    CART_ITEM_NOT_FOUND(NOT_FOUND.value(), "장바구니 아이템이 존재하지 않습니다."),
     REVIEW_IS_NOT_EXIST(HttpStatus.NOT_FOUND.value(), "리뷰가 존재하지 않습니다."),
     PRODUCT_IS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "상품이 존재하지 않습니다."),
     SHARE_CHECK_LIST_ITEM_NOT_FOUND(NOT_FOUND.value(), "공유체크리스트 아이템이 존재하지 않습니다."),
@@ -55,6 +56,7 @@ public enum ErrorCode {
     /* 500: Internal Server Error */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
     DATABASE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "데이터베이스 오류가 발생했습니다."),
+    QR_GENERATE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "QR 코드 생성에 실패했습니다."),
     NULL_POINTER_EXCEPTION(HttpStatus.INTERNAL_SERVER_ERROR.value(), "잘못된 값(NULL)이 처리되었습니다."),
     PERSIST_EXCEPTION_TO_THIRD_PARTY(HttpStatus.INTERNAL_SERVER_ERROR.value(), "외부 저장소에 저장을 실패했습니다.");
 

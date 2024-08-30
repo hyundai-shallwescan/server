@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+ <!-- 
+ * 상품 결제 Mybatis 매퍼
+ * @author 김민정
+ * @since 2024.08.28
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일       수정자        수정내용
+ * ==========  =========    =========
+ * 2024.08.28  김민정        최초 생성
+ * 2024.08.28  김민정        상품 결제 정보 삽입을 위한 프로시저 호출
+ * 2024.08.28  김민정        새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출
+ * </pre>
+ -->
+<mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
+
+	<!-- 상품 결제 정보 삽입을 위한 프로시저 호출 -->
+	<insert id="insertPayment" parameterType="com.ite.sws.domain.payment.vo.PaymentVO" statementType="CALLABLE">
+		{CALL PROC_INSERT_PAYMENT(
+				#{cartId, mode=IN, jdbcType=NUMERIC},
+				#{amount, mode=IN, jdbcType=NUMERIC},
+				#{paymentCard, mode=IN, jdbcType=VARCHAR},
+				#{paymentKey, mode=IN, jdbcType=VARCHAR},
+				#{paymentTime, mode=IN, jdbcType=TIMESTAMP},
+				#{paymentId, mode=OUT, jdbcType=NUMERIC}
+		)}
+	</insert>
+
+	<!-- 새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출 -->
+	<insert id="insertCartAndQRCode">
+		CALL PROC_INSERT_CART_AND_QRCODE(
+			#{cartId},
+			#{paymentId},
+		    #{qrCodeUri}
+			)
+	</insert>
+
+</mapper>

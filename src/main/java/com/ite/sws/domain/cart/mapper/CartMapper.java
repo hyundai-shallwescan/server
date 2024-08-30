@@ -100,11 +100,4 @@ public interface CartMapper {
      */
     int selectCountByCartId(@Param("cartId") Long cartId);
 
-    /**
-     * 상품이 존재하는지 확인
-     * @param productId 상품 ID
-     * @return
-     */
-    int selectProductByProductId(@Param("productId") Long productId);
-
 }
