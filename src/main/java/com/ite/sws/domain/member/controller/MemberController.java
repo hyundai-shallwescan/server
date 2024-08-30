@@ -37,6 +37,7 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * 2024.08.26   정은지        회원 탈퇴 기능 API 생성
  * 2024.08.27   정은지        구매 내역 조회 API 생성
  * 2024.08.27   정은지        작성 리뷰 조회 API 생성
+ * 2024.08.29   정은지        로그아웃 API 생성
  * </pre>
  */
 
@@ -90,11 +91,9 @@ public class MemberController {
      * @return JwtToken 객체
      */
     @PostMapping("/login")
-    public ResponseEntity<?> findMemberByLoginId(@RequestBody PostLoginReq postLoginReq) {
+    public ResponseEntity<?> login(@RequestBody PostLoginReq postLoginReq) {
 
-        log.info("LOGIN 정보", postLoginReq);
-
-        JwtToken token = memberService.findMemberByLoginId(postLoginReq);
+        JwtToken token = memberService.login(postLoginReq);
         return ResponseEntity.ok(token);
     }
 
@@ -166,6 +165,19 @@ public class MemberController {
         List<GetMemberReviewRes> reviews = memberService.findReviewList(memberId, page, size);
 
         return ResponseEntity.ok(reviews);
+    }
+
+    /**
+     * 로그아웃 API
+     * @return 로그아웃 성공 여부
+     */
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+
+        Long memberId = SecurityUtil.getCurrentMemberId();
+        memberService.logout(memberId);
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     /**

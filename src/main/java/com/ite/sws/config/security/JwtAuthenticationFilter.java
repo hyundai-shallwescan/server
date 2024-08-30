@@ -1,7 +1,9 @@
 package com.ite.sws.config.security;
 
 import com.ite.sws.util.JwtTokenProvider;
+import com.ite.sws.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -24,6 +26,7 @@ import java.io.IOException;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.25   정은지        최초 생성
+ * 2024.08.29   정은지        Redis를 활용한 JWT 검증 로직 추가
  * </pre>
  */
 
@@ -31,6 +34,8 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private RedisUtil redisUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 요청 필터링 메서드
@@ -43,15 +48,23 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
      */
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+
         // Request Header에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
 
-        // validateToken으로 토큰 유효성 검사
         if (token != null && jwtTokenProvider.validateToken(token)) {
-            // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String key ="JWT_TOKEN:" + jwtTokenProvider.getMemberIdFromToken(token);
 
+            logger.info("key: " + key);
+            logger.info(redisTemplate.hasKey(key));
+
+            String storedToken = redisTemplate.opsForValue().get(key);
+
+            if(redisTemplate.hasKey(key) & storedToken != null) {
+                // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
         chain.doFilter(request, response);
     }
