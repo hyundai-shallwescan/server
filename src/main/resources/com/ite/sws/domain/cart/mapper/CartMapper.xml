@@ -141,6 +141,7 @@
 		SELECT COUNT(*)
 		FROM   CART
 		WHERE  CART_ID = #{cartId}
+		  AND STATUS = 'ACTIVE'
 	</select>
 
 	<!-- 상품이 존재하는지 확인 -->
@@ -148,6 +149,7 @@
 		SELECT COUNT(*)
 		FROM   PRODUCT
 		WHERE  PRODUCT_ID = #{productId}
+		  AND IS_DELETED = 0
 	</select>
 
 </mapper>

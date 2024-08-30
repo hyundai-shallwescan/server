@@ -27,6 +27,7 @@
 		SELECT COUNT(*)
 		FROM   CART
 		WHERE  CART_ID = #{cartId}
+		  AND STATUS = 'ACTIVE'
 	</select>
 
 	<!-- 상품이 존재하는지 확인 -->
@@ -34,6 +35,7 @@
 		SELECT COUNT(*)
 		FROM   PRODUCT
 		WHERE  PRODUCT_ID = #{productId}
+		  AND IS_DELETED = 0
 	</select>
 
 	<!-- cartId에 해당하는 공유 체크리스트 아이템 조회 -->
