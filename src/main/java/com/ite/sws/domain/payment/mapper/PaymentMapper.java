@@ -13,14 +13,15 @@ import org.apache.ibatis.annotations.Param;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.08.28  	김민정       최초 생성
- * 2024.08.28  	김민정       상품 결제 정보 삽입
+ * 2024.08.28  	김민정       상품 결제 정보 삽입을 위한 프로시저 호출
  * 2024.08.28  	김민정       새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출
+ * 2024.08.28  	김민정       결제 ID를 통한 출입증 상태 사용 처리
  * </pre>
  */
 public interface PaymentMapper {
 
     /**
-     * 상품 결제 정보 삽입
+     * 상품 결제 정보 삽입을 위한 프로시저 호출
      * @param newPayment 상품 결제 생성 객체
      */
     void insertPayment(PaymentVO newPayment);
@@ -34,4 +35,10 @@ public interface PaymentMapper {
     void insertCartAndQRCode(@Param("cartId") Long cartId,
                              @Param("paymentId") Long paymentId,
                              @Param("qrCodeUri") String qrCodeUri);
+
+    /**
+     * 결제 ID를 통한 출입증 상태 사용 처리
+     * @param paymentId 결제 ID
+     */
+    int updateExitCredential(Long paymentId);
 }

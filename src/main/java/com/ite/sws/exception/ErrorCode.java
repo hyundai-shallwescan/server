@@ -49,6 +49,7 @@ public enum ErrorCode {
     PRODUCT_IS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "상품이 존재하지 않습니다."),
     SHARE_CHECK_LIST_ITEM_NOT_FOUND(NOT_FOUND.value(), "공유체크리스트 아이템이 존재하지 않습니다."),
     REVIEW_IS_NOT_FOUND(HttpStatus.NOT_FOUND.value(), "리뷰가 존재하지 않습니다."),
+    EXIT_CREDENTIAL_NOT_FOUND(NOT_FOUND.value(), "출인증이 존재하지 않습니다."),
 
     /* 409: Conflict */
     LOGIN_ID_ALREADY_EXISTS(CONFLICT.value(), "이미 존재하는 아이디입니다."),
