@@ -1,9 +1,11 @@
 package com.ite.sws.domain.checklist.service;
 
+import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
 import com.ite.sws.domain.checklist.dto.PostShareCheckListReq;
 import com.ite.sws.domain.checklist.mapper.ShareCheckListMapper;
 import com.ite.sws.domain.checklist.vo.ShareCheckListItemVO;
+import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,8 @@ import static com.ite.sws.exception.ErrorCode.SHARE_CHECK_LIST_ITEM_NOT_FOUND;
 public class ShareCheckListServiceImpl implements ShareCheckListService {
 
     private final ShareCheckListMapper shareCheckListMapper;
+    private final CartMapper cartMapper;
+    private final ProductMapper productMapper;
 
     /**
      * cartId로 공유 체크리스트 아이템 조회
@@ -47,7 +51,7 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
     @Transactional(readOnly = true)
     public GetShareCheckListRes findShareCheckList(Long cartId) {
         // cartId가 유효한지 확인
-        if (shareCheckListMapper.selectCountByCartId(cartId) == 0) {
+        if (cartMapper.selectCountByCartId(cartId) == 0) {
             throw new CustomException(ErrorCode.CART_NOT_FOUND);
         }
         List<GetShareCheckListRes.GetShareCheckRes> items = shareCheckListMapper.selectShareCheckListByCartId(cartId);
@@ -65,10 +69,10 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
     @Transactional
     public void addShareCheckListItem(PostShareCheckListReq postShareCheckListReq) {
         // cartId, productId가 유효한지 확인
-        if (shareCheckListMapper.selectCountByCartId(postShareCheckListReq.getCartId()) == 0) {
+        if (cartMapper.selectCountByCartId(postShareCheckListReq.getCartId()) == 0) {
             throw new CustomException(ErrorCode.CART_NOT_FOUND);
         }
-        if (shareCheckListMapper.selectCountByProductId(postShareCheckListReq.getProductId()) == 0) {
+        if (productMapper.selectCountByProductId(postShareCheckListReq.getProductId()) == 0) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 

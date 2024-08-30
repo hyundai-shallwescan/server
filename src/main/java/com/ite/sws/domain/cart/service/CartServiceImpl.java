@@ -8,6 +8,7 @@ import com.ite.sws.domain.cart.vo.CartMemberVO;
 import com.ite.sws.domain.cart.vo.CartVO;
 import com.ite.sws.domain.member.dto.JwtToken;
 import com.ite.sws.domain.member.dto.PostLoginReq;
+import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.util.JwtTokenProvider;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
@@ -47,6 +48,7 @@ import java.util.Optional;
 public class CartServiceImpl implements CartService {
 
     private final CartMapper cartMapper;
+    private final ProductMapper productMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -204,7 +206,7 @@ public class CartServiceImpl implements CartService {
         }
 
         // productId가 유효한지 확인
-        if (cartMapper.selectProductByProductId(productId) == 0) {
+        if (productMapper.selectCountByProductId(productId) == 0) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 
@@ -229,7 +231,7 @@ public class CartServiceImpl implements CartService {
         }
 
         // productId가 유효한지 확인
-        if (cartMapper.selectProductByProductId(productId) == 0) {
+        if (productMapper.selectCountByProductId(productId) == 0) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 

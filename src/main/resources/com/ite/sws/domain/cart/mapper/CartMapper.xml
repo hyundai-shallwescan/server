@@ -22,7 +22,6 @@
  * 2024.08.26  김민정        장바구니 아이템 수량 업데이트를 위한 프로시저 호출
  * 2024.08.26  김민정        장바구니 아이템 삭제
  * 2024.08.26  김민정        장바구니가 존재하는지 확인
- * 2024.08.26  김민정        상품이 존재하는지 확인
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -58,9 +57,11 @@
 		</selectKey>
 		INSERT INTO CART
 					(CART_ID,
-					 MEMBER_ID)
+					 MEMBER_ID,
+					 CART_URI)
 		VALUES      (#{cartId},
-					 #{memberId})
+					 #{memberId},
+					 'scanandgo://deeplink?cartId=' || #{cartId})
 	</insert>
 
 	<!-- 장바구니 회원가입 -->
@@ -142,14 +143,6 @@
 		FROM   CART
 		WHERE  CART_ID = #{cartId}
 		  AND STATUS = 'ACTIVE'
-	</select>
-
-	<!-- 상품이 존재하는지 확인 -->
-	<select id="selectProductByProductId" resultType="int">
-		SELECT COUNT(*)
-		FROM   PRODUCT
-		WHERE  PRODUCT_ID = #{productId}
-		  AND IS_DELETED = 0
 	</select>
 
 </mapper>

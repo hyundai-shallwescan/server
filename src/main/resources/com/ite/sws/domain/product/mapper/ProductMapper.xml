@@ -13,6 +13,7 @@
  * ==========  =========    =========
  * 2024.08.23  	정은지        최초 생성
  * 2024.08.23  	구지웅        select query 수정
+ * 2024.08.26  	김민정        상품이 존재하는지 확인
  * </pre>
  -->
  
@@ -66,5 +67,13 @@
 	PRODUCT
 	WHERE NAME LIKE CONCAT(#{productName}, '%') AND IS_DELETED NOT IN ('1')
 </select>
+
+	<!-- 상품이 존재하는지 확인 -->
+	<select id="selectCountByProductId" resultType="int">
+		SELECT COUNT(*)
+		FROM   PRODUCT
+		WHERE  PRODUCT_ID = #{productId}
+		  AND IS_DELETED = 0
+	</select>
 
 </mapper>

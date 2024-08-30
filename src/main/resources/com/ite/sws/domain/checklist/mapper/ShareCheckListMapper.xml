@@ -12,8 +12,6 @@
  * 수정일       수정자        수정내용
  * ==========  =========    =========
  * 2024.08.27  김민정        최초 생성
- * 2024.08.27  김민정        장바구니가 존재하는지 확인
- * 2024.08.27  김민정        상품이 존재하는지 확인
  * 2024.08.27  김민정        cartId에 해당하는 공유 체크리스트 아이템 조회
  * 2024.08.27  김민정        공유 체크리스트 아이템 생성을 위한 프로시저 호출
  * 2024.08.28  김민정        공유 체크리스트 아이템 삭제를 위한 프로시저 호출
@@ -21,22 +19,6 @@
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.checklist.mapper.ShareCheckListMapper">
-
-	<!-- 장바구니가 존재하는지 확인 -->
-	<select id="selectCountByCartId" resultType="int">
-		SELECT COUNT(*)
-		FROM   CART
-		WHERE  CART_ID = #{cartId}
-		  AND STATUS = 'ACTIVE'
-	</select>
-
-	<!-- 상품이 존재하는지 확인 -->
-	<select id="selectCountByProductId" resultType="int">
-		SELECT COUNT(*)
-		FROM   PRODUCT
-		WHERE  PRODUCT_ID = #{productId}
-		  AND IS_DELETED = 0
-	</select>
 
 	<!-- cartId에 해당하는 공유 체크리스트 아이템 조회 -->
 	<select id="selectShareCheckListByCartId"
