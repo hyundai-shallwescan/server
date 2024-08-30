@@ -49,8 +49,6 @@ public class JwtTokenProvider {
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14; // 14일
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;  // 14일
 
-    private RedisUtil redisUtil;
-
     /**
      *  secretKey를 이용해 HMAC-SHA 알고리즘용 키를 초기화하는 메서드
      */

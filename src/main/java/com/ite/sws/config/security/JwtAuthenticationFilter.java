@@ -1,7 +1,6 @@
 package com.ite.sws.config.security;
 
 import com.ite.sws.util.JwtTokenProvider;
-import com.ite.sws.util.RedisUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
@@ -34,7 +33,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends GenericFilterBean {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private RedisUtil redisUtil;
     private final RedisTemplate<String, String> redisTemplate;
 
     /**
