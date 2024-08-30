@@ -92,7 +92,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**
      * AuthenticationManager 빈 등록
-     * @return AuthenticationManagers
+     * @return AuthenticationManager
      * @throws Exception exception
      */
     @Bean
