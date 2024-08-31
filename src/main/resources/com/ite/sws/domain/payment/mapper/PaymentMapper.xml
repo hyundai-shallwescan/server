@@ -14,6 +14,8 @@
 * 2024.08.28  김민정        최초 생성
 * 2024.08.28  김민정        상품 결제 정보 삽입을 위한 프로시저 호출
 * 2024.08.28  김민정        새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출
+* 2024.08.30  김민정        멤버의 이전 구매 기록에서 비슷한 가격대의 제품을 찾기
+* 2024.08.30  김민정        전체 상품 중에서 비슷한 가격대의 제품을 찾기
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
@@ -47,4 +49,33 @@
 		WHERE  PAYMENT_ID = #{paymentId}
 		  AND  STATUS = 'ACTIVE'
 	</update>
+
+	<!-- 멤버의 이전 구매 기록에서 비슷한 가격대의 제품을 찾기 -->
+	<select id="findPreviousPurchasesInPriceRange" resultType="com.ite.sws.domain.product.vo.ProductVO">
+		SELECT    P.PRODUCT_ID,
+				  P.NAME,
+				  P.PRICE,
+				  P.THUMBNAIL_IMAGE
+		FROM      PRODUCT P
+				  LEFT JOIN PAYMENT_ITEM PI ON P.PRODUCT_ID = PI.PRODUCT_ID
+				  JOIN      PAYMENT PM 		ON PI.PAYMENT_ID = PM.PAYMENT_ID
+				  JOIN      CART C 			ON PM.CART_ID = C.CART_ID
+		WHERE     C.MEMBER_ID = #{memberId}
+		  			AND P.PRICE BETWEEN #{targetAmount} AND #{targetAmount}+5000
+		ORDER BY  P.PRICE ASC,
+				  PI.CREATED_AT DESC
+		FETCH FIRST 1 ROWS ONLY
+	</select>
+
+	<!-- 전체 상품 중에서 비슷한 가격대의 제품을 찾기 -->
+	<select id="findSingleProductInPriceRange" resultType="com.ite.sws.domain.product.vo.ProductVO">
+		SELECT   PRODUCT_ID,
+				 NAME,
+				 PRICE,
+				 THUMBNAIL_IMAGE
+		FROM     PRODUCT
+		WHERE    PRICE BETWEEN #{targetAmount} AND #{targetAmount}+10000
+		ORDER BY PRICE ASC
+		FETCH FIRST 1 ROWS ONLY
+	</select>
 </mapper>

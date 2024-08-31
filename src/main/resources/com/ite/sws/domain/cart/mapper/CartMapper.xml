@@ -22,6 +22,7 @@
  * 2024.08.26  김민정        장바구니 아이템 수량 업데이트를 위한 프로시저 호출
  * 2024.08.26  김민정        장바구니 아이템 삭제
  * 2024.08.26  김민정        장바구니가 존재하는지 확인
+ * 2024.08.30  김민정        장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -142,7 +143,20 @@
 		SELECT COUNT(*)
 		FROM   CART
 		WHERE  CART_ID = #{cartId}
-		  AND STATUS = 'ACTIVE'
+		 	   AND STATUS = 'ACTIVE'
+	</select>
+
+	<!-- 장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회 -->
+	<select id="calculateTotalCartValue" resultType="com.ite.sws.domain.cart.dto.CartTotalDTO">
+		SELECT C.MEMBER_ID AS memberId,
+		       SUM(P.PRICE * CI.QUANTITY) AS totalCartFee
+		FROM   CART_ITEM CI
+			   LEFT JOIN PRODUCT P ON CI.PRODUCT_ID = P.PRODUCT_ID
+			   LEFT JOIN CART C ON C.CART_ID = CI.CART_ID
+		WHERE  CI.CART_ID = #{cartId}
+			   AND CI.IS_DELETED = 0
+		  	   AND C.STATUS='ACTIVE'
+		GROUP BY C.MEMBER_ID
 	</select>
 
 </mapper>

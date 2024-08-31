@@ -1,5 +1,6 @@
 package com.ite.sws.domain.payment.service;
 
+import com.ite.sws.domain.payment.dto.GetProductRecommendationRes;
 import com.ite.sws.domain.payment.dto.PostPaymentReq;
 import com.ite.sws.domain.payment.dto.PostPaymentRes;
 
@@ -15,6 +16,7 @@ import com.ite.sws.domain.payment.dto.PostPaymentRes;
  * 2024.08.28  	김민정       최초 생성
  * 2024.08.28  	김민정       상품 결제 기능 추가
  * 2024.08.28  	김민정       출입증 인증 기능 추가
+ * 2024.08.28  	김민정       무료 주차 정산 가능 금액대 상품 조회
  * </pre>
  */
 public interface PaymentService {
@@ -30,4 +32,11 @@ public interface PaymentService {
      * @param paymentId 결제 ID
      */
     void modifyExitCredentialStatus(Long paymentId);
+
+    /**
+     * 무료 주차 정산 가능 금액대 상품 조회
+     * @param cartId 장바구니 ID
+     * @return
+     */
+    GetProductRecommendationRes findRecommendProduct(Long cartId);
 }
