@@ -1,5 +1,6 @@
 package com.ite.sws.domain.cart.service;
 
+import com.ite.sws.domain.cart.dto.CartItemDTO;
 import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.cart.dto.PostCartItemReq;
 import com.ite.sws.domain.cart.mapper.CartMapper;
@@ -32,7 +33,7 @@ import java.util.Optional;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.08.26  	김민정       최초 생성
- * 2024.08.26  	김민정       MemberId로 장바구니 아이템 조회 기능 추가
+ * 2024.08.26  	김민정       cartId로 장바구니 아이템 조회 기능 추가
  * 2024.08.26   김민정       새로운 장바구니 생성 기능 추가
  * 2024.08.26   남진수       장바구니 로그인 기능 추가
  * 2024.08.27   남진수       CartMember 생성 메서드 추가 (장바구니 회원가입)
@@ -41,6 +42,7 @@ import java.util.Optional;
  * 2024.08.26  	김민정       장바구니 아이템 추가 및 수량 증가 기능 추가
  * 2024.08.26  	김민정       장바구니 아이템 수량 변경 기능 추가
  * 2024.08.26  	김민정       장바구니 아이템 삭제
+ * 2024.08.31  	김민정       장바구니 아이템 조회 시, 장바구니 총 금액 계산
  * </pre>
  */
 @Service
@@ -62,12 +64,24 @@ public class CartServiceImpl implements CartService {
     @Transactional
     public GetCartRes findCartItemList(Long cartId) {
         // 해당 cart_id에 속하는 cart items 가져오기
-        List<GetCartRes.GetCartItemRes> cartItems = cartMapper.selectCartItemListByCartId(cartId);
+        List<CartItemDTO> cartItems = cartMapper.selectCartItemListByCartId(cartId);
 
         return GetCartRes.builder()
                 .cartId(cartId)
+                .totalPrice(calculateCartTotalPrice(cartItems))
                 .items(cartItems)
                 .build();
+    }
+
+    /**
+     * 장바구니 총 금액 계산
+     * @param cartItems
+     * @return
+     */
+    private Long calculateCartTotalPrice(List<CartItemDTO> cartItems) {
+        return cartItems.stream()
+                .mapToLong(item -> item.getProductPrice() * item.getQuantity())
+                .sum();
     }
   
     /**

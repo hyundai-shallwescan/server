@@ -1,7 +1,7 @@
 package com.ite.sws.domain.cart.mapper;
 
+import com.ite.sws.domain.cart.dto.CartItemDTO;
 import com.ite.sws.domain.cart.dto.CartTotalDTO;
-import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartMemberVO;
 import com.ite.sws.domain.cart.vo.CartVO;
@@ -49,7 +49,7 @@ public interface CartMapper {
      * @param cartId 장바구니 ID
      * @return 장바구니 아이템 리스트
      */
-    List<GetCartRes.GetCartItemRes> selectCartItemListByCartId(@Param("cartId") Long cartId);
+    List<CartItemDTO> selectCartItemListByCartId(@Param("cartId") Long cartId);
 
     /**
      * 새로운 장바구니 생성
