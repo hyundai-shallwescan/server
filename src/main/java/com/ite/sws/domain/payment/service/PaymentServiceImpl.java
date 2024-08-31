@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import static com.ite.sws.exception.ErrorCode.CART_ITEM_NOT_FOUND;
 import static com.ite.sws.exception.ErrorCode.CART_NOT_FOUND;
 import static com.ite.sws.exception.ErrorCode.DATABASE_ERROR;
+import static com.ite.sws.exception.ErrorCode.EXIT_CREDENTIAL_NOT_FOUND;
 
 /**
  * 상품 결제 서비스 구현체
@@ -30,6 +31,7 @@ import static com.ite.sws.exception.ErrorCode.DATABASE_ERROR;
  * ----------  --------    ---------------------------
  * 2024.08.28  	김민정       최초 생성
  * 2024.08.28  	김민정       상품 결제 생성 기능 추가
+ * 2024.08.28  	김민정       출입증 인증 처리 기능 추가
  * </pre>
  */
 @Service
@@ -50,7 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
         // 결제 시각: KST -> UTC 변환
         ZonedDateTime utcZonedDateTime = ZonedDateTime
                 .parse(postPaymentReq.getPaymentTime(), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-                .withZone(ZoneId.of("Asia/Seoul")))
+                        .withZone(ZoneId.of("Asia/Seoul")))
                 .withZoneSameInstant(ZoneId.of("UTC"));
         LocalDateTime utcLocalDateTime = utcZonedDateTime.toLocalDateTime();
 
@@ -93,6 +95,19 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentId(newPayment.getPaymentId())
                 .qrUrl(qrCodeUri)
                 .build();
+    }
+
+    /**
+     * 출입증 인증 처리
+     * @param paymentId 결제 ID
+     */
+    @Override
+    public void modifyExitCredentialStatus(Long paymentId) {
+        int rowsUpdated = paymentMapper.updateExitCredential(paymentId);
+
+        if (rowsUpdated == 0) {
+            throw new CustomException(EXIT_CREDENTIAL_NOT_FOUND);
+        }
     }
 
     // QR 텍스트 생성

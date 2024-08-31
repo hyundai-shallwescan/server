@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
- <!-- 
- * 상품 결제 Mybatis 매퍼
- * @author 김민정
- * @since 2024.08.28
- * @version 1.0
- *
- * <pre>
- * 수정일       수정자        수정내용
- * ==========  =========    =========
- * 2024.08.28  김민정        최초 생성
- * 2024.08.28  김민정        상품 결제 정보 삽입을 위한 프로시저 호출
- * 2024.08.28  김민정        새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출
- * </pre>
- -->
+<!--
+* 상품 결제 Mybatis 매퍼
+* @author 김민정
+* @since 2024.08.28
+* @version 1.0
+*
+* <pre>
+* 수정일       수정자        수정내용
+* ==========  =========    =========
+* 2024.08.28  김민정        최초 생성
+* 2024.08.28  김민정        상품 결제 정보 삽입을 위한 프로시저 호출
+* 2024.08.28  김민정        새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출
+* </pre>
+-->
 <mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
 
 	<!-- 상품 결제 정보 삽입을 위한 프로시저 호출 -->
@@ -27,7 +27,7 @@
 				#{paymentKey, mode=IN, jdbcType=VARCHAR},
 				#{paymentTime, mode=IN, jdbcType=TIMESTAMP},
 				#{paymentId, mode=OUT, jdbcType=NUMERIC}
-		)}
+			)}
 	</insert>
 
 	<!-- 새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출 -->
@@ -35,8 +35,16 @@
 		CALL PROC_INSERT_CART_AND_QRCODE(
 			#{cartId},
 			#{paymentId},
-		    #{qrCodeUri}
+			#{qrCodeUri}
 			)
 	</insert>
 
+	<!-- 결제 ID를 통한 출입증 상태 사용 처리 -->
+	<update id="updateExitCredential">
+		UPDATE EXIT_CREDENTIAL
+		SET    STATUS = 'DONE',
+			   UPDATED_AT = CURRENT_TIMESTAMP
+		WHERE  PAYMENT_ID = #{paymentId}
+		  AND  STATUS = 'ACTIVE'
+	</update>
 </mapper>

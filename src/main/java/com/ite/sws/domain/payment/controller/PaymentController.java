@@ -4,10 +4,14 @@ import com.ite.sws.domain.payment.dto.PostPaymentReq;
 import com.ite.sws.domain.payment.dto.PostPaymentRes;
 import com.ite.sws.domain.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
  * ----------  --------    ---------------------------
  * 2024.08.28  	김민정       최초 생성
  * 2024.08.28  	김민정       상품 결제 내역 등록 API 생성
+ * 2024.08.30  	김민정       QR 출입증 인증 API 생성
  * </pre>
  */
 @RestController
@@ -38,5 +43,16 @@ public class PaymentController {
     @PostMapping
     public ResponseEntity<PostPaymentRes> addPayment(@RequestBody PostPaymentReq postPaymentReq) {
         return ResponseEntity.ok(paymentService.addPayment(postPaymentReq));
+    }
+
+    /**
+     * QR 출입증 인증 API
+     * @param paymentId 결제 ID
+     * @return QR 코드 인증 결과 응답
+     */
+    @PatchMapping("/{paymentId}")
+    public ResponseEntity<Void> modifyExitCredentialStatus(@PathVariable Long paymentId) {
+        paymentService.modifyExitCredentialStatus(paymentId);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
