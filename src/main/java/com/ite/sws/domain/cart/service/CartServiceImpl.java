@@ -54,15 +54,13 @@ public class CartServiceImpl implements CartService {
     private final JwtTokenProvider jwtTokenProvider;
 
     /**
-     * MemberId로 장바구니 아이템 조회
-     * @param memberId 멤버 식별자
+     * cartId로 장바구니 아이템 조회
+     * @param cartId 멤버 식별자
      * @return 장바구니 아이템 리스트
      */
     @Override
     @Transactional
-    public GetCartRes findCartItemList(Long memberId) {
-        Long cartId = findCartByMemberId(memberId);
-
+    public GetCartRes findCartItemList(Long cartId) {
         // 해당 cart_id에 속하는 cart items 가져오기
         List<GetCartRes.GetCartItemRes> cartItems = cartMapper.selectCartItemListByCartId(cartId);
 
