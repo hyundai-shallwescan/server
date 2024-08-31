@@ -5,6 +5,7 @@ import com.ite.sws.domain.cart.dto.PostCartItemReq;
 import com.ite.sws.domain.cart.service.CartService;
 import com.ite.sws.domain.member.dto.JwtToken;
 import com.ite.sws.domain.member.dto.PostLoginReq;
+import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.08.26  	김민정       장바구니 항목 추가 및 수량 증가 API 생성
  * 2024.08.26  	김민정       장바구니 수량 변경 API 생성
  * 2024.08.26  	김민정       장바구니 아이템 삭제 API 생성
+ * 2024.08.31  	김민정       PathVariable에서 memberId 제거
  * </pre>
  */
 @RestController
@@ -45,13 +47,11 @@ public class CartController {
 
     /**
      * 장바구니 조회 API
-     * @param memberId 멤버 ID
      * @return 장바구니 아이템 조회 결과 응답
      */
-    @GetMapping
-    public ResponseEntity<GetCartRes> findCartItemList(@RequestParam Long memberId) {
-        // TODO: memberId 파라미터 제거
-        return ResponseEntity.ok(cartService.findCartItemList(memberId));
+    @GetMapping("/{cartId}")
+    public ResponseEntity<GetCartRes> findCartItemList(@PathVariable Long cartId) {
+        return ResponseEntity.ok(cartService.findCartItemList(cartId));
     }
   
     /**
@@ -68,13 +68,11 @@ public class CartController {
     /**
      * 장바구니 항목 추가 및 수량 증가 API
      * @param postCartItemReq 장바구니 아이템 객체
-     * @param memberId 멤버 ID
      * @return 장바구니 상품 담기 결과 응답
      */
     @PutMapping
-    public ResponseEntity<Void> addAndModifyCartItem(@RequestBody PostCartItemReq postCartItemReq,
-                                                     @RequestParam Long memberId) {
-        // TODO: memberId 파라미터 제거
+    public ResponseEntity<Void> addAndModifyCartItem(@RequestBody PostCartItemReq postCartItemReq) {
+        Long memberId = SecurityUtil.getCurrentMemberId();
         cartService.addAndModifyCartItem(postCartItemReq, memberId);
         return ResponseEntity.status(HttpStatus.OK).build();
     }
