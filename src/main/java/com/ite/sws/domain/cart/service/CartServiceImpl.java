@@ -178,7 +178,9 @@ public class CartServiceImpl implements CartService {
      * @param memberId 멤버 식별자
      * @return 멤버의 장바구니 식별자
      */
-    private Long findCartByMemberId(Long memberId) {
+    @Transactional
+    @Override
+    public Long findCartByMemberId(Long memberId) {
         // 장바구니에서 ACTIVE인 상태 중 가장 최근에 생성된 cart 가져오기
         Long cartId = cartMapper.selectActiveCartByMemberId(memberId);
 
@@ -197,6 +199,7 @@ public class CartServiceImpl implements CartService {
      * @param delta 수량 변화량 (+1, -1)
      */
     @Transactional
+    @Override
     public void modifyCartItemQuantity(Long cartId, Long productId, int delta) {
         // cartId가 유효한지 확인
         if (cartMapper.selectCountByCartId(cartId) == 0) {
@@ -222,6 +225,7 @@ public class CartServiceImpl implements CartService {
      * @param productId 상품 ID
      */
     @Transactional
+    @Override
     public void removeCartItem(Long cartId, Long productId) {
         // cartId가 유효한지 확인
         if (cartMapper.selectCountByCartId(cartId) == 0) {

@@ -20,6 +20,7 @@ import com.ite.sws.domain.cart.dto.PostCartItemReq;
  * 2024.08.26  	김민정       장바구니 아이템 수량 변경
  * 2024.08.26  	김민정       장바구니 아이템 삭제
  * 2024.08.26   남진수       장바구니 로그인 및 회원가입 기능 추가
+ * 2024.09.01  	김민정       MemberId로 장바구니 조회: private->public 변경
  * </pre>
  */
 public interface CartService {
@@ -58,4 +59,11 @@ public interface CartService {
      * @return JwtToken 객체
      */
     JwtToken findCartMemberByLoginId(PostLoginReq postLoginReq);
+
+    /**
+     * MemberId로 장바구니 조회
+     * @param memberId 멤버 식별자
+     * @return 멤버의 장바구니 식별자
+     */
+    Long findCartByMemberId(Long memberId);
 }
