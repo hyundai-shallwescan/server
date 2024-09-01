@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.08.26  	김민정       최초 생성
  * 2024.08.26  	김민정       장바구니 조회 API 생성
  * 2024.08.26   남진수       장바구니 로그인 API 생성
- * 2024.08.26  	김민정       장바구니 항목 추가 및 수량 증가 API 생성
+ * 2024.08.26  	김민정       장바구니 아이템 추가 API 생성
  * 2024.08.26  	김민정       장바구니 수량 변경 API 생성
  * 2024.08.26  	김민정       장바구니 아이템 삭제 API 생성
  * 2024.08.31  	김민정       PathVariable에서 memberId 제거
@@ -66,7 +66,7 @@ public class CartController {
     }
 
     /**
-     * 장바구니 항목 추가 및 수량 증가 API
+     * 장바구니 아이템 추가 API
      * @param postCartItemReq 장바구니 아이템 객체
      * @return 장바구니 상품 담기 결과 응답
      */
