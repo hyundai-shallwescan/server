@@ -1,5 +1,6 @@
 package com.ite.sws.domain.member.service;
 
+import com.ite.sws.domain.cart.service.CartService;
 import com.ite.sws.domain.cart.vo.CartVO;
 import com.ite.sws.domain.member.dto.*;
 import com.ite.sws.domain.member.mapper.MemberMapper;
@@ -43,6 +44,7 @@ import java.util.stream.Collectors;
  * 2024.08.27   정은지        구매 내역 조회 추가
  * 2024.08.27   정은지        작성 리뷰 조회 추가
  * 2024.08.29   정은지        로그아웃 추가
+ * 2024.09.01   정은지        로그인 시 토큰에 cartId 저장
  * </pre>
  */
 
@@ -56,6 +58,7 @@ public class MemberServiceImpl implements MemberService {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisTemplate<String, String> redisTemplate;
+    private final CartService cartService;
 
     /**
      * 로그인 아이디 중복 체크
@@ -135,8 +138,11 @@ public class MemberServiceImpl implements MemberService {
         // authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
+        // cartId 가져오기
+        Long cartId = cartService.findCartByMemberId(auth.getMemberId());
+
         // 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId());
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), cartId);
 
         // Redis에 memberId를 키로 JWT 토큰 저장
         String token = jwtToken.getAccessToken().toString();

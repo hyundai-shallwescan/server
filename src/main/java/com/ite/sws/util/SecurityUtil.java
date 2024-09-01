@@ -13,20 +13,39 @@ import org.springframework.security.core.context.SecurityContextHolder;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.25   정은지        최초 생성
+ * 2024.09.01   정은지        cartId 추출 메서드 추가
  * </pre>
  */
 
 public class SecurityUtil {
 
     /**
-     * 인증된 사용자의 memberId를 가져오는 메서드
-     * @return Long 인증된 사용자의 memberId
+     * 인증된 사용자의 CustomAuthenticationDetails를 가져오는 메서드
+     * @return JwtTokenProvider.CustomAuthenticationDetails 인증된 사용자의 CustomAuthenticationDetails 객체
      */
-    public static Long getCurrentMemberId() {
+    private static JwtTokenProvider.CustomAuthenticationDetails getAuthenticationDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getDetails() instanceof Long) {
-            return (Long) authentication.getDetails();
+        if (authentication != null && authentication.getDetails() instanceof JwtTokenProvider.CustomAuthenticationDetails) {
+            return (JwtTokenProvider.CustomAuthenticationDetails) authentication.getDetails();
         }
         return null;
+    }
+
+    /**
+     * memberId를 추출하는 메서드
+     * @return Long memberId
+     */
+    public static Long getCurrentMemberId() {
+        JwtTokenProvider.CustomAuthenticationDetails details = getAuthenticationDetails();
+        return (details != null) ? details.getMemberId() : null;
+    }
+
+    /**
+     * cartId를 추출하는 메서드
+     * @return Long cartId
+     */
+    public static Long getCurrentCartId() {
+        JwtTokenProvider.CustomAuthenticationDetails details = getAuthenticationDetails();
+        return (details != null) ? details.getCartId() : null;
     }
 }
