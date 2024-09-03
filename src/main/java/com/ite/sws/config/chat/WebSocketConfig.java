@@ -1,6 +1,8 @@
 package com.ite.sws.config.chat;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -17,24 +19,41 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
  * ----------  --------    ---------------------------
  * 2024.08.26  	남진수       최초 생성
  * 2024.08.26  	남진수       WebSocket 설정 추가
+ * 2024.09.03  	남진수       클라이언트 인바운드 채널 설정 추가
  * </pre>
  */
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final StompHandler stompHandler;
+
+    /**
+     * WebSocket 엔드포인트 등록
+     * @param registry 엔드포인트 레지스트리
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-//        registry.addEndpoint("/ws").setAllowedOrigins("*").withSockJS();
         registry.addEndpoint("/ws").setAllowedOrigins("*");
     }
 
+    /**
+     * 메시지 브로커 설정
+     * @param registry 메시지 브로커 레지스트리
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        //클라이언트로 메시지를 보낼 때 사용할 prefix
         registry.enableSimpleBroker("/sub");
-        //클라이언트가 메시지를 보낼 때 사용할 prefix
         registry.setApplicationDestinationPrefixes("/pub");
     }
 
+    /**
+     * 클라이언트 인바운드 채널 설정
+     * @param registration 채널 레지스트리
+     */
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompHandler);
+    }
 }
