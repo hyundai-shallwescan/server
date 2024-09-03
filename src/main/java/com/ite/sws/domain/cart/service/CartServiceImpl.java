@@ -150,15 +150,16 @@ public class CartServiceImpl implements CartService {
      * @param cartMemberId CartMember ID
      * @return JwtToken 객체
      */
-    private JwtToken authenticateAndGenerateToken(String username, String password, Long cartMemberId) {
+    @Transactional
+    public JwtToken authenticateAndGenerateToken(String username, String password, Long cartMemberId) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(username, password);
 
         // 실제 검증
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-
+        Long cartId = findCartByMemberId(cartMemberId);
         // 인증 정보를 기반으로 JWT 토큰 생성 후 반환
-        return jwtTokenProvider.generateToken(authentication, cartMemberId, null);
+        return jwtTokenProvider.generateToken(authentication, cartMemberId, cartId);
     }
 
     /**
