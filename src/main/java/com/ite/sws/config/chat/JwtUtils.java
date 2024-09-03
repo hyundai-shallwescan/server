@@ -54,7 +54,6 @@ public class JwtUtils {
      */
     public void validateToken(final String token) {
         try {
-            System.out.println("@@@@@@@@"+token);
             Jwts.parserBuilder().setSigningKey(jwtSecretKey).build().parseClaimsJws(token);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             throw new IllegalArgumentException("잘못된 JWT 서명입니다.");
