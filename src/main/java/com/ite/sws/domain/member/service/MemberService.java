@@ -43,9 +43,9 @@ public interface MemberService {
     /**
      * 로그인
      * @param postLoginReq 아이디, 비밀번호
-     * @return JwtToken 객체
+     * @return PostLoginRes 로그인 응답 객체
      */
-    JwtToken login(PostLoginReq postLoginReq);
+    PostLoginRes login(PostLoginReq postLoginReq);
 
     /**
      * 멤버 아이디로 회원 정보 조회
