@@ -16,6 +16,7 @@
 * 2024.08.28  김민정        새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출
 * 2024.08.30  김민정        멤버의 이전 구매 기록에서 비슷한 가격대의 제품을 찾기
 * 2024.08.30  김민정        전체 상품 중에서 비슷한 가격대의 제품을 찾기
+* 2024.09.01  김민정        결제 후, 새로운 장바구니 ID 반환 기능 추가
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
@@ -33,11 +34,12 @@
 	</insert>
 
 	<!-- 새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출 -->
-	<insert id="insertCartAndQRCode">
+	<insert id="insertCartAndQRCode" parameterType="com.ite.sws.domain.payment.vo.CartQRCodeVO" statementType="CALLABLE">
 		CALL PROC_INSERT_CART_AND_QRCODE(
-			#{cartId},
-			#{paymentId},
-			#{qrCodeUri}
+			#{cartId, mode=IN, jdbcType=NUMERIC},
+			#{paymentId, mode=IN, jdbcType=NUMERIC},
+			#{qrCodeUri, mode=IN, jdbcType=VARCHAR},
+			#{newCartId, mode=OUT, jdbcType=NUMERIC, javaType=java.lang.Long}
 			)
 	</insert>
 

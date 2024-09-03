@@ -1,5 +1,6 @@
 package com.ite.sws.domain.payment.mapper;
 
+import com.ite.sws.domain.payment.vo.CartQRCodeVO;
 import com.ite.sws.domain.payment.vo.PaymentVO;
 import com.ite.sws.domain.product.vo.ProductVO;
 import org.apache.ibatis.annotations.Param;
@@ -19,6 +20,7 @@ import org.apache.ibatis.annotations.Param;
  * 2024.08.28  	김민정       결제 ID를 통한 출입증 상태 사용 처리
  * 2024.08.30  	김민정       멤버의 이전 구매 기록에서 비슷한 가격대의 제품을 찾기
  * 2024.08.30  	김민정       전체 상품 중에서 비슷한 가격대의 제품을 찾기
+ * 2024.09.01   김민정       결제 후, 새로운 장바구니 ID 반환 기능 추가
  * </pre>
  */
 public interface PaymentMapper {
@@ -31,13 +33,9 @@ public interface PaymentMapper {
 
     /**
      * 새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출
-     * @param cartId 기존 장바구니 ID
-     * @param paymentId 결제 ID
-     * @param qrCodeUri QR 코드 URI
+     * @param cartQRCodeVO 장바구니 및 QR 생성 객체
      */
-    void insertCartAndQRCode(@Param("cartId") Long cartId,
-                             @Param("paymentId") Long paymentId,
-                             @Param("qrCodeUri") String qrCodeUri);
+    Long insertCartAndQRCode(CartQRCodeVO cartQRCodeVO);
 
     /**
      * 결제 ID를 통한 출입증 상태 사용 처리

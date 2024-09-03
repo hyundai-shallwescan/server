@@ -8,6 +8,7 @@ import com.ite.sws.domain.payment.dto.GetProductRecommendationRes;
 import com.ite.sws.domain.payment.dto.PostPaymentReq;
 import com.ite.sws.domain.payment.dto.PostPaymentRes;
 import com.ite.sws.domain.payment.mapper.PaymentMapper;
+import com.ite.sws.domain.payment.vo.CartQRCodeVO;
 import com.ite.sws.domain.payment.vo.PaymentVO;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
@@ -43,6 +44,7 @@ import static com.ite.sws.exception.ErrorCode.EXIT_CREDENTIAL_NOT_FOUND;
  * 2024.08.30  	김민정       주차 시간에 따른 주차 요금 계산
  * 2024.08.28  	김민정       주차 시간에 따른 필요한 최소 구매 금액을 결정
  * 2024.08.28  	김민정       추가 구매가 필요한 금액에 가장 가까운 상품을 조회
+ * 2024.09.01  	김민정       결제 후, 새로운 장바구니 ID 반환 기능 추가
  * </pre>
  */
 @Service
@@ -103,9 +105,16 @@ public class PaymentServiceImpl implements PaymentService {
         // 3-1. 이전 장바구니를 가졌던 유저에게, 새로운 장바구니 생성
         // 3-2. QR 코드 저장, 반환
         // TODO: 장바구니 URI 암호화
-        paymentMapper.insertCartAndQRCode(postPaymentReq.getCartId(), newPayment.getPaymentId(), qrCodeUri);
+        CartQRCodeVO cartQRCodeVO = CartQRCodeVO.builder()
+                .cartId(postPaymentReq.getCartId())
+                .paymentId(newPayment.getPaymentId())
+                .qrCodeUri(qrCodeUri)
+                .build();
+        paymentMapper.insertCartAndQRCode(cartQRCodeVO);
+
         return PostPaymentRes.builder()
                 .paymentId(newPayment.getPaymentId())
+                .newCartId(cartQRCodeVO.getNewCartId())
                 .qrUrl(qrCodeUri)
                 .build();
     }

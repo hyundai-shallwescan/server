@@ -1,4 +1,4 @@
-package com.ite.sws.domain.payment.dto;
+package com.ite.sws.domain.payment.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,24 +6,24 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /**
- * 상품 결제 Response DTO
+ * CartQRCode VO
  * @author 김민정
- * @since 2024.08.30
+ * @since 2024.09.01
  * @version 1.0
  *
  * <pre>
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
- * 2024.08.30  	김민정       최초 생성
- * 2024.09.01  	김민정       새로운 cartId 필드 추가
+ * 2024.09.01  	김민정       최초 생성
  * </pre>
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
-public class PostPaymentRes {
+public class CartQRCodeVO {
+    private Long cartId;
     private Long paymentId;
+    private String qrCodeUri;
     private Long newCartId;
-    private String qrUrl;
 }
