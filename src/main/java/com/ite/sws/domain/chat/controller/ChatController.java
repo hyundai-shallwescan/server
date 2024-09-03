@@ -7,7 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
@@ -20,8 +25,8 @@ import java.util.List;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.08.26  	남진수       최초 생성
- * 2024.08.26  	남진수       채팅 메시지 전송 API 생성
  * 2024.08.26  	남진수       채팅 메시지 조회 API 생성
+ * 2024.09.03  	남진수       채팅 메시지 전송 및 저장 API 생성
  * </pre>
  */
 @RestController
@@ -33,23 +38,18 @@ public class ChatController {
     private final SimpMessagingTemplate template;
 
     /**
-     * 장바구니 입장 채팅 메시지 전송
-     * @param message 채팅 메시지
-     */
-    @MessageMapping(value = "/chat/enter")
-    public void enter(ChatDTO message){
-        System.out.println(message.getPayload());
-        template.convertAndSend("/sub/chat/room/" + message.getCartId(), message);
-    }
-
-    /**
-     * 채팅 메시지 전송
+     * 채팅 메시지 전송 및 저장
      * @param message 채팅 메시지
      */
     @MessageMapping(value = "/chat/message")
-    public void message(ChatDTO message){
-        System.out.println(message.getPayload());
-        template.convertAndSend("/sub/chat/room/" + message.getCartId(), message);
+    public void message(ChatDTO message) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long cartMemberId = (Long) authentication.getPrincipal();
+            message.setCartMemberId(cartMemberId);
+            chatService.saveMessage(message);
+            template.convertAndSend("/sub/chat/" + message.getCartId(), message);
+        }
     }
 
     /**

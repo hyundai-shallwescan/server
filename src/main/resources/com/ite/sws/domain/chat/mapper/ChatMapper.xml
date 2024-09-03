@@ -11,8 +11,8 @@
  * 수정일        수정자        수정내용
  * ==========  =========    =========
  * 2024.08.26  남진수        최초 생성
- * 2024.08.26  남진수        채팅 메시지 저장
  * 2024.08.26  남진수        채팅 메시지 조회
+ * 2024.09.03  남진수        채팅 메시지 저장
  * </pre>
  -->
 
@@ -22,19 +22,20 @@
         INSERT INTO   CHAT_MESSAGE
                      (CHAT_MESSAGE_ID,
                       CART_MEMBER_ID,
+                      NAME,
                       PAYLOAD,
-                      CREATED_AT,
                       STATUS)
         VALUES       (SEQ_CHAT_MESSAGE_ID.NEXTVAL,
                       #{cartMemberId},
+                      #{name},
                       #{payload},
-                      #{createdAt},
                       #{status})
     </insert>
 
     <select id="selectMessagesByCartId" resultType="com.ite.sws.domain.chat.dto.GetChatRes">
         SELECT MSG.CHAT_MESSAGE_ID,
                MSG.CART_MEMBER_ID,
+               MSG.NAME,
                MSG.PAYLOAD,
                MSG.CREATED_AT,
                MSG.STATUS,

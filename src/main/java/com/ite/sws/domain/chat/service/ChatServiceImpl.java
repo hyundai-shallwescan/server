@@ -1,11 +1,11 @@
 package com.ite.sws.domain.chat.service;
 
+import com.ite.sws.domain.chat.dto.ChatDTO;
 import com.ite.sws.domain.chat.dto.GetChatRes;
 import com.ite.sws.domain.chat.mapper.ChatMapper;
 import com.ite.sws.domain.chat.vo.ChatMessageVO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -18,8 +18,8 @@ import java.util.List;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.08.26  	남진수       최초 생성
- * 2024.08.26  	남진수       채팅 메시지 저장 기능 추가
  * 2024.08.26  	남진수       채팅 메시지 조회 기능 추가
+ * 2024.09.03  	남진수       채팅 메시지 저장 기능 추가
  * </pre>
  */
 @Service
@@ -32,9 +32,13 @@ public class ChatServiceImpl implements ChatService {
      * 채팅 메시지 저장
      * @param message 채팅 메시지
      */
-    public void saveMessage(ChatMessageVO message) {
-        ChatMessageVO updatedMessage = message.toBuilder()
-                .createdAt(LocalDateTime.now())
+    public void saveMessage(ChatDTO message) {
+        ChatMessageVO updatedMessage = ChatMessageVO.builder()
+                .cartMemberId(message.getCartMemberId())
+                .cartId(message.getCartId())
+                .name(message.getName())
+                .payload(message.getPayload())
+                .status(message.getStatus())
                 .build();
         chatMapper.insertMessage(updatedMessage);
     }

@@ -25,7 +25,9 @@ import java.time.LocalDateTime;
 public class ChatMessageVO {
     private Long chatMessageId;
     private Long cartMemberId;
+    private Long cartId;
+    private String name;
     private String payload;
-    private LocalDateTime createdAt;
     private String status;
+    private LocalDateTime createdAt;
 }
