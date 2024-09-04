@@ -415,6 +415,13 @@
 			<artifactId>lettuce-core</artifactId>
 			<version>6.0.0.RELEASE</version>
 		</dependency>
+
+	<dependency>
+    <groupId>org.apache.tomcat</groupId>
+    <artifactId>tomcat-catalina</artifactId>
+    <version>9.0.88</version>
+</dependency>
+
 		<!-- ==================  dependency 끝  =========================== -->
 		<!-- ==================  dependency 끝  =========================== -->
 		<!-- ==================  dependency 끝  =========================== -->
