@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * 2024.08.27   정은지        구매 내역 조회 추가
  * 2024.08.27   정은지        작성 리뷰 조회 추가
  * 2024.08.29   정은지        로그아웃 추가
- * 2024.09.01   정은지        로그인 시 토큰에 cartId 저장
+ * 2024.09.01   정은지        로그인 반환 값에 cartId 추가
  * </pre>
  */
 
@@ -114,7 +114,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Transactional
     @Override
-    public JwtToken login(PostLoginReq postLoginReq) {
+    public PostLoginRes login(PostLoginReq postLoginReq) {
 
         // 로그인 아이디로 사용자 조회
         Optional<AuthVO> authOptional = memberMapper.selectMemberByLoginId(postLoginReq.getLoginId());
@@ -142,13 +142,20 @@ public class MemberServiceImpl implements MemberService {
         Long cartId = cartService.findCartByMemberId(auth.getMemberId());
 
         // 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), cartId);
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId());
+        String token = jwtToken.getAccessToken().toString();
+
+        PostLoginRes postLoginRes =  PostLoginRes.builder()
+                .cartId(cartId)
+                .token(token)
+                .build();
 
         // Redis에 memberId를 키로 JWT 토큰 저장
-        String token = jwtToken.getAccessToken().toString();
+
         int expirationMinutes = (int) (jwtTokenProvider.getExpiration(jwtToken.getAccessToken()) / 60000);
         redisTemplate.opsForValue().set("JWT_TOKEN:" + auth.getMemberId(), token, expirationMinutes);
-        return jwtToken;
+
+        return postLoginRes;
     }
 
     /**
@@ -187,6 +194,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public void removeMember(Long memberId) {
+        logout(memberId);
         memberMapper.deleteMember(memberId);
     }
 

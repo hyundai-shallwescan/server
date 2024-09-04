@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -91,10 +92,12 @@ public class MemberController {
      * @return JwtToken 객체
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody PostLoginReq postLoginReq) {
+    public ResponseEntity<?> login(@RequestBody PostLoginReq postLoginReq, HttpServletResponse response) {
 
-        JwtToken token = memberService.login(postLoginReq);
-        return ResponseEntity.ok(token);
+        PostLoginRes postLoginRes = memberService.login(postLoginReq);
+        response.addHeader("Authorization", "Bearer " + postLoginRes.getToken());
+
+        return ResponseEntity.ok(new PostLoginRes(postLoginRes.getCartId(), null));
     }
 
     /**
