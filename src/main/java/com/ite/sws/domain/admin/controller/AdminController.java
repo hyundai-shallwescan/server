@@ -94,7 +94,7 @@ public class AdminController {
     return ResponseEntity.ok(sales);
   }
 
-  @GetMapping(value = "/admins/payments/members", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @GetMapping(value = "/payments/members", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<PaymentEvent> streamUserPayments(
       @RequestParam(value = "page",defaultValue = "0") int page,
       @RequestParam(value = "size",defaultValue = "10") int size,
