@@ -138,7 +138,6 @@ public class MemberController {
     @DeleteMapping
     public ResponseEntity<Void> modifyMemberStatus() {
         Long memberId = SecurityUtil.getCurrentMemberId();
-        memberService.logout(memberId);
         memberService.removeMember(memberId);
 
         return ResponseEntity.status(HttpStatus.OK).build();

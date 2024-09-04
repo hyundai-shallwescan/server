@@ -194,6 +194,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public void removeMember(Long memberId) {
+        logout(memberId);
         memberMapper.deleteMember(memberId);
     }
 
