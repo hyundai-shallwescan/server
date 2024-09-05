@@ -14,9 +14,7 @@ import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
  * ----------  --------    ---------------------------
  * 2024.08.26  	구지웅      최초 생성
  * 2024.08.27   구지웅      유저 결제 내역 조회 기능 구현, sales 조회 기능 구현
+ * 2024.09.05   구지웅      delete method naming modifyProductIsDeletedToggle로 수정*
  * </pre>
  *
  */
@@ -52,7 +51,7 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public void deleteProduct(Long productId) {
+  public void modifyProductIsDeletedToggle(Long productId) {
     findProductHelper(productId);
     adminMapper.updateProductIsDeleted(productId);
   }

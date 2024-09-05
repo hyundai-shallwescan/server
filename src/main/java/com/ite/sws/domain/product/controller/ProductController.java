@@ -24,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * ----------  --------    ---------------------------
  * 2024.08.23  	정은지        최초 생성
  * 2024.08.27  	구지웅        담당자 구지웅 기능 구현
+ * 2024.09.05  	구지웅        상품 조회 페이지네이션 추가
  * </pre>
  */
 
@@ -41,8 +42,9 @@ public class ProductController {
   }
 
   @GetMapping
-  public ResponseEntity<List<ProductVO>> findProductByName(@RequestParam String name) {
-    return ResponseEntity.ok().body(productService.findProductsByProductName(name));
+  public ResponseEntity<List<ProductVO>> findProductByName(@RequestParam String name,
+      @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+    return ResponseEntity.ok().body(productService.findProductsByProductName(name,page, size));
   }
 
   @GetMapping("/{productId}/reviews")

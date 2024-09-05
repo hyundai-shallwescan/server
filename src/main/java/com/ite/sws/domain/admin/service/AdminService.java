@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
  * ----------  --------    ---------------------------
  * 2024.08.26  	구지웅      최초 생성
  * 2024.08.27   구지웅      유저 결제 내역 조회 기능 구현, sales 조회 기능 구현
+ * 2024.09.05   구지웅      delete method naming modifyProductIsDeletedToggle로 수정
  * </pre>
  *
  */
@@ -28,7 +29,7 @@ public interface AdminService {
 
   void addProduct(PostCreateProductReq postCreateProductReq, List<MultipartFile> fileList);
 
-  void deleteProduct(Long productId);
+  void modifyProductIsDeletedToggle(Long productId);
 
   void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
 

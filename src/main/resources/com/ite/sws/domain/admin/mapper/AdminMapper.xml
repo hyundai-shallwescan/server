@@ -15,6 +15,7 @@
      * 2024.08.27  	구지웅      세일즈 조회 쿼리 생성
      * 2024.08.27  	구지웅      회원 구매내역 select 쿼리 수정
      * 2024.09.04  	구지웅      sales 쿼리 수정
+     * 2024.09.05   구지웅      selectPaymentHistory pagination 추가
     -->
 
 <mapper namespace="com.ite.sws.domain.admin.mapper.AdminMapper">
@@ -40,9 +41,13 @@
 
   <update id="updateProductIsDeleted" parameterType="long">
     UPDATE PRODUCT
-    SET IS_DELETED = 1
+    SET IS_DELETED =
+        CASE
+            WHEN IS_DELETED = 1 THEN 0
+            ELSE 1
+        END
     WHERE PRODUCT_ID = #{productId}
-  </update>
+</update>
 
   <update id="updateProduct" parameterType="com.ite.sws.domain.product.vo.ProductVO">
     UPDATE PRODUCT
@@ -79,10 +84,10 @@
   </select>
 
 
-<select id="selectMemberPaymentHistory" parameterType="long" resultMap ="memberPaymentHistoryResultMap">
+<select id="selectMemberPaymentHistory" parameterType="long" resultMap="memberPaymentHistoryResultMap">
     SELECT
         P.PAYMENT_ID AS paymentId,
-        SUM(P.AMOUNT) AS totalAmountSum,
+        paymentTotals.totalAmountSum, -- Total amount for the payment
         P.CREATED_AT AS paymentCreatedAt,
         PI.PRODUCT_ID AS productId,
         PI.NAME AS productName,
@@ -92,10 +97,17 @@
     FROM
         PAYMENT P
         JOIN PAYMENT_ITEM PI ON P.PAYMENT_ID = PI.PAYMENT_ID
+        JOIN (
+            SELECT
+                PAYMENT_ID,
+                SUM(PRICE * QUANTITY) AS totalAmountSum
+            FROM
+                PAYMENT_ITEM
+            GROUP BY
+                PAYMENT_ID
+        ) paymentTotals ON P.PAYMENT_ID = paymentTotals.PAYMENT_ID
     WHERE
         P.PAYMENT_ID = #{paymentId}
-    GROUP BY
-        P.PAYMENT_ID, P.CREATED_AT, PI.PRODUCT_ID, PI.NAME, PI.THUMBNAIL_IMAGE, PI.QUANTITY, PI.PRICE
     ORDER BY
         P.CREATED_AT DESC
 </select>
