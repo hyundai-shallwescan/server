@@ -14,7 +14,9 @@ import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -67,8 +69,8 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long memberId) {
-    return adminMapper.selectMemberPaymentHistory(memberId);
+  public List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long paymentId) {
+    return adminMapper.selectMemberPaymentHistory(paymentId);
   }
 
   @Override

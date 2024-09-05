@@ -78,10 +78,10 @@ public class AdminController {
     return ResponseEntity.status(200).build();
   }
 
-  @GetMapping("/payments/members/{memberId}")
+  @GetMapping("/payments/{paymentId}")
   public ResponseEntity<List<GetMemberPaymentHistoryRes>> findMemberPaymentHistory(
-      @PathVariable Long memberId) {
-    return ResponseEntity.ok().body(adminService.findUserPaymentHistory(memberId));
+      @PathVariable Long paymentId) {
+    return ResponseEntity.ok().body(adminService.findUserPaymentHistory(paymentId));
   }
 
   @GetMapping("/sales")

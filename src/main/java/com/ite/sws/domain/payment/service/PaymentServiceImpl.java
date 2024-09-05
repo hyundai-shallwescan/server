@@ -77,7 +77,6 @@ public class PaymentServiceImpl implements PaymentService {
                         .withZone(ZoneId.of("Asia/Seoul")))
                 .withZoneSameInstant(ZoneId.of("UTC"));
         LocalDateTime utcLocalDateTime = utcZonedDateTime.toLocalDateTime();
-
         // 1. 상품 결제 정보 삽입을 위한 프로시저 호출
         // 1-0. 장바구니 존재 확인
         // 1-1. 결제 생성
@@ -119,7 +118,7 @@ public class PaymentServiceImpl implements PaymentService {
             .build();
         paymentMapper.insertCartAndQRCode(cartQRCodeVO);
 
-       emitPaymentEvent(newPayment);
+       emitPaymentEvent(newPayment,utcLocalDateTime);
 
         return PostPaymentRes.builder()
             .paymentId(newPayment.getPaymentId())
@@ -127,12 +126,10 @@ public class PaymentServiceImpl implements PaymentService {
             .qrUrl(qrCodeUri)
             .build();
     }
-    private void emitPaymentEvent(PaymentVO paymentVO){
+    private void emitPaymentEvent(PaymentVO paymentVO,LocalDateTime currentTime){
           eventPublisher.emitPaymentEvent(
             PaymentEvent.of(paymentVO.getPaymentId(), SecurityUtil.getCurrentMemberId(),
-                memberMapper.selectMemberByMemberId(SecurityUtil.getCurrentMemberId()).getLoginId(),LocalDateTime.now()));
-
-
+                memberMapper.selectMemberByMemberId(SecurityUtil.getCurrentMemberId()).getName(),currentTime));
     }
 
     // QR 텍스트 생성

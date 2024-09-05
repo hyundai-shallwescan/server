@@ -32,7 +32,7 @@ public interface AdminService {
 
   void modifyProduct(Long productId, PatchProductReq patchProductReq, List<MultipartFile> fileList);
 
-  List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long memberId);
+  List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long paymentId);
 
   List<GetSalesRes> findSalesByCriteria(SalesCriteria criteria);
 

@@ -79,34 +79,27 @@
   </select>
 
 
-  <select id="selectMemberPaymentHistory" parameterType="java.lang.Long"
-    resultMap="memberPaymentHistoryResultMap">
+<select id="selectMemberPaymentHistory" parameterType="long" resultMap ="memberPaymentHistoryResultMap">
     SELECT
-    M.MEMBER_ID AS memberId,
-    P.PAYMENT_ID AS paymentId,
-    SUM(P.AMOUNT) AS totalAmountSum,
-    P.CREATED_AT AS createdAt,
-    PI.PRODUCT_ID AS productId,
-    PI.NAME AS name,
-    PI.THUMBNAIL_IMAGE AS thumbnailImage,
-    PI.QUANTITY AS quantity,
-    PI.PRICE AS price
+        P.PAYMENT_ID AS paymentId,
+        SUM(P.AMOUNT) AS totalAmountSum,
+        P.CREATED_AT AS paymentCreatedAt,
+        PI.PRODUCT_ID AS productId,
+        PI.NAME AS productName,
+        PI.THUMBNAIL_IMAGE AS thumbnailImage,
+        PI.QUANTITY AS quantity,
+        PI.PRICE AS price
     FROM
-    MEMBER M
-    JOIN
-    CART C ON M.MEMBER_ID = C.MEMBER_ID
-    JOIN
-    PAYMENT P ON C.CART_ID = P.CART_ID
-    JOIN
-    PAYMENT_ITEM PI ON P.PAYMENT_ID = PI.PAYMENT_ID
+        PAYMENT P
+        JOIN PAYMENT_ITEM PI ON P.PAYMENT_ID = PI.PAYMENT_ID
     WHERE
-    M.MEMBER_ID = #{memberId}
+        P.PAYMENT_ID = #{paymentId}
     GROUP BY
-    M.MEMBER_ID, P.PAYMENT_ID, P.CREATED_AT, PI.PRODUCT_ID, PI.NAME, PI.THUMBNAIL_IMAGE,
-    PI.QUANTITY, PI.PRICE
+        P.PAYMENT_ID, P.CREATED_AT, PI.PRODUCT_ID, PI.NAME, PI.THUMBNAIL_IMAGE, PI.QUANTITY, PI.PRICE
     ORDER BY
-    P.CREATED_AT DESC
-  </select>
+        P.CREATED_AT DESC
+</select>
+
 
 <select id="selectSalesByCriteria" parameterType="com.ite.sws.domain.admin.dto.SalesCriteria"
     resultMap="GetSalesResMap">
@@ -197,21 +190,20 @@
 </resultMap>
 
 
-  <resultMap id="memberPaymentHistoryResultMap"
-    type="com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes">
-    <id property="memberId" column="memberId"/>
-    <result property="paymentId" column="paymentId"/>
+<resultMap id="memberPaymentHistoryResultMap" type="com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes">
+    <id property="paymentId" column="paymentId"/>
     <result property="totalAmountSum" column="totalAmountSum"/>
-    <result property="paymentCreatedAt" column="createdAt"/>
-    <collection property="purchasedProducts"
-      ofType="com.ite.sws.domain.admin.dto.PurchasedProduct">
-      <id property="productId" column="productId"/>
-      <result property="productName" column="name"/>
-      <result property="thumbnailImage" column="thumbnailImage"/>
-      <result property="quantity" column="quantity"/>
-      <result property="price" column="price"/>
+    <result property="paymentCreatedAt" column="paymentCreatedAt"/>
+    <collection property="purchasedProducts" ofType="com.ite.sws.domain.admin.dto.PurchasedProduct">
+        <result property="productId" column="productId"/>
+        <result property="productName" column="productName"/>
+        <result property="thumbnailImage" column="thumbnailImage"/>
+        <result property="quantity" column="quantity"/>
+        <result property="price" column="price"/>
     </collection>
-  </resultMap>
+</resultMap>
+
+
   <resultMap id="GetPaymentHistoryResResultMap"
     type="com.ite.sws.domain.admin.dto.GetPaymentHistoryRes">
     <id property="paymentId" column="payment_id"/>

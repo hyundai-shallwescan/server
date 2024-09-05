@@ -8,6 +8,7 @@ import com.ite.sws.domain.admin.dto.SalesCriteria;
 import com.ite.sws.domain.product.vo.ProductVO;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 
 /**
@@ -31,7 +32,7 @@ public interface AdminMapper {
 
       void updateProduct(ProductVO productVO);
 
-      List<GetMemberPaymentHistoryRes> selectMemberPaymentHistory(Long memberId);
+      List<GetMemberPaymentHistoryRes> selectMemberPaymentHistory(Long paymentId);
 
       List<GetSalesRes> selectSalesByCriteria(SalesCriteria criteria);
 

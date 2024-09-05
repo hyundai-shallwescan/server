@@ -12,7 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Getter
 public class GetMemberPaymentHistoryRes {
-    private Long memberId;
     private Long paymentId;
     private Long totalAmountSum;
     private LocalDateTime paymentCreatedAt;
@@ -23,11 +22,13 @@ public class GetMemberPaymentHistoryRes {
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-class PurchasedProduct {
+ class PurchasedProduct {
     private Long productId;
     private String productName;
     private String thumbnailImage;
     private Integer quantity;
     private Long price;
 }
+
+
 
