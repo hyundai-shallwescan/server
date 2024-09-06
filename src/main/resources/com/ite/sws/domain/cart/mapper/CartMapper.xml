@@ -23,6 +23,7 @@
  * 2024.08.26  김민정        장바구니 아이템 삭제
  * 2024.08.26  김민정        장바구니가 존재하는지 확인
  * 2024.08.30  김민정        장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
+ * 2024.09.05  김민정        장바구니 아이템 정보 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -157,6 +158,21 @@
 			   AND CI.IS_DELETED = 0
 		  	   AND C.STATUS='ACTIVE'
 		GROUP BY C.MEMBER_ID
+	</select>
+
+	<!-- 장바구니 아이템 정보 조회 -->
+	<select id="selectCartItemDetail" resultType="com.ite.sws.domain.cart.dto.CartItemMessageDTO">
+		SELECT CI.CART_ID,
+		       CI.PRODUCT_ID,
+			   CI.QUANTITY,
+			   P.NAME          AS productName,
+			   P.PRICE         AS productPrice,
+			   P.THUMBNAIL_IMAGE AS productThumbnail
+		FROM   CART_ITEM CI
+				   LEFT JOIN PRODUCT P ON CI.PRODUCT_ID = P.PRODUCT_ID
+		WHERE  CI.CART_ID = #{cartId}
+		  AND  CI.PRODUCT_ID = #{productId}
+		  AND  CI.IS_DELETED = 0
 	</select>
 
 </mapper>
