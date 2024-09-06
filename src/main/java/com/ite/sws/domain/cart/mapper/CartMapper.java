@@ -35,6 +35,7 @@ import java.util.Optional;
  * 2024.08.26  	김민정       상품이 존재하는지 확인
  * 2024.08.30  	김민정       장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
  * 2024.09.05  	김민정       장바구니 아이템 정보 조회
+ * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
  * </pre>
  */
 public interface CartMapper {
@@ -119,4 +120,11 @@ public interface CartMapper {
      */
     CartItemMessageDTO selectCartItemDetail(@Param("cartId") Long cartId,
                                             @Param("productId") Long productId);
+
+    /**
+     * memberId로 cartMemberId 조회
+     * @param memberId 멤버 id
+     * @return cartId
+     */
+    Long selectCartMemberIdByMemberId(Long memberId);
 }
