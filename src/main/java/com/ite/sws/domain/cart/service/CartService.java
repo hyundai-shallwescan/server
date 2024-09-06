@@ -1,5 +1,6 @@
 package com.ite.sws.domain.cart.service;
 
+import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
 import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.member.dto.JwtToken;
 import com.ite.sws.domain.member.dto.PostLoginReq;
@@ -66,4 +67,18 @@ public interface CartService {
      * @return 멤버의 장바구니 식별자
      */
     Long findCartByMemberId(Long memberId);
+
+    /**
+     * 장바구니 변경 사항 전송
+     * @param cartId 장바구니 ID
+     * @param cartItemMessageDTO 장바구니 아이템 변경 메시지
+     */
+    void sendCartUpdateMessage(Long cartId, CartItemMessageDTO cartItemMessageDTO);
+
+    /**
+     * 장바구니 변경 사항 관련 채팅 전송
+     * @param cartId 장바구니 ID
+     * @param dto 장바구니 아이템 관련 채팅 메시지
+     */
+    void sendCartChatMessage(Long cartId, CartItemMessageDTO dto);
 }

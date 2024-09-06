@@ -9,6 +9,7 @@ import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.08.26  	김민정       장바구니 수량 변경 API 생성
  * 2024.08.26  	김민정       장바구니 아이템 삭제 API 생성
  * 2024.08.31  	김민정       PathVariable에서 memberId 제거
+ * 2024.09.05   김민정       장바구니 상태 변화 웹소켓으로 전송
  * </pre>
  */
 @RestController
@@ -44,6 +46,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartController {
 
     private final CartService cartService;
+
+    private final SimpMessagingTemplate template;
 
     /**
      * 장바구니 조회 API

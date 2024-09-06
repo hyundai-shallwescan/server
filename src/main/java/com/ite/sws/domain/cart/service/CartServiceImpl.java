@@ -1,6 +1,7 @@
 package com.ite.sws.domain.cart.service;
 
 import com.ite.sws.domain.cart.dto.CartItemDTO;
+import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
 import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.cart.dto.PostCartItemReq;
 import com.ite.sws.domain.cart.mapper.CartMapper;
@@ -54,6 +55,8 @@ public class CartServiceImpl implements CartService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+
+    private final CartMessageSender messageSender;
 
     /**
      * cartId로 장바구니 아이템 조회
@@ -180,11 +183,24 @@ public class CartServiceImpl implements CartService {
         }
 
         // 장바구니 아이템 생성 시 필요한 데이터 설정
-        CartItemVO newCartItem = CartItemVO.builder()
+        CartItemVO vo = CartItemVO.builder()
                 .cartId(cartId)
                 .productId(productId)
                 .build();
-        cartMapper.insertCartItem(newCartItem);
+
+        // 장바구니 아이템 추가 또는 수량 증가
+        cartMapper.insertCartItem(vo);
+
+        // --------------------------
+        // 웹소켓 전송용 DTO
+        CartItemMessageDTO messageDTO = cartMapper.selectCartItemDetail(cartId, productId);
+
+        // 아이템 수량이 1이면 새로운 생성, 1 초과면 증가
+        String action = messageDTO.getQuantity() == 1 ? "create" :
+                        (messageDTO.getQuantity() > 1 ? "increase" : "create");
+        messageDTO.setAction(action);
+
+        sendCartUpdateMessage(messageDTO.getCartId(), messageDTO);
     }
 
     /**
@@ -231,6 +247,14 @@ public class CartServiceImpl implements CartService {
                 .quantity(delta)
                 .build();
         cartMapper.updateCartItemQuantity(modifyCartItem);
+
+        //----------------------------------
+        String action = delta > 0 ? "increase" : "decrease";
+        CartItemMessageDTO messageDTO = CartItemMessageDTO.builder()
+                .productId(productId)
+                .action(action)
+                .build();
+        sendCartUpdateMessage(cartId, messageDTO);
     }
 
     /**
@@ -256,5 +280,32 @@ public class CartServiceImpl implements CartService {
                 .productId(productId)
                 .build();
         cartMapper.deleteCartItem(deleteCartItem);
+
+        //-----------------------------------------------
+        CartItemMessageDTO messageDTO = CartItemMessageDTO.builder()
+                .productId(productId)
+                .action("delete")
+                .build();
+        sendCartUpdateMessage(cartId, messageDTO);
+    }
+
+    /**
+     * 장바구니 변경 사항 전송
+     * @param cartId 장바구니 ID
+     * @param cartItemMessageDTO 장바구니 아이템 변경 메시지
+     */
+    public void sendCartUpdateMessage(Long cartId, CartItemMessageDTO cartItemMessageDTO) {
+        String destination = "/sub/cart/" + cartId;
+        messageSender.sendMessage(destination, cartItemMessageDTO);
+    }
+
+    /**
+     * 장바구니 변경 사항 관련 채팅 전송
+     * @param cartId 장바구니 ID
+     * @param dto 장바구니 아이템 관련 채팅 메시지
+     */
+    public void sendCartChatMessage(Long cartId, CartItemMessageDTO dto) {
+        String destination = "/sub/chat/" + cartId;
+        messageSender.sendMessage(destination, dto);
     }
 }

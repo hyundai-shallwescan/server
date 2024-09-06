@@ -1,6 +1,7 @@
 package com.ite.sws.domain.cart.mapper;
 
 import com.ite.sws.domain.cart.dto.CartItemDTO;
+import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
 import com.ite.sws.domain.cart.dto.CartTotalDTO;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartMemberVO;
@@ -33,6 +34,7 @@ import java.util.Optional;
  * 2024.08.26  	김민정       장바구니가 존재하는지 확인
  * 2024.08.26  	김민정       상품이 존재하는지 확인
  * 2024.08.30  	김민정       장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
+ * 2024.09.05  	김민정       장바구니 아이템 정보 조회
  * </pre>
  */
 public interface CartMapper {
@@ -108,4 +110,13 @@ public interface CartMapper {
      * @return
      */
     CartTotalDTO calculateTotalCartValue(@Param("cartId") Long cartId);
+
+    /**
+     * 장바구니 아이템 정보 조회
+     * @param cartId 장바구니 ID
+     * @param productId 상품 ID
+     * @return
+     */
+    CartItemMessageDTO selectCartItemDetail(@Param("cartId") Long cartId,
+                                            @Param("productId") Long productId);
 }
