@@ -67,12 +67,16 @@
 
 	<!-- 장바구니 회원가입 -->
 	<insert id="insertCartMember">
+		<selectKey keyProperty="cartMemberId" resultType="long" order="BEFORE">
+			SELECT SEQ_CART_MEMBER_ID.NEXTVAL
+			FROM   DUAL
+		</selectKey>
 		INSERT INTO CART_MEMBER
 					(CART_MEMBER_ID,
 					 CART_ID,
 					 NAME,
 					 PASSWORD)
-		VALUES      (SEQ_CART_MEMBER_ID.NEXTVAL,
+		VALUES      (#{cartMemberId},
 		             #{cartId},
 					 #{name},
 					 #{password})

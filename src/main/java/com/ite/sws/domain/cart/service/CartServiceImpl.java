@@ -157,7 +157,6 @@ public class CartServiceImpl implements CartService {
 
         // 실제 검증
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        Long cartId = findCartByMemberId(cartMemberId);
         // 인증 정보를 기반으로 JWT 토큰 생성 후 반환
         return jwtTokenProvider.generateToken(authentication, cartMemberId);
     }
