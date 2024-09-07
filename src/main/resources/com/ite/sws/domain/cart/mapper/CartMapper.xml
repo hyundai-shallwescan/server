@@ -24,6 +24,7 @@
  * 2024.08.26  김민정        장바구니가 존재하는지 확인
  * 2024.08.30  김민정        장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
  * 2024.09.05  김민정        장바구니 아이템 정보 조회
+ * 2024.09.06  남진수        memberId로 cartMemberId 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -68,12 +69,16 @@
 
 	<!-- 장바구니 회원가입 -->
 	<insert id="insertCartMember">
+		<selectKey keyProperty="cartMemberId" resultType="long" order="BEFORE">
+			SELECT SEQ_CART_MEMBER_ID.NEXTVAL
+			FROM   DUAL
+		</selectKey>
 		INSERT INTO CART_MEMBER
 					(CART_MEMBER_ID,
 					 CART_ID,
 					 NAME,
 					 PASSWORD)
-		VALUES      (SEQ_CART_MEMBER_ID.NEXTVAL,
+		VALUES      (#{cartMemberId},
 		             #{cartId},
 					 #{name},
 					 #{password})
@@ -173,6 +178,18 @@
 		WHERE  CI.CART_ID = #{cartId}
 		  AND  CI.PRODUCT_ID = #{productId}
 		  AND  CI.IS_DELETED = 0
+	</select>
+
+	<!-- memberId로 cartMemberId 조회 -->
+	<select id="selectCartMemberIdByMemberId" >
+		SELECT CART_MEMBER_ID
+		FROM   MEMBER M
+				   JOIN CART C
+						ON ( M.MEMBER_ID = C.MEMBER_ID
+							AND C.STATUS = 'ACTIVE' )
+				   JOIN CART_MEMBER CM
+						ON ( C.CART_ID = CM.CART_ID )
+		WHERE  M.MEMBER_ID = #{memberId}
 	</select>
 
 </mapper>

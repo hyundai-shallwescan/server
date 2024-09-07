@@ -10,7 +10,6 @@ import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartMemberVO;
 import com.ite.sws.domain.cart.vo.CartVO;
 import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.util.JwtTokenProvider;
 import com.ite.sws.exception.CustomException;
@@ -48,6 +47,7 @@ import java.util.Optional;
  * 2024.08.26  	김민정       장바구니 아이템 삭제
  * 2024.08.31  	김민정       장바구니 아이템 조회 시, 장바구니 총 금액 계산
  * 2024.09.05   김민정       장바구니 상태 변화 웹소켓으로 전송
+ * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
  * 2024.09.07   김민정       장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
  * </pre>
  */
@@ -112,39 +112,39 @@ public class CartServiceImpl implements CartService {
   
     /**
      * 장바구니 로그인 및 회원가입
-     * @param postLoginReq 아이디, 비밀번호
+     * @param postCartLoginReq 아이디, 비밀번호
      * @return JwtToken 객체
      */
     @Transactional
-    public JwtToken findCartMemberByLoginId(PostLoginReq postLoginReq) {
-        Optional<CartMemberVO> authOptional = cartMapper.selectCartMemberByLoginId(postLoginReq.getLoginId());
+    public JwtToken cartLogin(PostCartLoginReq postCartLoginReq) {
+        Optional<CartMemberVO> authOptional = cartMapper.selectCartMemberByLoginId(postCartLoginReq.getLoginId());
 
         // 아이디가 존재하지 않으면 새로운 CartMember 생성
         if (!authOptional.isPresent()) {
-            CartMemberVO newCartMember = createNewCartMember(postLoginReq);
-            return authenticateAndGenerateToken(newCartMember.getName(), postLoginReq.getPassword(), newCartMember.getCartMemberId());
+            CartMemberVO newCartMember = createNewCartMember(postCartLoginReq);
+            return authenticateAndGenerateToken(newCartMember.getName(), postCartLoginReq.getPassword(), newCartMember.getCartMemberId());
         }
 
         // 아이디가 존재하나 비밀번호가 일치하지 않으면 예외 발생
         CartMemberVO auth = authOptional.get();
-        if (!passwordEncoder.matches(postLoginReq.getPassword(), auth.getPassword())) {
+        if (!passwordEncoder.matches(postCartLoginReq.getPassword(), auth.getPassword())) {
             throw new CustomException(ErrorCode.LOGIN_FAIL);
         }
 
         // 인증 후 토큰 생성
-        return authenticateAndGenerateToken(auth.getName(), postLoginReq.getPassword(), auth.getCartMemberId());
+        return authenticateAndGenerateToken(auth.getName(), postCartLoginReq.getPassword(), auth.getCartMemberId());
     }
 
     /**
      * 새로운 CartMember 생성 메서드 (장바구니 멤버 회원가입)
-     * @param postLoginReq 아이디와 비밀번호
+     * @param postCartLoginReq 아이디와 비밀번호
      * @return 생성된 CartMemberVO 객체
      */
-    private CartMemberVO createNewCartMember(PostLoginReq postLoginReq) {
+    private CartMemberVO createNewCartMember(PostCartLoginReq postCartLoginReq) {
         CartMemberVO cartMember = CartMemberVO.builder()
-                .cartId(1L) // 임시로 1로 설정
-                .name(postLoginReq.getLoginId())
-                .password(passwordEncoder.encode(postLoginReq.getPassword()))
+                .name(postCartLoginReq.getLoginId())
+                .password(passwordEncoder.encode(postCartLoginReq.getPassword()))
+                .cartId(postCartLoginReq.getCartId())
                 .build();
 
         cartMapper.insertCartMember(cartMember);
@@ -165,9 +165,8 @@ public class CartServiceImpl implements CartService {
 
         // 실제 검증
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        Long cartId = findCartByMemberId(cartMemberId);
         // 인증 정보를 기반으로 JWT 토큰 생성 후 반환
-        return jwtTokenProvider.generateToken(authentication, cartMemberId);
+        return jwtTokenProvider.generateToken(authentication, null, cartMemberId);
     }
 
     /**
@@ -287,4 +286,16 @@ public class CartServiceImpl implements CartService {
                 .build();
         eventPublisher.publishEvent(new CartUpdateEvent(this, messageDTO));
     }
+
+
+    /**
+     * MemberId로 cartMemberId 조회
+     * @param memberId 멤버 id
+     * @return cartMemberId
+     */
+    public Long findCartMemberIdByMemberId(Long memberId) {
+        // 회원의 CART 중 'ACTIVE' 상태인 cartMemberId 가져오기
+        return cartMapper.selectCartMemberIdByMemberId(memberId);
+    }
+
 }

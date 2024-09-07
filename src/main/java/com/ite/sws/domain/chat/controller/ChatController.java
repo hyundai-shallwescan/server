@@ -57,7 +57,7 @@ public class ChatController {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
-            Long cartMemberId = jwtTokenProvider.getMemberIdFromToken(token);
+            Long cartMemberId = jwtTokenProvider.getCartMemberIdFromToken(token);
             authentication = new UsernamePasswordAuthenticationToken(cartMemberId, null, null);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
