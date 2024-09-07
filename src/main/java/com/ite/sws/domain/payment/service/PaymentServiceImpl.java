@@ -228,7 +228,7 @@ public class PaymentServiceImpl implements PaymentService {
      * @param parkedMinutes 주차 시간 (분)
      * @return 필요한 최소 구매 금액 (원)
      */
-    private int determineRequiredPurchaseAmount(long parkedMinutes) {
+    public int determineRequiredPurchaseAmount(long parkedMinutes) {
         // 무료 주차 시간 기준 (분 단위)
         final int ONE_HOUR = 60;
         final int TWO_HOURS = 120;

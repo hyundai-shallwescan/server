@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.08.28  	남진수       최초 생성
+ * 2024.09.07  	남진수       무료 출차 관련 반환값 추가
  * </pre>
  */
 @Getter
@@ -23,6 +24,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class GetParkingRes {
+    private String freeParkingTime; // 무료 출차 가능 시간
+    private Long feeForFreeParking; // 무료로 출차하기 위한 금액
     private LocalDateTime entranceAt; // 입차 시간
     private String carNumber; // 차량 번호
     private Long discountParkingHour; // 할인 주차 시간(시)
