@@ -20,14 +20,32 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtil {
 
     /**
-     * 인증된 사용자의 memberId를 가져오는 메서드
-     * @return Long 인증된 사용자의 memberId
+     * 인증된 사용자의 CustomAuthenticationDetails를 가져오는 메서드
+     * @return JwtTokenProvider.CustomAuthenticationDetails 인증된 사용자의 CustomAuthenticationDetails 객체
      */
-    public static Long getCurrentMemberId() {
+    private static JwtTokenProvider.CustomAuthenticationDetails getAuthenticationDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getDetails() instanceof Long) {
-            return (Long) authentication.getDetails();
+        if (authentication != null && authentication.getDetails() instanceof JwtTokenProvider.CustomAuthenticationDetails) {
+            return (JwtTokenProvider.CustomAuthenticationDetails) authentication.getDetails();
         }
         return null;
+    }
+
+    /**
+     * memberId를 추출하는 메서드
+     * @return Long memberId
+     */
+    public static Long getCurrentMemberId() {
+        JwtTokenProvider.CustomAuthenticationDetails details = getAuthenticationDetails();
+        return (details != null) ? details.getMemberId() : null;
+    }
+
+    /**
+     * cartMemberId를 추출하는 메서드
+     * @return Long cartMemberId
+     */
+    public static Long getCurrentCartMemberId() {
+        JwtTokenProvider.CustomAuthenticationDetails details = getAuthenticationDetails();
+        return (details != null) ? details.getCartMemberId() : null;
     }
 }
