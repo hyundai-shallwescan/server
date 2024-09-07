@@ -23,8 +23,8 @@
 
     <!-- 마이 체크리스트 조회 -->
     <select id="selectMyCheckListByMemberId">
-        SELECT MCLI.MY_CHECK_LIST_ITEM_ID,
-               MCLC.NAME AS categoryName,
+        SELECT MCLC.MY_CHECK_LIST_CATEGORY_ID,
+               MCLI.MY_CHECK_LIST_ITEM_ID,
                MCLI.ITEM AS itemName,
                MCLI.STATUS
         FROM   MY_CHECK_LIST_ITEM MCLI
