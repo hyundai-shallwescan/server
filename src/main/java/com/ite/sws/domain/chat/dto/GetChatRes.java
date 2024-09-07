@@ -26,6 +26,7 @@ public class GetChatRes {
     private Long chatMessageId;
     private Long cartMemberId;
     private Long cartId;
+    private String name;
     private String payload;
     private LocalDateTime createdAt;
     private String status;

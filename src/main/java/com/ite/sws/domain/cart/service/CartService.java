@@ -2,8 +2,8 @@ package com.ite.sws.domain.cart.service;
 
 import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
 import com.ite.sws.domain.cart.dto.GetCartRes;
+import com.ite.sws.domain.cart.dto.PostCartLoginReq;
 import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.cart.dto.PostCartItemReq;
 
 /**
@@ -22,6 +22,7 @@ import com.ite.sws.domain.cart.dto.PostCartItemReq;
  * 2024.08.26  	김민정       장바구니 아이템 삭제
  * 2024.08.26   남진수       장바구니 로그인 및 회원가입 기능 추가
  * 2024.09.01  	김민정       MemberId로 장바구니 조회: private->public 변경
+ * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
  * </pre>
  */
 public interface CartService {
@@ -56,10 +57,10 @@ public interface CartService {
   
     /**
      * 장바구니 로그인 및 회원가입
-     * @param postLoginReq 아이디, 비밀번호
+     * @param postCartLoginReq 아이디, 비밀번호
      * @return JwtToken 객체
      */
-    JwtToken findCartMemberByLoginId(PostLoginReq postLoginReq);
+    JwtToken cartLogin(PostCartLoginReq postCartLoginReq);
 
     /**
      * MemberId로 장바구니 조회
@@ -81,4 +82,11 @@ public interface CartService {
      * @param dto 장바구니 아이템 관련 채팅 메시지
      */
     void sendCartChatMessage(Long cartId, CartItemMessageDTO dto);
+
+    /**
+     * memberId로 cartMemberId 조회
+     * @param memberId 멤버 id
+     * @return cartMemberId
+     */
+    Long findCartMemberIdByMemberId(Long memberId);
 }
