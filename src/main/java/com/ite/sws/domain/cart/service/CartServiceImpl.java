@@ -1,6 +1,11 @@
 package com.ite.sws.domain.cart.service;
 
-import com.ite.sws.domain.cart.dto.*;
+import com.ite.sws.domain.cart.dto.CartItemDTO;
+import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
+import com.ite.sws.domain.cart.dto.GetCartRes;
+import com.ite.sws.domain.cart.dto.PostCartItemReq;
+import com.ite.sws.domain.cart.dto.PostCartLoginReq;
+import com.ite.sws.domain.cart.event.CartUpdateEvent;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartMemberVO;
@@ -10,7 +15,9 @@ import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.util.JwtTokenProvider;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
+import com.ite.sws.util.MessageSender;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -40,7 +47,9 @@ import java.util.Optional;
  * 2024.08.26  	김민정       장바구니 아이템 수량 변경 기능 추가
  * 2024.08.26  	김민정       장바구니 아이템 삭제
  * 2024.08.31  	김민정       장바구니 아이템 조회 시, 장바구니 총 금액 계산
+ * 2024.09.05   김민정       장바구니 상태 변화 웹소켓으로 전송
  * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
+ * 2024.09.07   김민정       장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
  * </pre>
  */
 @Service
@@ -52,8 +61,8 @@ public class CartServiceImpl implements CartService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-
-    private final CartMessageSender messageSender;
+    private final MessageSender messageSender;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * cartId로 장바구니 아이템 조회
@@ -163,18 +172,17 @@ public class CartServiceImpl implements CartService {
 
     /**
      * 장바구니 아이템 추가 및 수량 증가
-     * (1) 기존에 장바구니에 해당 상품이 존재하지 않을 시, 새로운 아이템 생성
-     * (2) 기존에 장바구니에 해당 상품이 존재할 시, 수량 증가
+     * (1) 장바구니에 해당 상품이 없을 경우 새로운 아이템을 생성
+     * (2) 장바구니에 해당 상품이 이미 존재할 경우 수량을 증가
+     *
      * @param postCartItemReq 장바구니 아이템 객체
+     * @param memberId 회원 ID
      */
     @Override
     @Transactional
     public void addAndModifyCartItem(PostCartItemReq postCartItemReq, Long memberId) {
-        // 유저의 장바구니 조회
-        Long cartId = findCartByMemberId(memberId);
-
-        // 바코드 번호로 상품 아이디 조회
-        Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());
+        Long cartId = findCartByMemberId(memberId);   // 유저의 장바구니 조회
+        Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());   // 바코드 번호로 상품 아이디 조회
         if (productId == null) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
@@ -184,20 +192,12 @@ public class CartServiceImpl implements CartService {
                 .cartId(cartId)
                 .productId(productId)
                 .build();
+        cartMapper.insertCartItem(vo);  // 장바구니 아이템 추가 또는 수량 증가
 
-        // 장바구니 아이템 추가 또는 수량 증가
-        cartMapper.insertCartItem(vo);
-
-        // --------------------------
-        // 웹소켓 전송용 DTO
+        // 장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
         CartItemMessageDTO messageDTO = cartMapper.selectCartItemDetail(cartId, productId);
-
-        // 아이템 수량이 1이면 새로운 생성, 1 초과면 증가
-        String action = messageDTO.getQuantity() == 1 ? "create" :
-                        (messageDTO.getQuantity() > 1 ? "increase" : "create");
-        messageDTO.setAction(action);
-
-        sendCartUpdateMessage(messageDTO.getCartId(), messageDTO);
+        messageDTO.setAction(messageDTO.getQuantity() == 1 ? "create" : "increase"); // 아이템 수량이 1이면 새로운 생성, 1 초과면 증가
+        eventPublisher.publishEvent(new CartUpdateEvent(this, messageDTO));
     }
 
     /**
@@ -245,13 +245,14 @@ public class CartServiceImpl implements CartService {
                 .build();
         cartMapper.updateCartItemQuantity(modifyCartItem);
 
-        //----------------------------------
+        // 장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
         String action = delta > 0 ? "increase" : "decrease";
         CartItemMessageDTO messageDTO = CartItemMessageDTO.builder()
+                .cartId(cartId)
                 .productId(productId)
                 .action(action)
                 .build();
-        sendCartUpdateMessage(cartId, messageDTO);
+        eventPublisher.publishEvent(new CartUpdateEvent(this, messageDTO));
     }
 
     /**
@@ -278,33 +279,15 @@ public class CartServiceImpl implements CartService {
                 .build();
         cartMapper.deleteCartItem(deleteCartItem);
 
-        //-----------------------------------------------
+        // 장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
         CartItemMessageDTO messageDTO = CartItemMessageDTO.builder()
+                .cartId(cartId)
                 .productId(productId)
                 .action("delete")
                 .build();
-        sendCartUpdateMessage(cartId, messageDTO);
+        eventPublisher.publishEvent(new CartUpdateEvent(this, messageDTO));
     }
 
-    /**
-     * 장바구니 변경 사항 전송
-     * @param cartId 장바구니 ID
-     * @param cartItemMessageDTO 장바구니 아이템 변경 메시지
-     */
-    public void sendCartUpdateMessage(Long cartId, CartItemMessageDTO cartItemMessageDTO) {
-        String destination = "/sub/cart/" + cartId;
-        messageSender.sendMessage(destination, cartItemMessageDTO);
-    }
-
-    /**
-     * 장바구니 변경 사항 관련 채팅 전송
-     * @param cartId 장바구니 ID
-     * @param dto 장바구니 아이템 관련 채팅 메시지
-     */
-    public void sendCartChatMessage(Long cartId, CartItemMessageDTO dto) {
-        String destination = "/sub/chat/" + cartId;
-        messageSender.sendMessage(destination, dto);
-    }
 
     /**
      * MemberId로 cartMemberId 조회
