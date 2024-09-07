@@ -112,7 +112,7 @@ public class MemberServiceImpl implements MemberService {
         CartMemberVO cartMember = CartMemberVO.builder()
                 .cartId(cart.getCartId())
                 .name(member.getName())
-                .password(auth.getPassword())
+                .password(null)
                 .build();
         cartMapper.insertCartMember(cartMember);
     }

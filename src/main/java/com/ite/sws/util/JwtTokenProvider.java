@@ -4,6 +4,7 @@ import com.ite.sws.domain.member.dto.JwtToken;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -112,10 +113,11 @@ public class JwtTokenProvider {
                 .collect(Collectors.toList());
 
         Long memberId = claims.get("memberId", Long.class);
+        Long cartMemberId = claims.get("cartMemberId", Long.class);
 
         UserDetails principal = new User(claims.getSubject(), "", authorities);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(principal, "", authorities);
-        authenticationToken.setDetails(memberId);  // memberId를 Details로 설정
+        authenticationToken.setDetails(new CustomAuthenticationDetails(memberId, cartMemberId));
 
         return authenticationToken;
     }
@@ -190,5 +192,12 @@ public class JwtTokenProvider {
     public Long getCartMemberIdFromToken(String accessToken) {
         Claims claims = parseClaims(accessToken); // JWT 토큰에서 Claims를 파싱
         return claims.get("cartMemberId", Long.class); // Claims에서 cartMemberId 추출하여 반환
+    }
+
+    @Getter
+    @RequiredArgsConstructor
+    public static class CustomAuthenticationDetails {
+        private final Long memberId;
+        private final Long cartMemberId;
     }
 }
