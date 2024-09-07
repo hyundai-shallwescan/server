@@ -31,19 +31,18 @@
 	</bean>
 
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-    <property name="dataSource" ref="dataSource"/>
-    <property name="typeAliasesPackage" value="com.ite.sws.domain.product,
-                                               com.ite.sws.domain.admin,
-                                               com.ite.sws.domain.member,
-                                               com.ite.sws.domain.cart,
-                                               com.ite.sws.domain.chat,
-                                               com.ite.sws.domain.parking,
-                                               com.ite.sws.domain.payment,
-                                               com.ite.sws.domain.review"/>
-    <property name="configLocation" value="classpath:/mybatis-config.xml"/>
-    <property name="typeHandlersPackage" value="com.ite.sws.util"/>
-</bean>
-
+		<property name="dataSource" ref="dataSource"/>
+		<property name="typeAliasesPackage" value="com.ite.sws.domain.product,
+												   com.ite.sws.domain.admin,
+												   com.ite.sws.domain.member,
+												   com.ite.sws.domain.cart,
+												   com.ite.sws.domain.chat,
+												   com.ite.sws.domain.parking,
+												   com.ite.sws.domain.payment,
+												   com.ite.sws.domain.review"/>
+		<property name="configLocation" value="classpath:/mybatis-config.xml"/>
+		<property name="typeHandlersPackage" value="com.ite.sws.util"/>
+	</bean>
 
  	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
  		<property name="dataSource" ref="dataSource"></property>
