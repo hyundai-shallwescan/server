@@ -119,8 +119,9 @@ public class ParkingServiceImpl implements ParkingService{
 
         // 무료로 출차 가능한 시간 계산
         long feeForFreeParking = 0L;
-        String freeParkingTime = null;
+        String freeParkingTime = "금액 정산 후 출차가 가능합니다.";
         if (!parkingPaymentStatus.equals("EMPTY")) {
+            // 무료로 출차가 가능한 경우
             if (paidParkingTime.isNegative()) {
                 int freeParkingHour = (int) paidParkingTime.negated().toHours();
                 int freeParkingMinute = (int) (paidParkingTime.negated().toMinutes() % 60);
@@ -131,11 +132,10 @@ public class ParkingServiceImpl implements ParkingService{
                 freeParkingTime = freeParkingEndTime.format(DateTimeFormatter.ofPattern("HH:mm"));
                 paidParkingTime = Duration.ZERO;
             } else {
-                // 무료 출차를 위한 필요 금액 계산
-                feeForFreeParking = paymentService.determineRequiredPurchaseAmount(paidParkingTime.toMinutes());
-                // 무료 출차가 불가능한 경우
-                if (feeForFreeParking == 0) {
-                    freeParkingTime = "금액 정산 후 출차가 가능합니다.";
+                // 추가 구매로 무료 출차가 가능한 경우
+                if (paymentService.determineRequiredPurchaseAmount(paidParkingTime.toMinutes()) != 0) {
+                    // 무료 출차를 위한 추가 필요 금액 계산
+                    feeForFreeParking = paymentService.determineRequiredPurchaseAmount(parkingTime.toMinutes()) - totalPrice;
                 }
             }
         }
