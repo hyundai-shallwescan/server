@@ -3,11 +3,14 @@ package com.ite.sws.domain.parking.service;
 import com.ite.sws.domain.parking.dto.*;
 import com.ite.sws.domain.parking.mapper.ParkingMapper;
 import com.ite.sws.domain.parking.vo.ParkingHistoryVO;
+import com.ite.sws.domain.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -31,6 +34,7 @@ import java.util.List;
 public class ParkingServiceImpl implements ParkingService{
 
     private final ParkingMapper parkingMapper;
+    private final PaymentService paymentService;
 
     /**
      * 주차 기록 추가(입차 처리)
@@ -75,11 +79,18 @@ public class ParkingServiceImpl implements ParkingService{
         int totalPrice;
         String parkingPaymentStatus;
 
-        // 회원의 결제 금액 조회
-        Integer paymentAmount = parkingMapper.selectPaymentAmountByMemberId(memberId);
+        // 결제 관련 정보 조회
+        ParkingPaymentDTO parkingPaymentDTO = parkingMapper.selectPaymentIdAndAmountByMemberId(memberId);
+
+        // 주차 결제 상태
+        String paymentStatus = null;
+
         // 당일 결제 금액이 존재할 경우
-        if (paymentAmount != null) {
-            totalPrice = paymentAmount;
+        if (parkingPaymentDTO != null) {
+            // 결제 금액
+            totalPrice = parkingPaymentDTO.getPaymentAmount();
+            // 주차 결제 상태 조회
+            paymentStatus = parkingMapper.selectParkingPaymentStatusByPaymentId(parkingPaymentDTO.getPaymentId());
             parkingPaymentStatus = "PAID";
         } else {
             // 회원의 장바구니 목록 조회
@@ -106,10 +117,36 @@ public class ParkingServiceImpl implements ParkingService{
         // 유료 주차 시간 계산 (총 주차 시간 - 무료 주차 시간)
         Duration paidParkingTime = parkingTime.minus(discountParkingDuration);
 
+        // 무료로 출차 가능한 시간 계산
+        long feeForFreeParking = 0L;
+        String freeParkingTime = null;
+        if (!parkingPaymentStatus.equals("EMPTY")) {
+            if (paidParkingTime.isNegative()) {
+                int freeParkingHour = (int) paidParkingTime.negated().toHours();
+                int freeParkingMinute = (int) (paidParkingTime.negated().toMinutes() % 60);
+                LocalDateTime freeParkingEndTime = LocalDateTime.now(ZoneId.of("Asia/Seoul"))
+                        .plusHours(freeParkingHour)
+                        .plusMinutes(freeParkingMinute);
+
+                freeParkingTime = freeParkingEndTime.format(DateTimeFormatter.ofPattern("HH:mm"));
+                paidParkingTime = Duration.ZERO;
+            } else {
+                // 무료 출차를 위한 필요 금액 계산
+                feeForFreeParking = paymentService.determineRequiredPurchaseAmount(paidParkingTime.toMinutes());
+                // 무료 출차가 불가능한 경우
+                if (feeForFreeParking == 0) {
+                    freeParkingTime = "금액 정산 후 출차가 가능합니다.";
+                }
+            }
+        }
+
         // 주차 요금 계산 (10분당 1,000원)
         Long parkingFee = (paidParkingTime.toMinutes() / 10 + (paidParkingTime.toMinutes() % 10 > 0 ? 1L : 0L)) * 1000L;
 
         return GetParkingRes.builder()
+                .paymentStatus(paymentStatus)
+                .freeParkingTime(freeParkingTime)
+                .feeForFreeParking(feeForFreeParking)
                 .entranceAt(parkingHistoryDTO.getEntranceAt())
                 .carNumber(parkingHistoryDTO.getCarNumber())
                 .discountParkingHour(discountParkingHours)

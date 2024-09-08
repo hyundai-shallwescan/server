@@ -2,6 +2,7 @@ package com.ite.sws.domain.parking.mapper;
 
 import com.ite.sws.domain.parking.dto.CartItemListDTO;
 import com.ite.sws.domain.parking.dto.ParkingHistoryDTO;
+import com.ite.sws.domain.parking.dto.ParkingPaymentDTO;
 import com.ite.sws.domain.parking.vo.ParkingHistoryVO;
 import java.util.List;
 
@@ -52,11 +53,11 @@ public interface ParkingMapper {
     ParkingHistoryDTO selectParkingHistoryByMemberId(Long memberId);
 
     /**
-     * 결제 금액 조회
+     * 결제 관련 정보 조회
      * @param memberId 회원 ID
-     * @return 무료 주차 시간
+     * @return 결제 ID, 결제 금액
      */
-    Integer selectPaymentAmountByMemberId(Long memberId);
+    ParkingPaymentDTO selectPaymentIdAndAmountByMemberId(Long memberId);
 
     /**
      * 장바구니금액 정보 조회
@@ -65,5 +66,10 @@ public interface ParkingMapper {
      */
     List<CartItemListDTO> selectCartItemListByMemberId(Long memberId);
 
-
+    /**
+     * 주차 결제 상태 조회
+     * @param parkingPaymentId 주차 결제 ID
+     * @return 주차 결제 상태
+     */
+    String selectParkingPaymentStatusByPaymentId(Long parkingPaymentId);
 }
