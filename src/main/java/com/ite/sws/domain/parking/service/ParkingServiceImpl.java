@@ -79,11 +79,18 @@ public class ParkingServiceImpl implements ParkingService{
         int totalPrice;
         String parkingPaymentStatus;
 
-        // 회원의 결제 금액 조회
-        Integer paymentAmount = parkingMapper.selectPaymentAmountByMemberId(memberId);
+        // 결제 관련 정보 조회
+        ParkingPaymentDTO parkingPaymentDTO = parkingMapper.selectPaymentIdAndAmountByMemberId(memberId);
+
+        // 주차 결제 상태
+        String paymentStatus = null;
+
         // 당일 결제 금액이 존재할 경우
-        if (paymentAmount != null) {
-            totalPrice = paymentAmount;
+        if (parkingPaymentDTO != null) {
+            // 결제 금액
+            totalPrice = parkingPaymentDTO.getPaymentAmount();
+            // 주차 결제 상태 조회
+            paymentStatus = parkingMapper.selectParkingPaymentStatusByPaymentId(parkingPaymentDTO.getPaymentId());
             parkingPaymentStatus = "PAID";
         } else {
             // 회원의 장바구니 목록 조회
@@ -137,6 +144,7 @@ public class ParkingServiceImpl implements ParkingService{
         Long parkingFee = (paidParkingTime.toMinutes() / 10 + (paidParkingTime.toMinutes() % 10 > 0 ? 1L : 0L)) * 1000L;
 
         return GetParkingRes.builder()
+                .paymentStatus(paymentStatus)
                 .freeParkingTime(freeParkingTime)
                 .feeForFreeParking(feeForFreeParking)
                 .entranceAt(parkingHistoryDTO.getEntranceAt())
