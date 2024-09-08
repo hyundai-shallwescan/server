@@ -25,6 +25,8 @@
  * 2024.08.30  김민정        장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
  * 2024.09.05  김민정        장바구니 아이템 정보 조회
  * 2024.09.06  남진수        memberId로 cartMemberId 조회
+ * 2024.09.08  김민정        cartMemberId로 장바구니 유저 이름 조회
+ * 2024.09.08  김민정        productId로 채팅용 상품 정보 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -190,6 +192,26 @@
 				   JOIN CART_MEMBER CM
 						ON ( C.CART_ID = CM.CART_ID )
 		WHERE  M.MEMBER_ID = #{memberId}
+	</select>
+
+	<!-- cartMemberId로 장바구니 유저 이름 조회 -->
+	<select id="selectNameByCartMemberId" resultType="java.lang.String">
+		SELECT NAME
+		FROM   CART_MEMBER
+		WHERE  CART_MEMBER_ID = #{cartMemberId}
+	</select>
+
+	<!-- productId로 채팅용 상품 정보 조회 -->
+	<select id="selectCartItemChatDetails" resultType="com.ite.sws.domain.cart.dto.CartItemChatDTO">
+		SELECT (SELECT CM.NAME
+				FROM   CART_MEMBER CM
+				WHERE  CM.CART_MEMBER_ID = #{cartMemberId}) AS cartMemberName,
+				P.NAME                                      AS productName,
+				P.PRICE                                     AS productPrice,
+				P.THUMBNAIL_IMAGE                           AS productThumbnail
+		FROM   PRODUCT P
+		WHERE  P.PRODUCT_ID = #{productId}
+		  AND  P.IS_DELETED = 0
 	</select>
 
 </mapper>

@@ -197,7 +197,7 @@ public class PaymentServiceImpl implements PaymentService {
             additionalAmountRequired = 60000 - totalCartValue;
         }
 
-        // 11. 추가 금액에 해당하는 상품 추천
+        // 8. 추가 금액에 해당하는 상품 추천
         ProductVO recommendedProduct = findProductsInPriceRange(additionalAmountRequired, memberId);
         if (recommendedProduct == null) {
             return GetProductRecommendationRes.builder()
