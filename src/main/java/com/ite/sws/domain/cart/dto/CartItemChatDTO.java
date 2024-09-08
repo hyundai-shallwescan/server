@@ -23,6 +23,8 @@ import lombok.Setter;
 @Builder
 @Getter
 public class CartItemChatDTO {
+    private Long cartMemberId;
+    private Long cartId;
     private String cartMemberName;
     @Setter
     private String action; // "create", "increase", "decrease", "delete"

@@ -53,6 +53,7 @@
 	<mybatis-spring:scan base-package="com.ite.sws.domain.**.mapper"/>
 
 	<context:component-scan base-package="com.ite.sws.domain.**.service"/>
+	<context:component-scan base-package="com.ite.sws.domain.**.event"/>
 	<context:component-scan base-package="com.ite.sws.aop"/>
 	<context:component-scan base-package="com.ite.sws.util"/>
 	<context:component-scan base-package="com.ite.sws.exception"/>
