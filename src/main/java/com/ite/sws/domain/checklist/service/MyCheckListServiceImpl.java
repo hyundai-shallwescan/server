@@ -58,7 +58,6 @@ public class MyCheckListServiceImpl implements MyCheckListService{
 
         MyCheckListVO myCheckList = MyCheckListVO.builder()
                     .memberId(postMyCheckListReq.getMemberId())
-                    .myCheckListCategoryId(postMyCheckListReq.getMyCheckListCategoryId())
                     .item(postMyCheckListReq.getItem())
                     .build();
 
@@ -98,7 +97,6 @@ public class MyCheckListServiceImpl implements MyCheckListService{
 
         MyCheckListVO myCheckList = MyCheckListVO.builder()
                         .myCheckListItemId(myCheckListItemId)
-                        .myCheckListCategoryId(putMyCheckListReq.getMyCheckListCategoryId())
                         .item(putMyCheckListReq.getItem())
                         .build();
 

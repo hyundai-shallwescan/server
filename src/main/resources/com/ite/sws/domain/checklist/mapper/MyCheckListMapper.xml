@@ -23,16 +23,13 @@
 
     <!-- 마이 체크리스트 조회 -->
     <select id="selectMyCheckListByMemberId">
-        SELECT MCLC.MY_CHECK_LIST_CATEGORY_ID,
-               MCLI.MY_CHECK_LIST_ITEM_ID,
-               MCLI.ITEM AS itemName,
-               MCLI.STATUS
-        FROM   MY_CHECK_LIST_ITEM MCLI
-                   JOIN MY_CHECK_LIST_CATEGORY MCLC
-                        ON MCLI.MY_CHECK_LIST_CATEGORY_ID = MCLC.MY_CHECK_LIST_CATEGORY_ID
-        WHERE  MCLI.MEMBER_ID = #{memberId}
-               AND MCLI.IS_DELETED = 0
-        ORDER  BY MCLI.MY_CHECK_LIST_ITEM_ID DESC
+        SELECT MY_CHECK_LIST_ITEM_ID,
+               ITEM AS itemName,
+               STATUS
+        FROM   MY_CHECK_LIST_ITEM
+        WHERE  MEMBER_ID = #{memberId}
+          AND IS_DELETED = 0
+        ORDER  BY MY_CHECK_LIST_ITEM_ID DESC
     </select>
 
     <!-- 아이템 추가 -->
@@ -40,11 +37,9 @@
         INSERT INTO MY_CHECK_LIST_ITEM
                     (MY_CHECK_LIST_ITEM_ID,
                      MEMBER_ID,
-                     MY_CHECK_LIST_CATEGORY_ID,
                      ITEM)
         VALUES      (SEQ_MY_CHECK_LIST_ITEM_ID.NEXTVAL,
                      #{memberId},
-                     #{myCheckListCategoryId},
                      #{item})
     </insert>
 
@@ -71,8 +66,7 @@
     <!-- 아이템 변경 -->
     <update id="updateMyCheckListItem">
         UPDATE MY_CHECK_LIST_ITEM
-        SET    MY_CHECK_LIST_CATEGORY_ID = #{myCheckListCategoryId},
-               ITEM = #{item},
+        SET    ITEM = #{item},
                UPDATED_AT = CURRENT_TIMESTAMP
         WHERE  MY_CHECK_LIST_ITEM_ID = #{myCheckListItemId}
     </update>

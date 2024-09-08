@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GetMyCheckListRes {
-    private Long myCheckListCategoryId;
     private Long myCheckListItemId;
     private String itemName;
     private String status;
