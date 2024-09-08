@@ -46,7 +46,7 @@ public class ChatBotServiceImpl implements ChatBotService {
         // product가 없는 경우, message만 반환
         if (responseBody.getProduct() == null || responseBody.getProduct().isEmpty()) {
             return GetChatGptRes.builder()
-                    .message(responseBody != null ? responseBody.getMessage() : "No products available.")
+                    .message(responseBody.getMessage())
                     .build();
         }
 
