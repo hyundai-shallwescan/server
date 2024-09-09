@@ -39,6 +39,7 @@ public class GetMemberPaymentRes {
     @NoArgsConstructor
     public static class GetMemberPaymentItemRes {
         private Long paymentItemId;
+        private Long productId;
         private String name;
         private Integer price;
         private Integer quantity;

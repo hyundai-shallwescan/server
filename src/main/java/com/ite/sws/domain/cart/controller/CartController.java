@@ -2,13 +2,14 @@ package com.ite.sws.domain.cart.controller;
 
 import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.cart.dto.PostCartItemReq;
+import com.ite.sws.domain.cart.dto.PostCartLoginReq;
 import com.ite.sws.domain.cart.service.CartService;
 import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.08.26  	김민정       장바구니 수량 변경 API 생성
  * 2024.08.26  	김민정       장바구니 아이템 삭제 API 생성
  * 2024.08.31  	김민정       PathVariable에서 memberId 제거
+ * 2024.09.05   김민정       장바구니 상태 변화 웹소켓으로 전송
  * </pre>
  */
 @RestController
@@ -44,6 +46,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class CartController {
 
     private final CartService cartService;
+
+    private final SimpMessagingTemplate template;
 
     /**
      * 장바구니 조회 API
@@ -56,12 +60,12 @@ public class CartController {
   
     /**
      * 장바구니 로그인 및 회원가입
-     * @param postLoginReq 아이디, 비밀번호
+     * @param postCartLoginReq 아이디, 비밀번호
      * @return JwtToken 객체
      */
     @PostMapping("/login")
-    public ResponseEntity<?> findMemberByLoginId(@RequestBody PostLoginReq postLoginReq) {
-        JwtToken token = cartService.findCartMemberByLoginId(postLoginReq);
+    public ResponseEntity<?> cartLogin(@RequestBody PostCartLoginReq postCartLoginReq) {
+        JwtToken token = cartService.cartLogin(postCartLoginReq);
         return ResponseEntity.ok(token);
     }
 

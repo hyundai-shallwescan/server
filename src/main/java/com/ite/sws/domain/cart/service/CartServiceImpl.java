@@ -1,19 +1,24 @@
 package com.ite.sws.domain.cart.service;
 
+import com.ite.sws.domain.cart.dto.CartItemChatDTO;
 import com.ite.sws.domain.cart.dto.CartItemDTO;
+import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
 import com.ite.sws.domain.cart.dto.GetCartRes;
 import com.ite.sws.domain.cart.dto.PostCartItemReq;
+import com.ite.sws.domain.cart.dto.PostCartLoginReq;
+import com.ite.sws.domain.cart.event.CartEventPublisher;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartMemberVO;
 import com.ite.sws.domain.cart.vo.CartVO;
 import com.ite.sws.domain.member.dto.JwtToken;
-import com.ite.sws.domain.member.dto.PostLoginReq;
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.util.JwtTokenProvider;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
+import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -43,6 +48,11 @@ import java.util.Optional;
  * 2024.08.26  	김민정       장바구니 아이템 수량 변경 기능 추가
  * 2024.08.26  	김민정       장바구니 아이템 삭제
  * 2024.08.31  	김민정       장바구니 아이템 조회 시, 장바구니 총 금액 계산
+ * 2024.09.05   김민정       장바구니 상태 변화 웹소켓으로 전송
+ * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
+ * 2024.09.07   김민정       장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
+ * 2024.09.07   김민정       장바구니 변경 채팅 발송
+ * 2024.09.07   김민정       CartItemChatDTO 생성
  * </pre>
  */
 @Service
@@ -54,6 +64,8 @@ public class CartServiceImpl implements CartService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ApplicationEventPublisher eventPublisher;
+    private final CartEventPublisher cartEventPublisher;
 
     /**
      * cartId로 장바구니 아이템 조회
@@ -104,39 +116,39 @@ public class CartServiceImpl implements CartService {
   
     /**
      * 장바구니 로그인 및 회원가입
-     * @param postLoginReq 아이디, 비밀번호
+     * @param postCartLoginReq 아이디, 비밀번호
      * @return JwtToken 객체
      */
     @Transactional
-    public JwtToken findCartMemberByLoginId(PostLoginReq postLoginReq) {
-        Optional<CartMemberVO> authOptional = cartMapper.selectCartMemberByLoginId(postLoginReq.getLoginId());
+    public JwtToken cartLogin(PostCartLoginReq postCartLoginReq) {
+        Optional<CartMemberVO> authOptional = cartMapper.selectCartMemberByLoginId(postCartLoginReq.getLoginId());
 
         // 아이디가 존재하지 않으면 새로운 CartMember 생성
         if (!authOptional.isPresent()) {
-            CartMemberVO newCartMember = createNewCartMember(postLoginReq);
-            return authenticateAndGenerateToken(newCartMember.getName(), postLoginReq.getPassword(), newCartMember.getCartMemberId());
+            CartMemberVO newCartMember = createNewCartMember(postCartLoginReq);
+            return authenticateAndGenerateToken(newCartMember.getName(), postCartLoginReq.getPassword(), newCartMember.getCartMemberId());
         }
 
         // 아이디가 존재하나 비밀번호가 일치하지 않으면 예외 발생
         CartMemberVO auth = authOptional.get();
-        if (!passwordEncoder.matches(postLoginReq.getPassword(), auth.getPassword())) {
+        if (!passwordEncoder.matches(postCartLoginReq.getPassword(), auth.getPassword())) {
             throw new CustomException(ErrorCode.LOGIN_FAIL);
         }
 
         // 인증 후 토큰 생성
-        return authenticateAndGenerateToken(auth.getName(), postLoginReq.getPassword(), auth.getCartMemberId());
+        return authenticateAndGenerateToken(auth.getName(), postCartLoginReq.getPassword(), auth.getCartMemberId());
     }
 
     /**
      * 새로운 CartMember 생성 메서드 (장바구니 멤버 회원가입)
-     * @param postLoginReq 아이디와 비밀번호
+     * @param postCartLoginReq 아이디와 비밀번호
      * @return 생성된 CartMemberVO 객체
      */
-    private CartMemberVO createNewCartMember(PostLoginReq postLoginReq) {
+    private CartMemberVO createNewCartMember(PostCartLoginReq postCartLoginReq) {
         CartMemberVO cartMember = CartMemberVO.builder()
-                .cartId(1L) // 임시로 1로 설정
-                .name(postLoginReq.getLoginId())
-                .password(passwordEncoder.encode(postLoginReq.getPassword()))
+                .name(postCartLoginReq.getLoginId())
+                .password(passwordEncoder.encode(postCartLoginReq.getPassword()))
+                .cartId(postCartLoginReq.getCartId())
                 .build();
 
         cartMapper.insertCartMember(cartMember);
@@ -157,35 +169,43 @@ public class CartServiceImpl implements CartService {
 
         // 실제 검증
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        Long cartId = findCartByMemberId(cartMemberId);
         // 인증 정보를 기반으로 JWT 토큰 생성 후 반환
-        return jwtTokenProvider.generateToken(authentication, cartMemberId, cartId);
+        return jwtTokenProvider.generateToken(authentication, null, cartMemberId);
     }
 
     /**
      * 장바구니 아이템 추가 및 수량 증가
-     * (1) 기존에 장바구니에 해당 상품이 존재하지 않을 시, 새로운 아이템 생성
-     * (2) 기존에 장바구니에 해당 상품이 존재할 시, 수량 증가
+     * (1) 장바구니에 해당 상품이 없을 경우 새로운 아이템을 생성
+     * (2) 장바구니에 해당 상품이 이미 존재할 경우 수량을 증가
+     *
      * @param postCartItemReq 장바구니 아이템 객체
+     * @param memberId 회원 ID
      */
     @Override
     @Transactional
     public void addAndModifyCartItem(PostCartItemReq postCartItemReq, Long memberId) {
-        // 유저의 장바구니 조회
-        Long cartId = findCartByMemberId(memberId);
-
-        // 바코드 번호로 상품 아이디 조회
-        Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());
+        Long cartId = findCartByMemberId(memberId);   // 유저의 장바구니 조회
+        Long productId = cartMapper.selectProductByBarcode(postCartItemReq.getBarcode());   // 바코드 번호로 상품 아이디 조회
         if (productId == null) {
             throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 
         // 장바구니 아이템 생성 시 필요한 데이터 설정
-        CartItemVO newCartItem = CartItemVO.builder()
+        CartItemVO cartItem = CartItemVO.builder()
                 .cartId(cartId)
                 .productId(productId)
                 .build();
-        cartMapper.insertCartItem(newCartItem);
+        cartMapper.insertCartItem(cartItem);  // 장바구니 아이템 추가 또는 수량 증가
+
+        // 장바구니 변경 관련 이벤트 발행 (비동기 처리)
+        // (1) 장바구니 변경 실시간 처리
+        CartItemMessageDTO messageDTO = cartMapper.selectCartItemDetail(cartId, productId);
+        messageDTO.setAction(messageDTO.getQuantity() == 1 ? "create" : "increase"); // 아이템 수량이 1이면 새로운 생성, 1 초과면 증가
+        cartEventPublisher.publishCartUpdateEvent(messageDTO);
+
+        // (2) 장바구니 변경 채팅 발송
+        CartItemChatDTO cartItemChatDTO = createCartItemChatDTO(messageDTO);
+        cartEventPublisher.publishCartUpdateChatEvent(cartItemChatDTO);
     }
 
     /**
@@ -232,6 +252,16 @@ public class CartServiceImpl implements CartService {
                 .quantity(delta)
                 .build();
         cartMapper.updateCartItemQuantity(modifyCartItem);
+
+        // 장바구니 변경 관련 이벤트 발행 (비동기 처리)
+        // (1) 장바구니 변경 실시간 처리
+        CartItemMessageDTO messageDTO = cartMapper.selectCartItemDetail(cartId, productId);
+        messageDTO.setAction(delta > 0 ? "increase" : "decrease");
+        cartEventPublisher.publishCartUpdateEvent(messageDTO);
+
+        // (2) 장바구니 변경 채팅 발송
+        CartItemChatDTO cartItemChatDTO = createCartItemChatDTO(messageDTO);
+        cartEventPublisher.publishCartUpdateChatEvent(cartItemChatDTO);
     }
 
     /**
@@ -257,5 +287,76 @@ public class CartServiceImpl implements CartService {
                 .productId(productId)
                 .build();
         cartMapper.deleteCartItem(deleteCartItem);
+
+        // 장바구니 변경 관련 이벤트 발행 (비동기 처리)
+        // (1) 장바구니 변경 실시간 처리
+        CartItemMessageDTO messageDTO = CartItemMessageDTO.builder()
+                .cartId(cartId)
+                .productId(productId)
+                .action("delete")
+                .build();
+        cartEventPublisher.publishCartUpdateEvent(messageDTO);
+
+        // (2) 장바구니 변경 채팅 발송
+        Long cartMemberId = SecurityUtil.getCurrentCartMemberId();
+        CartItemChatDTO cartItemChatDTO = cartMapper.selectCartItemChatDetails(productId, cartMemberId);
+        cartEventPublisher.publishCartUpdateChatEvent(createCartItemChatDTO(cartItemChatDTO, cartId, cartMemberId));
     }
+
+
+    /**
+     * MemberId로 cartMemberId 조회
+     * @param memberId 멤버 id
+     * @return cartMemberId
+     */
+    public Long findCartMemberIdByMemberId(Long memberId) {
+        // 회원의 CART 중 'ACTIVE' 상태인 cartMemberId 가져오기
+        return cartMapper.selectCartMemberIdByMemberId(memberId);
+    }
+
+    /**
+     * CartItemChatDTO 생성
+     * : 장바구니 아이템 변경 시, 채팅을 위한 정보
+     * : create, update
+     *
+     * @param messageDTO 장바구니 아이템 메시지 객체
+     * @return
+     */
+    private CartItemChatDTO createCartItemChatDTO(CartItemMessageDTO messageDTO) {
+        Long cartMemberId = SecurityUtil.getCurrentCartMemberId();
+        String name = cartMapper.selectNameByCartMemberId(cartMemberId);
+        return CartItemChatDTO.builder()
+                .cartId((messageDTO.getCartId()))
+                .cartMemberId(cartMemberId)
+                .cartMemberName(name)
+                .action(messageDTO.getAction())
+                .productName(messageDTO.getProductName())
+                .productThumbnail(messageDTO.getProductThumbnail())
+                .quantity(messageDTO.getQuantity())
+                .build();
+    }
+
+    /**
+     * CartItemChatDTO 생성
+     * : 장바구니 아이템 변경 시, 채팅을 위한 정보
+     * : delete
+     *
+     * @param cartItemChatDTO 장바구니 아이템 메시지 객체
+     * @param cartId 장바구니 ID
+     * @param cartMemberId 장바구니 멤버 ID
+     * @return
+     */
+    private CartItemChatDTO createCartItemChatDTO(CartItemChatDTO cartItemChatDTO, Long cartId, Long cartMemberId) {
+        return CartItemChatDTO.builder()
+                .cartId(cartId)
+                .cartMemberId(cartMemberId)
+                .cartMemberName(cartItemChatDTO.getCartMemberName())
+                .action("delete")
+                .productName(cartItemChatDTO.getProductName())
+                .productPrice(cartItemChatDTO.getProductPrice())
+                .productThumbnail(cartItemChatDTO.getProductThumbnail())
+                .quantity(null)
+                .build();
+    }
+
 }

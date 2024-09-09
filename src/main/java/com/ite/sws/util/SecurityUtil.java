@@ -41,11 +41,11 @@ public class SecurityUtil {
     }
 
     /**
-     * cartId를 추출하는 메서드
-     * @return Long cartId
+     * cartMemberId를 추출하는 메서드
+     * @return Long cartMemberId
      */
-    public static Long getCurrentCartId() {
+    public static Long getCurrentCartMemberId() {
         JwtTokenProvider.CustomAuthenticationDetails details = getAuthenticationDetails();
-        return (details != null) ? details.getCartId() : null;
+        return (details != null) ? details.getCartMemberId() : null;
     }
 }

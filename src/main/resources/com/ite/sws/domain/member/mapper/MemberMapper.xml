@@ -133,6 +133,7 @@
     <!-- 구매 내역 아이템 조회 -->
     <select id="selectPaymentItemByPaymentId">
         SELECT PI.PAYMENT_ITEM_ID,
+               PI.PRODUCT_ID,
                PI.NAME,
                PI.PRICE,
                PI.QUANTITY,

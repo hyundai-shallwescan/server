@@ -23,6 +23,10 @@
  * 2024.08.26  김민정        장바구니 아이템 삭제
  * 2024.08.26  김민정        장바구니가 존재하는지 확인
  * 2024.08.30  김민정        장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
+ * 2024.09.05  김민정        장바구니 아이템 정보 조회
+ * 2024.09.06  남진수        memberId로 cartMemberId 조회
+ * 2024.09.08  김민정        cartMemberId로 장바구니 유저 이름 조회
+ * 2024.09.08  김민정        productId로 채팅용 상품 정보 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -67,12 +71,16 @@
 
 	<!-- 장바구니 회원가입 -->
 	<insert id="insertCartMember">
+		<selectKey keyProperty="cartMemberId" resultType="long" order="BEFORE">
+			SELECT SEQ_CART_MEMBER_ID.NEXTVAL
+			FROM   DUAL
+		</selectKey>
 		INSERT INTO CART_MEMBER
 					(CART_MEMBER_ID,
 					 CART_ID,
 					 NAME,
 					 PASSWORD)
-		VALUES      (SEQ_CART_MEMBER_ID.NEXTVAL,
+		VALUES      (#{cartMemberId},
 		             #{cartId},
 					 #{name},
 					 #{password})
@@ -157,6 +165,53 @@
 			   AND CI.IS_DELETED = 0
 		  	   AND C.STATUS='ACTIVE'
 		GROUP BY C.MEMBER_ID
+	</select>
+
+	<!-- 장바구니 아이템 정보 조회 -->
+	<select id="selectCartItemDetail" resultType="com.ite.sws.domain.cart.dto.CartItemMessageDTO">
+		SELECT CI.CART_ID,
+		       CI.PRODUCT_ID,
+			   CI.QUANTITY,
+			   P.NAME          AS productName,
+			   P.PRICE         AS productPrice,
+			   P.THUMBNAIL_IMAGE AS productThumbnail
+		FROM   CART_ITEM CI
+				   LEFT JOIN PRODUCT P ON CI.PRODUCT_ID = P.PRODUCT_ID
+		WHERE  CI.CART_ID = #{cartId}
+		  AND  CI.PRODUCT_ID = #{productId}
+		  AND  CI.IS_DELETED = 0
+	</select>
+
+	<!-- memberId로 cartMemberId 조회 -->
+	<select id="selectCartMemberIdByMemberId" >
+		SELECT CART_MEMBER_ID
+		FROM   MEMBER M
+				   JOIN CART C
+						ON ( M.MEMBER_ID = C.MEMBER_ID
+							AND C.STATUS = 'ACTIVE' )
+				   JOIN CART_MEMBER CM
+						ON ( C.CART_ID = CM.CART_ID )
+		WHERE  M.MEMBER_ID = #{memberId}
+	</select>
+
+	<!-- cartMemberId로 장바구니 유저 이름 조회 -->
+	<select id="selectNameByCartMemberId" resultType="java.lang.String">
+		SELECT NAME
+		FROM   CART_MEMBER
+		WHERE  CART_MEMBER_ID = #{cartMemberId}
+	</select>
+
+	<!-- productId로 채팅용 상품 정보 조회 -->
+	<select id="selectCartItemChatDetails" resultType="com.ite.sws.domain.cart.dto.CartItemChatDTO">
+		SELECT (SELECT CM.NAME
+				FROM   CART_MEMBER CM
+				WHERE  CM.CART_MEMBER_ID = #{cartMemberId}) AS cartMemberName,
+				P.NAME                                      AS productName,
+				P.PRICE                                     AS productPrice,
+				P.THUMBNAIL_IMAGE                           AS productThumbnail
+		FROM   PRODUCT P
+		WHERE  P.PRODUCT_ID = #{productId}
+		  AND  P.IS_DELETED = 0
 	</select>
 
 </mapper>

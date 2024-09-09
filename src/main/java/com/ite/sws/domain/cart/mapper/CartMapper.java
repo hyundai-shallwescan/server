@@ -1,6 +1,8 @@
 package com.ite.sws.domain.cart.mapper;
 
+import com.ite.sws.domain.cart.dto.CartItemChatDTO;
 import com.ite.sws.domain.cart.dto.CartItemDTO;
+import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
 import com.ite.sws.domain.cart.dto.CartTotalDTO;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartMemberVO;
@@ -33,6 +35,10 @@ import java.util.Optional;
  * 2024.08.26  	김민정       장바구니가 존재하는지 확인
  * 2024.08.26  	김민정       상품이 존재하는지 확인
  * 2024.08.30  	김민정       장바구니에 해당하는 아이템들의 총 금액과 MEMBER_ID 조회
+ * 2024.09.05  	김민정       장바구니 아이템 정보 조회
+ * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
+ * 2024.09.08   김민정       cartMemberId로 장바구니 유저 이름 조회
+ * 2024.09.08   김민정       productId로 채팅용 상품 정보 조회
  * </pre>
  */
 public interface CartMapper {
@@ -108,4 +114,34 @@ public interface CartMapper {
      * @return
      */
     CartTotalDTO calculateTotalCartValue(@Param("cartId") Long cartId);
+
+    /**
+     * 장바구니 아이템 정보 조회
+     * @param cartId 장바구니 ID
+     * @param productId 상품 ID
+     * @return
+     */
+    CartItemMessageDTO selectCartItemDetail(@Param("cartId") Long cartId,
+                                            @Param("productId") Long productId);
+
+    /**
+     * memberId로 cartMemberId 조회
+     * @param memberId 멤버 id
+     * @return cartId
+     */
+    Long selectCartMemberIdByMemberId(Long memberId);
+
+    /**
+     * cartMemberId로 장바구니 유저 이름 조회
+     * @param cartMemberId 장바구니 멤버 ID
+     * @return
+     */
+    String selectNameByCartMemberId(@Param("cartMemberId") Long cartMemberId);
+
+    /**
+     * productId로 채팅용 상품 정보 조회
+     * @param productId 상품 ID
+     */
+    CartItemChatDTO selectCartItemChatDetails(@Param("productId") Long productId,
+                                              @Param("cartMemberId") Long cartMemberId);
 }

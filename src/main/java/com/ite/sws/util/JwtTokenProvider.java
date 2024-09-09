@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
  * ----------  --------    ---------------------------
  * 2024.08.25   정은지        최초 생성
  * 2024.09.01   정은지        accessToken에 cartId 저장
+ * 2024.09.06   남진수        JWT 토큰에서 장바구니 멤버 ID를 추출
  * </pre>
  */
 
@@ -66,7 +67,7 @@ public class JwtTokenProvider {
      * @param memberId 멤버 아이디
      * @return JwtToken 객체
      */
-    public JwtToken generateToken(Authentication authentication, Long memberId, Long cartId) {
+    public JwtToken generateToken(Authentication authentication, Long memberId, Long cartMemberId) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -78,7 +79,7 @@ public class JwtTokenProvider {
                 .setSubject(authentication.getName())
                 .claim("auth", authorities) // 권한 정보 추가
                 .claim("memberId", memberId) // 사용자 ID 추가
-                .claim("cartId", cartId) // 장바구니 ID 추가
+                .claim("cartMemberId", cartMemberId) // 카트 멤버 ID 추가
                 .setExpiration(accessTokenExpiresIn)  // 만료 시간 설정
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -112,11 +113,11 @@ public class JwtTokenProvider {
                 .collect(Collectors.toList());
 
         Long memberId = claims.get("memberId", Long.class);
-        Long cartId = claims.get("cartId", Long.class);
+        Long cartMemberId = claims.get("cartMemberId", Long.class);
 
         UserDetails principal = new User(claims.getSubject(), "", authorities);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(principal, "", authorities);
-        authenticationToken.setDetails(new CustomAuthenticationDetails(memberId, cartId));  // memberId를 Details로 설정
+        authenticationToken.setDetails(new CustomAuthenticationDetails(memberId, cartMemberId));
 
         return authenticationToken;
     }
@@ -183,10 +184,20 @@ public class JwtTokenProvider {
         return claims.get("memberId", Long.class); // Claims에서 memberId를 추출하여 반환
     }
 
+    /**
+     * JWT 토큰에서 장바구니 멤버 ID를 추출하는 메서드
+     * @param accessToken JWT 액세스토큰
+     * @return cartMemberId 장바구니 멤버 아이디
+     */
+    public Long getCartMemberIdFromToken(String accessToken) {
+        Claims claims = parseClaims(accessToken); // JWT 토큰에서 Claims를 파싱
+        return claims.get("cartMemberId", Long.class); // Claims에서 cartMemberId 추출하여 반환
+    }
+
     @Getter
     @RequiredArgsConstructor
     public static class CustomAuthenticationDetails {
         private final Long memberId;
-        private final Long cartId;
+        private final Long cartMemberId;
     }
 }

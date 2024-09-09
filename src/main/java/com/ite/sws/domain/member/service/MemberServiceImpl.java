@@ -1,6 +1,8 @@
 package com.ite.sws.domain.member.service;
 
+import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.cart.service.CartService;
+import com.ite.sws.domain.cart.vo.CartMemberVO;
 import com.ite.sws.domain.cart.vo.CartVO;
 import com.ite.sws.domain.member.dto.*;
 import com.ite.sws.domain.member.mapper.MemberMapper;
@@ -18,7 +20,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +45,8 @@ import java.util.stream.Collectors;
  * 2024.08.27   정은지        구매 내역 조회 추가
  * 2024.08.27   정은지        작성 리뷰 조회 추가
  * 2024.08.29   정은지        로그아웃 추가
- * 2024.09.01   정은지        로그인 시 토큰에 cartId 저장
+ * 2024.09.01   정은지        로그인 반환 값에 cartId 추가
+ * 2024.09.06   남진수        회원가입 시 장바구니 회원도 생성되도록 추가
  * </pre>
  */
 
@@ -54,6 +56,7 @@ import java.util.stream.Collectors;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberMapper memberMapper;
+    private final CartMapper cartMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -105,6 +108,13 @@ public class MemberServiceImpl implements MemberService {
                 .build();
 
         memberMapper.insertCart(cart);
+
+        CartMemberVO cartMember = CartMemberVO.builder()
+                .cartId(cart.getCartId())
+                .name(member.getName())
+                .password(null)
+                .build();
+        cartMapper.insertCartMember(cartMember);
     }
 
     /**
@@ -114,7 +124,7 @@ public class MemberServiceImpl implements MemberService {
      */
     @Transactional
     @Override
-    public JwtToken login(PostLoginReq postLoginReq) {
+    public PostLoginRes login(PostLoginReq postLoginReq) {
 
         // 로그인 아이디로 사용자 조회
         Optional<AuthVO> authOptional = memberMapper.selectMemberByLoginId(postLoginReq.getLoginId());
@@ -141,14 +151,24 @@ public class MemberServiceImpl implements MemberService {
         // cartId 가져오기
         Long cartId = cartService.findCartByMemberId(auth.getMemberId());
 
+        // cartMemberId 가져오기
+        Long cartMemberId = cartService.findCartMemberIdByMemberId(auth.getMemberId());
+
         // 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), cartId);
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), cartMemberId);
+        String token = jwtToken.getAccessToken().toString();
+
+        PostLoginRes postLoginRes =  PostLoginRes.builder()
+                .cartId(cartId)
+                .token(token)
+                .build();
 
         // Redis에 memberId를 키로 JWT 토큰 저장
-        String token = jwtToken.getAccessToken().toString();
+
         int expirationMinutes = (int) (jwtTokenProvider.getExpiration(jwtToken.getAccessToken()) / 60000);
         redisTemplate.opsForValue().set("JWT_TOKEN:" + auth.getMemberId(), token, expirationMinutes);
-        return jwtToken;
+
+        return postLoginRes;
     }
 
     /**
@@ -187,6 +207,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional
     @Override
     public void removeMember(Long memberId) {
+        logout(memberId);
         memberMapper.deleteMember(memberId);
     }
 
