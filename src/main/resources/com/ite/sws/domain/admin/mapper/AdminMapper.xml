@@ -14,6 +14,8 @@
      * 2024.08.2 구지웅 최초 생성
      * 2024.08.27  	구지웅      세일즈 조회 쿼리 생성
      * 2024.08.27  	구지웅      회원 구매내역 select 쿼리 수정
+     * 2024.09.04  	구지웅      sales 쿼리 수정
+     * 2024.09.05   구지웅      selectPaymentHistory pagination 추가
     -->
 
 <mapper namespace="com.ite.sws.domain.admin.mapper.AdminMapper">
@@ -39,9 +41,13 @@
 
   <update id="updateProductIsDeleted" parameterType="long">
     UPDATE PRODUCT
-    SET IS_DELETED = 1
+    SET IS_DELETED =
+        CASE
+            WHEN IS_DELETED = 1 THEN 0
+            ELSE 1
+        END
     WHERE PRODUCT_ID = #{productId}
-  </update>
+</update>
 
   <update id="updateProduct" parameterType="com.ite.sws.domain.product.vo.ProductVO">
     UPDATE PRODUCT
@@ -78,82 +84,138 @@
   </select>
 
 
-  <select id="selectMemberPaymentHistory" parameterType="java.lang.Long"
-    resultMap="memberPaymentHistoryResultMap">
+<select id="selectMemberPaymentHistory" parameterType="long" resultMap="memberPaymentHistoryResultMap">
     SELECT
-    M.MEMBER_ID AS memberId,
-    P.PAYMENT_ID AS paymentId,
-    SUM(P.AMOUNT) AS totalAmountSum,
-    P.CREATED_AT AS createdAt,
-    PI.PRODUCT_ID AS productId,
-    PI.NAME AS name,
-    PI.THUMBNAIL_IMAGE AS thumbnailImage,
-    PI.QUANTITY AS quantity,
-    PI.PRICE AS price
+        P.PAYMENT_ID AS paymentId,
+        paymentTotals.totalAmountSum, -- Total amount for the payment
+        P.CREATED_AT AS paymentCreatedAt,
+        PI.PRODUCT_ID AS productId,
+        PI.NAME AS productName,
+        PI.THUMBNAIL_IMAGE AS thumbnailImage,
+        PI.QUANTITY AS quantity,
+        PI.PRICE AS price
     FROM
-    MEMBER M
-    JOIN
-    CART C ON M.MEMBER_ID = C.MEMBER_ID
-    JOIN
-    PAYMENT P ON C.CART_ID = P.CART_ID
-    JOIN
-    PAYMENT_ITEM PI ON P.PAYMENT_ID = PI.PAYMENT_ID
+        PAYMENT P
+        JOIN PAYMENT_ITEM PI ON P.PAYMENT_ID = PI.PAYMENT_ID
+        JOIN (
+            SELECT
+                PAYMENT_ID,
+                SUM(PRICE * QUANTITY) AS totalAmountSum
+            FROM
+                PAYMENT_ITEM
+            GROUP BY
+                PAYMENT_ID
+        ) paymentTotals ON P.PAYMENT_ID = paymentTotals.PAYMENT_ID
     WHERE
-    M.MEMBER_ID = #{memberId}
-    GROUP BY
-    M.MEMBER_ID, P.PAYMENT_ID, P.CREATED_AT, PI.PRODUCT_ID, PI.NAME, PI.THUMBNAIL_IMAGE,
-    PI.QUANTITY, PI.PRICE
+        P.PAYMENT_ID = #{paymentId}
     ORDER BY
-    P.CREATED_AT DESC
-  </select>
+        P.CREATED_AT DESC
+</select>
 
-  <select id="selectSalesByCriteria" parameterType="com.ite.sws.domain.admin.dto.SalesCriteria"
-    resultType="com.ite.sws.domain.admin.dto.GetSalesRes">
+
+<select id="selectSalesByCriteria" parameterType="com.ite.sws.domain.admin.dto.SalesCriteria"
+    resultMap="GetSalesResMap">
+
     SELECT
-    SUM(P.AMOUNT) AS totalAmount,
-    ROUND(100 * SUM(CASE WHEN M.GENDER = 'M' THEN 1 ELSE 0 END) / COUNT(*), 2) AS maleRatio,
-    ROUND(100 * SUM(CASE WHEN M.GENDER = 'F' THEN 1 ELSE 0 END) / COUNT(*), 2) AS femaleRatio,
-    ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 0 AND 9 THEN 1 ELSE 0 END) / COUNT(*), 2) AS
-    ageRange1Ratio,
-    ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 10 AND 19 THEN 1 ELSE 0 END) / COUNT(*), 2) AS
-    ageRange2Ratio,
-    ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 20 AND 29 THEN 1 ELSE 0 END) / COUNT(*), 2) AS
-    ageRange3Ratio,
-    ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 30 AND 39 THEN 1 ELSE 0 END) / COUNT(*), 2) AS
-    ageRange4Ratio,
-    ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 40 AND 49 THEN 1 ELSE 0 END) / COUNT(*), 2) AS
-    ageRange5Ratio,
-    ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 50 AND 59 THEN 1 ELSE 0 END) / COUNT(*), 2) AS
-    ageRange6Ratio,
-    ROUND(100 * SUM(CASE WHEN M.AGE BETWEEN 60 AND 100 THEN 1 ELSE 0 END) / COUNT(*), 2) AS
-    ageRangeSixtyToLastRatio
-    FROM
-    PAYMENT P
-    JOIN
-    CART C ON P.CART_ID = C.CART_ID
-    JOIN
-    MEMBER M ON C.MEMBER_ID = M.MEMBER_ID
-    WHERE
-    EXTRACT(YEAR FROM P.CREATED_AT) = #{year}
-    AND
-    EXTRACT(MONTH FROM P.CREATED_AT) = #{month}
-  </select>
+        EXTRACT(DAY FROM P.CREATED_AT) AS day,
+        SUM(P.AMOUNT) AS totalAmount,
 
-  <resultMap id="memberPaymentHistoryResultMap"
-    type="com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes">
-    <id property="memberId" column="memberId"/>
-    <result property="paymentId" column="paymentId"/>
-    <result property="totalAmountSum" column="totalAmountSum"/>
-    <result property="paymentCreatedAt" column="createdAt"/>
-    <collection property="purchasedProducts"
-      ofType="com.ite.sws.domain.admin.dto.PurchasedProduct">
-      <id property="productId" column="productId"/>
-      <result property="productName" column="name"/>
-      <result property="thumbnailImage" column="thumbnailImage"/>
-      <result property="quantity" column="quantity"/>
-      <result property="price" column="price"/>
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.GENDER = 'M' THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS maleRatio,
+
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.GENDER = 'F' THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS femaleRatio,
+
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.AGE BETWEEN 10 AND 19 THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS ageRange1Ratio,
+
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.AGE BETWEEN 20 AND 29 THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS ageRange2Ratio,
+
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.AGE BETWEEN 30 AND 39 THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS ageRange3Ratio,
+
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.AGE BETWEEN 40 AND 49 THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS ageRange4Ratio,
+
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.AGE BETWEEN 50 AND 59 THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS ageRange5Ratio,
+
+        (SELECT ROUND(100 * SUM(CASE WHEN M2.AGE >= 60 THEN 1 ELSE 0 END) / COUNT(*), 2)
+         FROM PAYMENT P2
+         JOIN CART C2 ON P2.CART_ID = C2.CART_ID
+         JOIN MEMBER M2 ON C2.MEMBER_ID = M2.MEMBER_ID
+         WHERE EXTRACT(YEAR FROM P2.CREATED_AT) = #{year} AND EXTRACT(MONTH FROM P2.CREATED_AT) = #{month}
+        ) AS ageRangeSixtyToLastRatio
+    FROM
+        PAYMENT P
+    WHERE
+        EXTRACT(YEAR FROM P.CREATED_AT) = #{year}
+        AND EXTRACT(MONTH FROM P.CREATED_AT) = #{month}
+    GROUP BY
+        EXTRACT(DAY FROM P.CREATED_AT)
+    ORDER BY
+        day ASC
+</select>
+
+ <resultMap id="GetSalesResMap" type="com.ite.sws.domain.admin.dto.GetSalesRes">
+    <result property="maleRatio" column="maleRatio" />
+    <result property="femaleRatio" column="femaleRatio" />
+    <result property="ageRange1Ratio" column="ageRange1Ratio" />
+    <result property="ageRange2Ratio" column="ageRange2Ratio" />
+    <result property="ageRange3Ratio" column="ageRange3Ratio" />
+    <result property="ageRange4Ratio" column="ageRange4Ratio" />
+    <result property="ageRange5Ratio" column="ageRange5Ratio" />
+    <result property="ageRangeSixtyToLastRatio" column="ageRangeSixtyToLastRatio" />
+    <collection property="dailySaleDtoList" ofType="com.ite.sws.domain.admin.dto.DailySaleDto">
+        <id property="day" column="day" />
+        <result property="totalAmount" column="totalAmount" />
     </collection>
-  </resultMap>
+</resultMap>
+
+
+<resultMap id="memberPaymentHistoryResultMap" type="com.ite.sws.domain.admin.dto.GetMemberPaymentHistoryRes">
+    <id property="paymentId" column="paymentId"/>
+    <result property="totalAmountSum" column="totalAmountSum"/>
+    <result property="paymentCreatedAt" column="paymentCreatedAt"/>
+    <collection property="purchasedProducts" ofType="com.ite.sws.domain.admin.dto.PurchasedProduct">
+        <result property="productId" column="productId"/>
+        <result property="productName" column="productName"/>
+        <result property="thumbnailImage" column="thumbnailImage"/>
+        <result property="quantity" column="quantity"/>
+        <result property="price" column="price"/>
+    </collection>
+</resultMap>
+
+
   <resultMap id="GetPaymentHistoryResResultMap"
     type="com.ite.sws.domain.admin.dto.GetPaymentHistoryRes">
     <id property="paymentId" column="payment_id"/>

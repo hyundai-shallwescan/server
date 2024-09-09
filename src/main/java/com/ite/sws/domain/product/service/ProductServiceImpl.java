@@ -39,7 +39,6 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductVO findProduct(Long productId) {
         Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);
-
         return optionalProduct.orElseThrow(() ->
             new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
     }
@@ -51,8 +50,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductVO> findProductsByProductName(String productName) {
-        return productMapper.selectProductsByProductName(productName);
+    public List<ProductVO> findProductsByProductName(String productName, int page, int size) {
+        return productMapper.selectProductsByProductName(productName,page,size);
     }
 
     @Override

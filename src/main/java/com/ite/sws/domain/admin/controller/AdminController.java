@@ -39,6 +39,7 @@ import reactor.core.publisher.Flux;
  * 2024.08.26  	구지웅      최초 생성 및 상품 관련 기능 구현
  * 2024.08.27   구지웅      유저 결제 내역 조회 기능 구현
  * 2024.08.28   구지웅      어드민 유저 sales 조회 기능 구현
+ * 2024.09.05   구지웅      DeleteMapping method naming 수정
  * </pre>
  *
  */
@@ -60,9 +61,9 @@ public class AdminController {
   }
 
   @DeleteMapping("/products/{productId}")
-  public ResponseEntity<Void> deleteProduct(
+  public ResponseEntity<Void> updateProductDeleteStatus(
       @PathVariable Long productId) {
-    adminService.deleteProduct(productId);
+    adminService.modifyProductIsDeletedToggle(productId);
     return ResponseEntity.status(200).build();
   }
 
@@ -78,10 +79,10 @@ public class AdminController {
     return ResponseEntity.status(200).build();
   }
 
-  @GetMapping("/payments/members/{memberId}")
+  @GetMapping("/payments/{paymentId}")
   public ResponseEntity<List<GetMemberPaymentHistoryRes>> findMemberPaymentHistory(
-      @PathVariable Long memberId) {
-    return ResponseEntity.ok().body(adminService.findUserPaymentHistory(memberId));
+      @PathVariable Long paymentId) {
+    return ResponseEntity.ok().body(adminService.findUserPaymentHistory(paymentId));
   }
 
   @GetMapping("/sales")
@@ -94,7 +95,7 @@ public class AdminController {
     return ResponseEntity.ok(sales);
   }
 
-  @GetMapping(value = "/admins/payments/members", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+  @GetMapping(value = "/payments/members", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<PaymentEvent> streamUserPayments(
       @RequestParam(value = "page",defaultValue = "0") int page,
       @RequestParam(value = "size",defaultValue = "10") int size,

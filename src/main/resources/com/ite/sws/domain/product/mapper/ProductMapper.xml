@@ -14,6 +14,7 @@
  * 2024.08.23  	정은지        최초 생성
  * 2024.08.23  	구지웅        select query 수정
  * 2024.08.26  	김민정        상품이 존재하는지 확인
+ * 2024.09.06  	구지웅        selectProductsByProductName like clause 수정
  * </pre>
  -->
  
@@ -30,7 +31,7 @@
 		CREATED_AT,
 		UPDATED_AT
 		FROM PRODUCT
-		WHERE IS_DELETED NOT IN ('1') AND PRODUCT_ID = #{productId}
+		WHERE PRODUCT_ID = #{productId}
 	</select>
 
 
@@ -48,15 +49,15 @@
 		UPDATED_AT AS updatedAt
 		FROM
 		PRODUCT
-		WHERE
-		PRODUCT_ID = #{productId} AND IS_DELETED NOT IN ('1')
+		WHERE PRODUCT_ID = #{productId} AND IS_DELETED NOT IN ('1')
 	</select>
-<select id="selectProductsByProductName" parameterType="java.lang.String"
+<select id="selectProductsByProductName"
 	resultType="com.ite.sws.domain.product.vo.ProductVO">
 	SELECT
 	PRODUCT_ID AS productId,
 	NAME AS name,
 	PRICE AS price,
+	IS_DELETED AS isDeleted,
 	THUMBNAIL_IMAGE AS thumbnailImage,
 	DESCRIPTION_IMAGE AS descriptionImage,
 	BARCODE AS barcode,
@@ -65,7 +66,8 @@
 	UPDATED_AT AS updatedAt
 	FROM
 	PRODUCT
-	WHERE NAME LIKE CONCAT(#{productName}, '%') AND IS_DELETED NOT IN ('1')
+	WHERE NAME LIKE '%' || #{productName} || '%'
+	OFFSET #{page} * #{size} ROWS FETCH NEXT #{size} ROWS ONLY
 </select>
 
 	<!-- 상품이 존재하는지 확인 -->

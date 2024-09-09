@@ -27,7 +27,8 @@ public interface ProductMapper {
 
     Optional<GetProductDetailRes> selectProductDetail(Long productId);
 
-    List<ProductVO> selectProductsByProductName(String productName);
+    List<ProductVO> selectProductsByProductName(@Param("productName") String productName, @Param("page") int page,
+        @Param("size") int size);
 
     /**
      * 상품이 존재하는지 확인
