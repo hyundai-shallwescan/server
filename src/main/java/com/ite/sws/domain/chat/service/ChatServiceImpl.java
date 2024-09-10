@@ -70,6 +70,10 @@ public class ChatServiceImpl implements ChatService {
         List<Long> cartMemberIdList = chatMapper.selectCartMemberIdListByCartId(cartId);
 
         for (Long cartMemberId : cartMemberIdList) {
+            // 메시지를 보낸 사람에게는 메시지를 보내지 않음
+            if (cartMemberId.equals(message.getCartMemberId())) {
+                continue;
+            }
             String fcmTokenKey = "FCM_TOKEN:" + cartMemberId;
             String targetToken = redisTemplate.opsForValue().get(fcmTokenKey);
 
