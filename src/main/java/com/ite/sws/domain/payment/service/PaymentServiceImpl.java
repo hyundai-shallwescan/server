@@ -17,15 +17,19 @@ import com.ite.sws.domain.payment.dto.PostPaymentReq;
 import com.ite.sws.domain.payment.dto.PostPaymentRes;
 import com.ite.sws.domain.payment.mapper.PaymentMapper;
 import com.ite.sws.domain.payment.vo.CartQRCodeVO;
+import com.ite.sws.domain.payment.vo.PaymentItemVO;
 import com.ite.sws.domain.payment.vo.PaymentVO;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.util.SecurityUtil;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Service;
@@ -77,11 +81,11 @@ public class PaymentServiceImpl implements PaymentService {
                         .withZone(ZoneId.of("Asia/Seoul")))
                 .withZoneSameInstant(ZoneId.of("UTC"));
         LocalDateTime utcLocalDateTime = utcZonedDateTime.toLocalDateTime();
+
         // 1. 상품 결제 정보 삽입을 위한 프로시저 호출
         // 1-0. 장바구니 존재 확인
         // 1-1. 결제 생성
-        // 1-2. 결제 아이템 생성
-        // 1-3. 현재 장바구니 상태 DONE + URI NULL
+        // 1-2. 현재 장바구니 상태 DONE + URI NULL
         PaymentVO newPayment = PaymentVO.builder()
                 .cartId(postPaymentReq.getCartId())
                 .amount(postPaymentReq.getTotalPrice())
@@ -93,24 +97,21 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             paymentMapper.insertPayment(newPayment);
         } catch (UncategorizedSQLException e) {
-            if (e.getSQLException().getErrorCode() == 20001) {
-                throw new CustomException(CART_NOT_FOUND);
-            } else if (e.getSQLException().getErrorCode() == 20002) {
-                throw new CustomException(CART_ITEM_NOT_FOUND);
-            }
-            // 다른 예외 처리
-            throw new CustomException(DATABASE_ERROR);
+            handleDatabaseException(e);
         }
 
-        // 2. QR 코드 생성 및 S3 저장
+        // 2. 클라이언트로부터 받은 결제 아이템 정보를 이용해 결제 아이템 생성
+        List<PaymentItemVO> paymentItems = postPaymentReq.getItems();
+        paymentMapper.insertPaymentItems(newPayment.getPaymentId(), paymentItems);
+
+        // 3. QR 코드 생성 및 S3 저장
         String paymentId = String.valueOf(newPayment.getPaymentId());
         String qrText = generateQRText(paymentId);
         String qrCodeUri = qrCodePersistenceHelper.uploadQRCode(qrText, paymentId);
 
-        // 3. 장바구니 및 QR 코드 생성을 위한 프로시저 호출
-        // 3-1. 이전 장바구니를 가졌던 유저에게, 새로운 장바구니 생성
-        // 3-2. QR 코드 저장, 반환
-        // TODO: 장바구니 URI 암호화
+        // 4. 장바구니 및 QR 코드 생성을 위한 프로시저 호출
+        // 4-1. 이전 장바구니를 가졌던 유저에게, 새로운 장바구니 생성
+        // 4-2. QR 코드 저장, 반환
         CartQRCodeVO cartQRCodeVO = CartQRCodeVO.builder()
             .cartId(postPaymentReq.getCartId())
             .paymentId(newPayment.getPaymentId())
@@ -135,6 +136,19 @@ public class PaymentServiceImpl implements PaymentService {
     // QR 텍스트 생성
     private String generateQRText(String qrText) {
         return "scanandgo://deeplink?paymentId=" + qrText;
+    }
+
+    /**
+     * 데이터베이스 에외 핸들링
+     * @param e
+     */
+    private void handleDatabaseException(UncategorizedSQLException e) {
+        if (e.getSQLException().getErrorCode() == 20001) {
+            throw new CustomException(CART_NOT_FOUND);
+        } else if (e.getSQLException().getErrorCode() == 20002) {
+            throw new CustomException(CART_ITEM_NOT_FOUND);
+        }
+        throw new CustomException(DATABASE_ERROR);
     }
 
     /**

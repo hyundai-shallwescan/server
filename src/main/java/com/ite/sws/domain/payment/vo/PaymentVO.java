@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 상품 결제 VO
@@ -30,4 +31,5 @@ public class PaymentVO {
     private String paymentCard;
     private String paymentKey;
     private LocalDateTime paymentTime;
+    private List<PaymentItemVO> items;
 }
