@@ -27,7 +27,6 @@ import java.time.LocalDateTime;
 public class MyCheckListVO {
     private Long myCheckListItemId;
     private Long memberId;
-    private Long myCheckListCategoryId;
     private String item;
     private String status;
     private Integer isDeleted;

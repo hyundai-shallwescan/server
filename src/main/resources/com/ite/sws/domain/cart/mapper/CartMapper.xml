@@ -190,7 +190,7 @@
 						ON ( M.MEMBER_ID = C.MEMBER_ID
 							AND C.STATUS = 'ACTIVE' )
 				   JOIN CART_MEMBER CM
-						ON ( C.CART_ID = CM.CART_ID )
+						ON ( M.NAME = CM.NAME )
 		WHERE  M.MEMBER_ID = #{memberId}
 	</select>
 

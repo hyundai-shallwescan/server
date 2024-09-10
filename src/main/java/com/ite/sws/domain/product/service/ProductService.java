@@ -21,6 +21,6 @@ import java.util.List;
 public interface ProductService {
     ProductVO findProduct(Long productId);
     GetProductDetailRes findProductDetail(Long productId);
-    List<ProductVO> findProductsByProductName(String productName);
+    List<ProductVO> findProductsByProductName(String productName, int page, int size);
     List<GetProductReviewRes>findProductReviews(Long productId, int page, int size);
 }

@@ -23,7 +23,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PutMyCheckListReq {
-
-    private Long myCheckListCategoryId;
     private String item;
 }

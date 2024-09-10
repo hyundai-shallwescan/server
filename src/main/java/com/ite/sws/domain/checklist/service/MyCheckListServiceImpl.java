@@ -3,6 +3,7 @@ package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.checklist.dto.GetMyCheckListRes;
 import com.ite.sws.domain.checklist.dto.PostMyCheckListReq;
+import com.ite.sws.domain.checklist.dto.PostMyCheckListRes;
 import com.ite.sws.domain.checklist.dto.PutMyCheckListReq;
 import com.ite.sws.domain.checklist.mapper.MyCheckListMapper;
 import com.ite.sws.domain.checklist.vo.MyCheckListVO;
@@ -51,18 +52,22 @@ public class MyCheckListServiceImpl implements MyCheckListService{
     /**
      * 마이 체크리스트 아이템 추가
      * @param postMyCheckListReq 추가 아이템
+     * @return PostMyCheckListRes 객체
      */
     @Transactional
     @Override
-    public void addMyCheckListItem(PostMyCheckListReq postMyCheckListReq) {
+    public PostMyCheckListRes addMyCheckListItem(PostMyCheckListReq postMyCheckListReq) {
 
         MyCheckListVO myCheckList = MyCheckListVO.builder()
                     .memberId(postMyCheckListReq.getMemberId())
-                    .myCheckListCategoryId(postMyCheckListReq.getMyCheckListCategoryId())
                     .item(postMyCheckListReq.getItem())
                     .build();
 
         myCheckListMapper.insertMyCheckListItem(myCheckList);
+
+        return PostMyCheckListRes.builder()
+                .myCheckListItemId(myCheckList.getMyCheckListItemId())
+                .build();
     }
 
     /**
@@ -98,7 +103,6 @@ public class MyCheckListServiceImpl implements MyCheckListService{
 
         MyCheckListVO myCheckList = MyCheckListVO.builder()
                         .myCheckListItemId(myCheckListItemId)
-                        .myCheckListCategoryId(putMyCheckListReq.getMyCheckListCategoryId())
                         .item(putMyCheckListReq.getItem())
                         .build();
 

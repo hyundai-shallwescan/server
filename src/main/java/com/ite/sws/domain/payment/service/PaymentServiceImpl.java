@@ -1,7 +1,15 @@
 package com.ite.sws.domain.payment.service;
 
+import static com.ite.sws.exception.ErrorCode.CART_ITEM_NOT_FOUND;
+import static com.ite.sws.exception.ErrorCode.CART_NOT_FOUND;
+import static com.ite.sws.exception.ErrorCode.DATABASE_ERROR;
+import static com.ite.sws.exception.ErrorCode.EXIT_CREDENTIAL_NOT_FOUND;
+
+import com.ite.sws.domain.admin.dto.PaymentEvent;
+import com.ite.sws.domain.admin.service.WebFluxAsyncPaymentInfoEventPublisher;
 import com.ite.sws.domain.cart.dto.CartTotalDTO;
 import com.ite.sws.domain.cart.mapper.CartMapper;
+import com.ite.sws.domain.member.mapper.MemberMapper;
 import com.ite.sws.domain.parking.dto.ParkingHistoryDTO;
 import com.ite.sws.domain.parking.mapper.ParkingMapper;
 import com.ite.sws.domain.payment.dto.GetProductRecommendationRes;
@@ -12,21 +20,16 @@ import com.ite.sws.domain.payment.vo.CartQRCodeVO;
 import com.ite.sws.domain.payment.vo.PaymentVO;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.UncategorizedSQLException;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import com.ite.sws.util.SecurityUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
-import static com.ite.sws.exception.ErrorCode.CART_ITEM_NOT_FOUND;
-import static com.ite.sws.exception.ErrorCode.CART_NOT_FOUND;
-import static com.ite.sws.exception.ErrorCode.DATABASE_ERROR;
-import static com.ite.sws.exception.ErrorCode.EXIT_CREDENTIAL_NOT_FOUND;
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.UncategorizedSQLException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * 상품 결제 서비스 구현체
@@ -45,6 +48,7 @@ import static com.ite.sws.exception.ErrorCode.EXIT_CREDENTIAL_NOT_FOUND;
  * 2024.08.28  	김민정       주차 시간에 따른 필요한 최소 구매 금액을 결정
  * 2024.08.28  	김민정       추가 구매가 필요한 금액에 가장 가까운 상품을 조회
  * 2024.09.01  	김민정       결제 후, 새로운 장바구니 ID 반환 기능 추가
+ * 2024.09.02 	구지웅       결제 이벤트 발생 시 결제 이벤트 발행
  * </pre>
  */
 @Service
@@ -55,9 +59,12 @@ public class PaymentServiceImpl implements PaymentService {
     private final CartMapper cartMapper;
     private final ParkingMapper parkingMapper;
     private final QRCodePersistenceHelper qrCodePersistenceHelper;
+    private final WebFluxAsyncPaymentInfoEventPublisher eventPublisher;
+    private final MemberMapper memberMapper;
 
     /**
      * 상품 결제 생성
+     *
      * @param postPaymentReq 상품 결제 객체
      */
     @Override
@@ -70,7 +77,6 @@ public class PaymentServiceImpl implements PaymentService {
                         .withZone(ZoneId.of("Asia/Seoul")))
                 .withZoneSameInstant(ZoneId.of("UTC"));
         LocalDateTime utcLocalDateTime = utcZonedDateTime.toLocalDateTime();
-
         // 1. 상품 결제 정보 삽입을 위한 프로시저 호출
         // 1-0. 장바구니 존재 확인
         // 1-1. 결제 생성
@@ -106,17 +112,24 @@ public class PaymentServiceImpl implements PaymentService {
         // 3-2. QR 코드 저장, 반환
         // TODO: 장바구니 URI 암호화
         CartQRCodeVO cartQRCodeVO = CartQRCodeVO.builder()
-                .cartId(postPaymentReq.getCartId())
-                .paymentId(newPayment.getPaymentId())
-                .qrCodeUri(qrCodeUri)
-                .build();
+            .cartId(postPaymentReq.getCartId())
+            .paymentId(newPayment.getPaymentId())
+            .qrCodeUri(qrCodeUri)
+            .build();
         paymentMapper.insertCartAndQRCode(cartQRCodeVO);
 
+       emitPaymentEvent(newPayment,utcLocalDateTime);
+
         return PostPaymentRes.builder()
-                .paymentId(newPayment.getPaymentId())
-                .newCartId(cartQRCodeVO.getNewCartId())
-                .qrUrl(qrCodeUri)
-                .build();
+            .paymentId(newPayment.getPaymentId())
+            .newCartId(cartQRCodeVO.getNewCartId())
+            .qrUrl(qrCodeUri)
+            .build();
+    }
+    private void emitPaymentEvent(PaymentVO paymentVO,LocalDateTime currentTime){
+          eventPublisher.emitPaymentEvent(
+            PaymentEvent.of(paymentVO.getPaymentId(), SecurityUtil.getCurrentMemberId(),
+                memberMapper.selectMemberByMemberId(SecurityUtil.getCurrentMemberId()).getName(),currentTime));
     }
 
     // QR 텍스트 생성

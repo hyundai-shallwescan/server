@@ -26,9 +26,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class
-ProductVO {
-
+public class ProductVO {
 	private Long productId;
 	private Long price;
 	private String name;
@@ -36,6 +34,7 @@ ProductVO {
 	private String descriptionImage;
 	private String barcode;
 	private String description;
+	private Integer isDeleted;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 }
