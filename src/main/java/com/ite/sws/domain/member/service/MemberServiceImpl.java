@@ -47,6 +47,7 @@ import java.util.stream.Collectors;
  * 2024.08.29   정은지        로그아웃 추가
  * 2024.09.01   정은지        로그인 반환 값에 cartId 추가
  * 2024.09.06   남진수        회원가입 시 장바구니 회원도 생성되도록 추가
+ * 2024.09.10   남진수        FCM 토큰 저장 기능 추가
  * </pre>
  */
 
@@ -167,7 +168,7 @@ public class MemberServiceImpl implements MemberService {
 
         int expirationMinutes = (int) (jwtTokenProvider.getExpiration(jwtToken.getAccessToken()) / 60000);
         redisTemplate.opsForValue().set("JWT_TOKEN:" + auth.getMemberId(), token, expirationMinutes);
-
+        redisTemplate.opsForValue().set("FCM_TOKEN:" + cartMemberId, postLoginReq.getFcmToken());
         return postLoginRes;
     }
 

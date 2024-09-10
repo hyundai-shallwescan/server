@@ -2,6 +2,7 @@ package com.ite.sws.domain.chat.service;
 
 import com.ite.sws.domain.chat.dto.ChatDTO;
 import com.ite.sws.domain.chat.dto.GetChatRes;
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public interface ChatService {
      * 채팅 메시지 저장
      * @param message 채팅 메시지
      */
-    void saveMessage(ChatDTO message);
+    void saveMessage(ChatDTO message) throws IOException;
 
     /**
      * 채팅 메시지 조회

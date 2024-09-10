@@ -38,6 +38,7 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.08.26  	김민정       장바구니 아이템 삭제 API 생성
  * 2024.08.31  	김민정       PathVariable에서 memberId 제거
  * 2024.09.05   김민정       장바구니 상태 변화 웹소켓으로 전송
+ * 2024.09.10   남진수       FCM 토큰 처리
  * </pre>
  */
 @RestController
@@ -64,7 +65,8 @@ public class CartController {
      * @return JwtToken 객체
      */
     @PostMapping("/login")
-    public ResponseEntity<?> cartLogin(@RequestBody PostCartLoginReq postCartLoginReq) {
+    public ResponseEntity<?> cartLogin(@RequestHeader(value = "FCM-TOKEN") String fcmToken, @RequestBody PostCartLoginReq postCartLoginReq) {
+        postCartLoginReq.setFcmToken(fcmToken);
         JwtToken token = cartService.cartLogin(postCartLoginReq);
         return ResponseEntity.ok(token);
     }

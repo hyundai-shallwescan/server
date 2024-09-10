@@ -17,6 +17,7 @@ import java.util.List;
  * 2024.08.26  	남진수       최초 생성
  * 2024.08.26  	남진수       채팅 메시지 저장 기능 추가
  * 2024.08.26  	남진수       채팅 메시지 조회 기능 추가
+ * 2024.09.10  	남진수       장바구니 멤버 아이디 조회 기능 추가
  * </pre>
  */
 @Mapper
@@ -34,4 +35,11 @@ public interface ChatMapper {
      * @return 채팅 메시지 리스트
      */
     List<GetChatRes> selectMessagesByCartId(Long cartId);
+
+    /**
+     * 장바구니 멤버 아이디 조회
+     * @param cartId 장바구니 식별자
+     * @return 장바구니 멤버 아이디 리스트
+     */
+    List<Long> selectCartMemberIdListByCartId(Long cartId);
 }
