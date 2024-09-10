@@ -2,6 +2,7 @@ package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.checklist.dto.GetMyCheckListRes;
 import com.ite.sws.domain.checklist.dto.PostMyCheckListReq;
+import com.ite.sws.domain.checklist.dto.PostMyCheckListRes;
 import com.ite.sws.domain.checklist.dto.PutMyCheckListReq;
 
 import java.util.List;
@@ -37,7 +38,7 @@ public interface MyCheckListService {
      * 마이 체크리스트 아이템 추가
      * @param postMyCheckListReq 추가 아이템
      */
-    void addMyCheckListItem(PostMyCheckListReq postMyCheckListReq);
+    PostMyCheckListRes addMyCheckListItem(PostMyCheckListReq postMyCheckListReq);
 
     /**
      * 마이 체크리스트 아이템 체크 상태 변경

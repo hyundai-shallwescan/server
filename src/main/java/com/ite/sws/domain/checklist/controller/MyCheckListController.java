@@ -2,6 +2,7 @@ package com.ite.sws.domain.checklist.controller;
 
 import com.ite.sws.domain.checklist.dto.GetMyCheckListRes;
 import com.ite.sws.domain.checklist.dto.PostMyCheckListReq;
+import com.ite.sws.domain.checklist.dto.PostMyCheckListRes;
 import com.ite.sws.domain.checklist.dto.PutMyCheckListReq;
 import com.ite.sws.domain.checklist.service.MyCheckListService;
 import com.ite.sws.util.SecurityUtil;
@@ -58,17 +59,17 @@ public class MyCheckListController {
     /**
      * 마이 체크리스트 아이템 추가 API
      * @param postMyCheckListReq 마이 체크리스트 아이템
-     * @return 아이템 추가 성공 여부
+     * @return 추가된 아이템 ID
      */
     @PostMapping
-    public ResponseEntity<Void> addMyCheckListItem(@RequestBody PostMyCheckListReq postMyCheckListReq) {
+    public ResponseEntity<PostMyCheckListRes> addMyCheckListItem(@RequestBody PostMyCheckListReq postMyCheckListReq) {
 
         Long memberId = SecurityUtil.getCurrentMemberId();
         postMyCheckListReq.setMemberId(memberId);
 
-        myCheckListService.addMyCheckListItem(postMyCheckListReq);
+        PostMyCheckListRes postMyCheckListRes = myCheckListService.addMyCheckListItem(postMyCheckListReq);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok(postMyCheckListRes);
     }
 
     /**
