@@ -112,6 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
         // 4. 장바구니 및 QR 코드 생성을 위한 프로시저 호출
         // 4-1. 이전 장바구니를 가졌던 유저에게, 새로운 장바구니 생성
         // 4-2. QR 코드 저장, 반환
+        // 4-3. 장바구니 주인의 cart_member_id의 cart_id를 새로운 장바구니로 변경
         CartQRCodeVO cartQRCodeVO = CartQRCodeVO.builder()
             .cartId(postPaymentReq.getCartId())
             .paymentId(newPayment.getPaymentId())
