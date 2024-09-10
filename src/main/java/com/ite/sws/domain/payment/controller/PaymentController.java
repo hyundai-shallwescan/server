@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -61,10 +62,12 @@ public class PaymentController {
     /**
      * 무료 주차 정산 가능 금액대 상품 추천 API
      * @param cartId 장바구니 ID
+     * @param totalPrice 장바구니 총 금액
      * @return
      */
     @GetMapping("/carts/{cartId}/recommend")
-    public ResponseEntity<GetProductRecommendationRes> findRecommendProduct(@PathVariable Long cartId) {
-        return ResponseEntity.ok(paymentService.findRecommendProduct(cartId));
+    public ResponseEntity<GetProductRecommendationRes> findRecommendProduct(@PathVariable Long cartId,
+                                                                            @RequestParam Long totalPrice) {
+        return ResponseEntity.ok(paymentService.findRecommendProduct(cartId, totalPrice));
     }
 }

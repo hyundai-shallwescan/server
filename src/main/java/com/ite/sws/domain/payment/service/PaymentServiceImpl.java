@@ -7,7 +7,6 @@ import static com.ite.sws.exception.ErrorCode.EXIT_CREDENTIAL_NOT_FOUND;
 
 import com.ite.sws.domain.admin.dto.PaymentEvent;
 import com.ite.sws.domain.admin.service.WebFluxAsyncPaymentInfoEventPublisher;
-import com.ite.sws.domain.cart.dto.CartTotalDTO;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.member.mapper.MemberMapper;
 import com.ite.sws.domain.parking.dto.ParkingHistoryDTO;
@@ -169,16 +168,16 @@ public class PaymentServiceImpl implements PaymentService {
     /**
      * 무료 주차 정산 가능 금액대 상품 조회
      * @param cartId 장바구니 ID
+     * @param totalPrice 장바구니 총 금액
      * @return
      */
     @Override
     @Transactional
-    public GetProductRecommendationRes findRecommendProduct(Long cartId) {
+    public GetProductRecommendationRes findRecommendProduct(Long cartId, Long totalPrice) {
 
         // 1. 장바구니 총 금액 조회
-        CartTotalDTO result = cartMapper.calculateTotalCartValue(cartId);
-        Long memberId = result.getMemberId();
-        Long totalCartValue = result.getTotalCartFee();
+        Long memberId = cartMapper.selectMemberIdByCartId(cartId);
+        Long totalCartValue = totalPrice;
 
         // 예상 결제 금액이 60,000원을 초과하면 추천하지 않음
         if (totalCartValue > 60000) {
@@ -220,10 +219,6 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 7. 추가로 구매해야 할 금액 계산
         long additionalAmountRequired = requiredPurchaseAmount - totalCartValue;
-        // 추가 금액을 초과하지 않도록 조정 (최대 60,000원)
-        if (totalCartValue + additionalAmountRequired > 60000) {
-            additionalAmountRequired = 60000 - totalCartValue;
-        }
 
         // 8. 추가 금액에 해당하는 상품 추천
         ProductVO recommendedProduct = findProductsInPriceRange(additionalAmountRequired, memberId);
@@ -234,7 +229,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         return GetProductRecommendationRes.builder()
                 .message("추가 구매를 통해 무료 주차 혜택을 받을 수 있습니다.")
-                .remainingParkingFee(parkingFee)
+                .remainingParkingFee(additionalAmountRequired)
                 .productId(recommendedProduct.getProductId())
                 .productName(recommendedProduct.getName())
                 .productPrice(recommendedProduct.getPrice())
