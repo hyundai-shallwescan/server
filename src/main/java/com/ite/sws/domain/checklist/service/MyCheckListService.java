@@ -37,6 +37,7 @@ public interface MyCheckListService {
     /**
      * 마이 체크리스트 아이템 추가
      * @param postMyCheckListReq 추가 아이템
+     * @return PostMyCheckListRes 객체
      */
     PostMyCheckListRes addMyCheckListItem(PostMyCheckListReq postMyCheckListReq);
 
