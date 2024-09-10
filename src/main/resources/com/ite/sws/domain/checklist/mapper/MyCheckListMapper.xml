@@ -33,7 +33,7 @@
     </select>
 
     <!-- 아이템 추가 -->
-    <insert id="insertMyCheckListItem">
+    <insert id="insertMyCheckListItem" useGeneratedKeys="true" keyProperty="myCheckListItemId" keyColumn="my_check_list_item_id">
         INSERT INTO MY_CHECK_LIST_ITEM
                     (MY_CHECK_LIST_ITEM_ID,
                      MEMBER_ID,
