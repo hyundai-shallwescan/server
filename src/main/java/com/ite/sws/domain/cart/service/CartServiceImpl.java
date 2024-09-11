@@ -19,6 +19,7 @@ import com.ite.sws.exception.ErrorCode;
 import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -53,6 +54,7 @@ import java.util.Optional;
  * 2024.09.07   김민정       장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
  * 2024.09.07   김민정       장바구니 변경 채팅 발송
  * 2024.09.07   김민정       CartItemChatDTO 생성
+ * 2024.09.10   남진수       FCM 토큰 저장 기능 추가
  * </pre>
  */
 @Service
@@ -66,6 +68,7 @@ public class CartServiceImpl implements CartService {
     private final JwtTokenProvider jwtTokenProvider;
     private final ApplicationEventPublisher eventPublisher;
     private final CartEventPublisher cartEventPublisher;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * cartId로 장바구니 아이템 조회
@@ -126,6 +129,8 @@ public class CartServiceImpl implements CartService {
         // 아이디가 존재하지 않으면 새로운 CartMember 생성
         if (!authOptional.isPresent()) {
             CartMemberVO newCartMember = createNewCartMember(postCartLoginReq);
+            // FCM 토큰 저장
+            redisTemplate.opsForValue().set("FCM_TOKEN:" + newCartMember.getCartMemberId(), postCartLoginReq.getFcmToken());
             return authenticateAndGenerateToken(newCartMember.getName(), postCartLoginReq.getPassword(), newCartMember.getCartMemberId());
         }
 
@@ -134,7 +139,8 @@ public class CartServiceImpl implements CartService {
         if (!passwordEncoder.matches(postCartLoginReq.getPassword(), auth.getPassword())) {
             throw new CustomException(ErrorCode.LOGIN_FAIL);
         }
-
+        // FCM 토큰 저장
+        redisTemplate.opsForValue().set("FCM_TOKEN:" + authOptional.get().getCartMemberId(), postCartLoginReq.getFcmToken());
         // 인증 후 토큰 생성
         return authenticateAndGenerateToken(auth.getName(), postCartLoginReq.getPassword(), auth.getCartMemberId());
     }

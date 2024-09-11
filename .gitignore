@@ -27,6 +27,7 @@ target/
 
 # properties
 **/*.properties
+**/firebase/
 
 #LOCAL CACHE
 **/sws.iml

@@ -39,6 +39,7 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * 2024.08.27   정은지        구매 내역 조회 API 생성
  * 2024.08.27   정은지        작성 리뷰 조회 API 생성
  * 2024.08.29   정은지        로그아웃 API 생성
+ * 2024.09.10   남진수        FCM 토큰 처리
  * </pre>
  */
 
@@ -92,8 +93,9 @@ public class MemberController {
      * @return JwtToken 객체
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody PostLoginReq postLoginReq, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestHeader(value = "FCM-TOKEN") String fcmToken, @RequestBody PostLoginReq postLoginReq, HttpServletResponse response) {
 
+        postLoginReq.setFcmToken(fcmToken);
         PostLoginRes postLoginRes = memberService.login(postLoginReq);
         response.addHeader("Authorization", "Bearer " + postLoginRes.getToken());
 

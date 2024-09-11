@@ -1,9 +1,6 @@
 package com.ite.sws.domain.cart.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import javax.validation.constraints.NotBlank;
 
 /**
@@ -16,6 +13,7 @@ import javax.validation.constraints.NotBlank;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.09.06  남진수       최초 생성
+ * 2024.09.10  남진수       안드로이드 device 토큰 추가
  * </pre>
  */
 @Getter
@@ -28,4 +26,6 @@ public class PostCartLoginReq {
     @NotBlank
     private String password;
     private Long cartId;
+    @Setter
+    private String fcmToken;
 }

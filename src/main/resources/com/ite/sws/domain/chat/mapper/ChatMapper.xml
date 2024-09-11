@@ -13,11 +13,13 @@
  * 2024.08.26  남진수        최초 생성
  * 2024.08.26  남진수        채팅 메시지 조회
  * 2024.09.03  남진수        채팅 메시지 저장
+ * 2024.09.10  남진수        장바구니 멤버 조회
  * </pre>
  -->
 
 <mapper namespace="com.ite.sws.domain.chat.mapper.ChatMapper">
 
+    <!-- 채팅 메시지 저장 -->
     <insert id="insertMessage">
         INSERT INTO   CHAT_MESSAGE
                      (CHAT_MESSAGE_ID,
@@ -32,6 +34,7 @@
                       #{status})
     </insert>
 
+    <!-- 채팅 메시지 조회 -->
     <select id="selectMessagesByCartId" resultType="com.ite.sws.domain.chat.dto.GetChatRes">
         SELECT MSG.CHAT_MESSAGE_ID,
                MSG.CART_MEMBER_ID,
@@ -45,6 +48,13 @@
                         ON MSG.CART_MEMBER_ID = MEM.CART_MEMBER_ID
         WHERE  MEM.CART_ID = #{cartId}
         ORDER  BY MSG.CREATED_AT ASC
+    </select>
+
+    <!-- 장바구니 멤버 조회 -->
+    <select id="selectCartMemberIdListByCartId" >
+        SELECT CART_MEMBER_ID
+        FROM   CART_MEMBER
+        WHERE  CART_ID = #{cartId}
     </select>
 
 </mapper>
