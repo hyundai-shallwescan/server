@@ -93,9 +93,13 @@ public class MemberController {
      * @return JwtToken 객체
      */
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestHeader(value = "FCM-TOKEN") String fcmToken, @RequestBody PostLoginReq postLoginReq, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestHeader(value = "FCM-TOKEN", required = false) String fcmToken,
+                                   @RequestBody PostLoginReq postLoginReq, HttpServletResponse response) {
 
-        postLoginReq.setFcmToken(fcmToken);
+        if (fcmToken != null) {
+            postLoginReq.setFcmToken(fcmToken);
+        }
+
         PostLoginRes postLoginRes = memberService.login(postLoginReq);
         response.addHeader("Authorization", "Bearer " + postLoginRes.getToken());
 

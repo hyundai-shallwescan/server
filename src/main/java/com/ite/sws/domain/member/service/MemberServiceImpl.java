@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
  * 2024.09.01   정은지        로그인 반환 값에 cartId 추가
  * 2024.09.06   남진수        회원가입 시 장바구니 회원도 생성되도록 추가
  * 2024.09.10   남진수        FCM 토큰 저장 기능 추가
+ * 2024.09.11   정은지        사용자 로그인, 관리자 로그인 로직 분리
  * </pre>
  */
 
@@ -149,6 +150,58 @@ public class MemberServiceImpl implements MemberService {
         // authenticate() 메서드를 통해 요청된 Member 에 대한 검증 진행
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 
+        // 관리자 로그인 로직
+        if (auth.getRole().equals("ROLE_ADMIN")) {
+            return adminLogin(auth, authentication);
+        // 사용자 로그인 로직
+        } else if (auth.getRole().equals("ROLE_USER")) {
+            // FCM 토큰이 없을 경우 예외 처리
+            if (postLoginReq.getFcmToken() == null) {
+                throw new CustomException(ErrorCode.FCM_TOKEN_MISSING);
+            }
+            return userLogin(auth, postLoginReq, authentication);
+        } else {
+            throw new CustomException(ErrorCode.LOGIN_FAIL);
+        }
+    }
+
+    /**
+     * 관리자 로그인 처리
+     * @param auth 인증된 사용자 정보
+     * @param authentication 인증 정보
+     * @return 로그인 응답
+     */
+    private PostLoginRes adminLogin(AuthVO auth, Authentication authentication) {
+        // cartId 가져오기 (관리자에게도 필요할 경우)
+        Long cartId = cartService.findCartByMemberId(auth.getMemberId());
+
+        // cartMemberId 가져오기
+        Long cartMemberId = cartService.findCartMemberIdByMemberId(auth.getMemberId());
+
+        // 인증 정보를 기반으로 JWT 토큰 생성
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), cartMemberId);
+        String token = jwtToken.getAccessToken().toString();
+
+        PostLoginRes postLoginRes = PostLoginRes.builder()
+                .cartId(cartId)
+                .token(token)
+                .build();
+
+        // Redis에 memberId를 키로 JWT 토큰 저장
+        int expirationMinutes = (int) (jwtTokenProvider.getExpiration(jwtToken.getAccessToken()) / 60000);
+        redisTemplate.opsForValue().set("JWT_TOKEN:" + auth.getMemberId(), token, expirationMinutes);
+
+        return postLoginRes;
+    }
+
+    /**
+     * 사용자 로그인 처리
+     * @param auth 인증된 사용자 정보
+     * @param postLoginReq 로그인 요청 정보
+     * @param authentication 인증 정보
+     * @return 로그인 응답
+     */
+    private PostLoginRes userLogin(AuthVO auth, PostLoginReq postLoginReq, Authentication authentication) {
         // cartId 가져오기
         Long cartId = cartService.findCartByMemberId(auth.getMemberId());
 
@@ -159,16 +212,16 @@ public class MemberServiceImpl implements MemberService {
         JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), cartMemberId);
         String token = jwtToken.getAccessToken().toString();
 
-        PostLoginRes postLoginRes =  PostLoginRes.builder()
+        PostLoginRes postLoginRes = PostLoginRes.builder()
                 .cartId(cartId)
                 .token(token)
                 .build();
 
-        // Redis에 memberId를 키로 JWT 토큰 저장
-
+        // Redis에 memberId를 키로 JWT 토큰 및 FCM 토큰 저장
         int expirationMinutes = (int) (jwtTokenProvider.getExpiration(jwtToken.getAccessToken()) / 60000);
         redisTemplate.opsForValue().set("JWT_TOKEN:" + auth.getMemberId(), token, expirationMinutes);
         redisTemplate.opsForValue().set("FCM_TOKEN:" + cartMemberId, postLoginReq.getFcmToken());
+
         return postLoginRes;
     }
 

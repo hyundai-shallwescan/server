@@ -31,6 +31,7 @@ public enum ErrorCode {
     REVIEW_FILE_TYPE_NOT_PERMITTED(BAD_REQUEST.value(), "올바르지 않은 파일 형식입니다."),
     ALL_FILE_AND_INFO_SHOULD_BE_IN_REQUEST(BAD_REQUEST.value(), "파일과 모든 정보를 입력해야합니다."),
     NO_COMMAND(BAD_REQUEST.value(), "존재하지 않은 명령어입니다."),
+    FCM_TOKEN_MISSING(BAD_REQUEST.value(), "FCM 토큰이 누락되었습니다."),
 
     /* 401: Unauthorized */
     REQUIRED_LOGIN(UNAUTHORIZED.value(), "로그인이 필요합니다."),
