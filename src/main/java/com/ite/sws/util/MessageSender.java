@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
  * 2024.09.06  	김민정       최초 생성
  * 2024.09.06   김민정       장바구니 업데이트 메시지 전송
  * 2024.09.06   김민정       채팅 메시지 전송
+ * 2024.09.11   김민정       결제 정보 전송
  * </pre>
  */
 @Component
@@ -41,6 +42,16 @@ public class MessageSender {
      */
     public void sendChatMessage(Long cartId, Object payload) {
         String destination = "/sub/chat/" + cartId;
+        this.template.convertAndSend(destination, payload);
+    }
+
+    /**
+     * 결제 정보 전송
+     * @param cartId 장바구니 ID
+     * @param payload 결제 관련 정보
+     */
+    public void sendPaymentDone(Long cartId, Object payload) {
+        String destination = "/sub/cart/" + cartId;
         this.template.convertAndSend(destination, payload);
     }
 }

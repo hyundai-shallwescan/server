@@ -12,8 +12,10 @@ import com.ite.sws.domain.member.mapper.MemberMapper;
 import com.ite.sws.domain.parking.dto.ParkingHistoryDTO;
 import com.ite.sws.domain.parking.mapper.ParkingMapper;
 import com.ite.sws.domain.payment.dto.GetProductRecommendationRes;
+import com.ite.sws.domain.payment.dto.PaymentDoneDTO;
 import com.ite.sws.domain.payment.dto.PostPaymentReq;
 import com.ite.sws.domain.payment.dto.PostPaymentRes;
+import com.ite.sws.domain.payment.event.PaymentDoneEvent;
 import com.ite.sws.domain.payment.mapper.PaymentMapper;
 import com.ite.sws.domain.payment.vo.CartQRCodeVO;
 import com.ite.sws.domain.payment.vo.PaymentItemVO;
@@ -30,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,6 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final QRCodePersistenceHelper qrCodePersistenceHelper;
     private final WebFluxAsyncPaymentInfoEventPublisher eventPublisher;
     private final MemberMapper memberMapper;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     /**
      * 상품 결제 생성
@@ -120,6 +124,16 @@ public class PaymentServiceImpl implements PaymentService {
         paymentMapper.insertCartAndQRCode(cartQRCodeVO);
 
        emitPaymentEvent(newPayment,utcLocalDateTime);
+
+        // 결제 관련 이벤트 발행 (비동기 처리)
+        PaymentDoneDTO paymentDoneDTO = PaymentDoneDTO.builder()
+                .paymentId(newPayment.getPaymentId())
+                .oldCartId(postPaymentReq.getCartId())
+                .newCartId(cartQRCodeVO.getNewCartId())
+                .cartOwnerName(cartQRCodeVO.getCartOwnerName())
+                .qrUrl(qrCodeUri)
+                .build();
+        applicationEventPublisher.publishEvent(new PaymentDoneEvent(this, paymentDoneDTO));
 
         return PostPaymentRes.builder()
             .paymentId(newPayment.getPaymentId())

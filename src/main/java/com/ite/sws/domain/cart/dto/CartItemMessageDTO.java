@@ -16,6 +16,7 @@ import lombok.Setter;
  * 수정일        수정자       수정내용
  * ----------  --------    ---------------------------
  * 2024.09.05  	김민정       최초 생성
+ * 2024.09.11   김민정       메시지 타입 기본값 지정
  * </pre>
  */
 @AllArgsConstructor
@@ -31,4 +32,6 @@ public class CartItemMessageDTO {
     private String productThumbnail;
     @Setter
     private String action; // "create", "increase", "decrease", "delete"
+    @Builder.Default
+    private String type = "cartUpdate";   // "cartUpdate", "paymentDone"
 }
