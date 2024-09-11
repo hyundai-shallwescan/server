@@ -26,8 +26,8 @@ public class ReviewPersistenceHelper extends AbstractPersistenceHelper<ReviewVO>
     @Override
     protected void processDomain(ReviewVO createRequest, List<String> fileIdentifiers,
         UploadCommand uploadCommand) {
-        String shortFormIdentifier = fileIdentifiers.size() > 0 ? fileIdentifiers.get(0) : null;
-        String thumbnailIdentifier = fileIdentifiers.size() > 1 ? fileIdentifiers.get(1) : null;
+        String thumbnailIdentifier = fileIdentifiers.size() > 0 ? fileIdentifiers.get(0) : null;
+        String shortFormIdentifier = fileIdentifiers.size() > 1 ? fileIdentifiers.get(1) : null;
 
         ReviewVO reviewVO = ReviewBindingMapper.INSTANCE.combineIntoReviewVo(createRequest,
             thumbnailIdentifier,
