@@ -84,6 +84,18 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void addMember(PostMemberReq postMemberReq) {
 
+        // 로그인 아이디 중복 시 예외 발생
+        int idCount = memberMapper.selectCountByLoginId(postMemberReq.getLoginId());
+        if (idCount > 0) {
+            throw new CustomException(ErrorCode.LOGIN_ID_ALREADY_EXISTS);
+        }
+
+        // 차량 번호 중복 시 예외 발생
+        int carCount = memberMapper.selectCountByCarNumber(postMemberReq.getCarNumber());
+        if (carCount > 0) {
+            throw new CustomException(ErrorCode.CART_NUMBER_ALREADY_EXISTS);
+        }
+
         // Member 테이블에 데이터 생성
         MemberVO member = MemberVO.builder()
                 .name(postMemberReq.getName())
@@ -111,6 +123,7 @@ public class MemberServiceImpl implements MemberService {
 
         memberMapper.insertCart(cart);
 
+        // Cart_Member 테이블에 데이터 생성
         CartMemberVO cartMember = CartMemberVO.builder()
                 .cartId(cart.getCartId())
                 .name(member.getName())
@@ -172,18 +185,11 @@ public class MemberServiceImpl implements MemberService {
      * @return 로그인 응답
      */
     private PostLoginRes adminLogin(AuthVO auth, Authentication authentication) {
-        // cartId 가져오기 (관리자에게도 필요할 경우)
-        Long cartId = cartService.findCartByMemberId(auth.getMemberId());
-
-        // cartMemberId 가져오기
-        Long cartMemberId = cartService.findCartMemberIdByMemberId(auth.getMemberId());
-
         // 인증 정보를 기반으로 JWT 토큰 생성
-        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), cartMemberId);
+        JwtToken jwtToken = jwtTokenProvider.generateToken(authentication, auth.getMemberId(), null);
         String token = jwtToken.getAccessToken().toString();
 
         PostLoginRes postLoginRes = PostLoginRes.builder()
-                .cartId(cartId)
                 .token(token)
                 .build();
 

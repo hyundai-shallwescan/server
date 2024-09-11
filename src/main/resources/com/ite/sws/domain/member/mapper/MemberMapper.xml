@@ -20,15 +20,23 @@
 * 2024.08.27    정은지        장바구니 생성 추가
 * 2024.08.27    정은지        구매 내역 아이템 조회 추가
 * 2024.08.27    정은지        작성 리뷰 조회 추가
+* 2024.09.11    정은지        차량 번호 중복 체크 추가
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.member.mapper.MemberMapper">
 
-    <!-- 아이디 중복 확인 -->
+    <!-- 아이디 중복 체크 -->
     <select id="selectCountByLoginId" resultType="int">
         SELECT COUNT(*)
         FROM   AUTH
         WHERE  LOGIN_ID = #{loginId}
+    </select>
+
+    <!-- 차량 번호 중복 체크 -->
+    <select id="selectCountByCarNumber" resultType="int">
+        SELECT COUNT(*)
+        FROM   MEMBER
+        WHERE  CAR_NUMBER = #{carNumber}
     </select>
 
     <!-- 회원가입 -->
