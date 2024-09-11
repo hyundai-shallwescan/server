@@ -17,6 +17,7 @@
 * 2024.08.30  김민정        멤버의 이전 구매 기록에서 비슷한 가격대의 제품을 찾기
 * 2024.08.30  김민정        전체 상품 중에서 비슷한 가격대의 제품을 찾기
 * 2024.09.01  김민정        결제 후, 새로운 장바구니 ID 반환 기능 추가
+* 2024.09.01  김민정        클라이언트에서 받은 결제 아이템 배열 삽입
 * </pre>
 -->
 <mapper namespace="com.ite.sws.domain.payment.mapper.PaymentMapper">
@@ -31,6 +32,42 @@
 				#{paymentTime, mode=IN, jdbcType=TIMESTAMP},
 				#{paymentId, mode=OUT, jdbcType=NUMERIC}
 			)}
+	</insert>
+
+	<!-- 클라이언트에서 받은 결제 아이템 배열 삽입 -->
+	<insert id="insertPaymentItems" parameterType="map">
+		DECLARE
+		v_name VARCHAR2(100);
+		v_price NUMBER;
+		v_thumbnail_image VARCHAR2(255);
+		BEGIN
+		<foreach collection="items" item="item">
+			-- 각 상품에 대한 정보를 변수에 저장
+			SELECT P.NAME, P.PRICE, P.THUMBNAIL_IMAGE
+			INTO v_name, v_price, v_thumbnail_image
+			FROM PRODUCT P
+			WHERE P.PRODUCT_ID = #{item.productId};
+
+			-- 결제 아이템 삽입
+			INSERT INTO PAYMENT_ITEM (
+			PAYMENT_ITEM_ID,
+			PAYMENT_ID,
+			PRODUCT_ID,
+			NAME,
+			PRICE,
+			QUANTITY,
+			THUMBNAIL_IMAGE
+			) VALUES (
+			SEQ_PAYMENT_ITEM_ID.NEXTVAL,
+			#{paymentId},
+			#{item.productId},
+			v_name,
+			v_price,
+			#{item.quantity},
+			v_thumbnail_image
+			);
+		</foreach>
+		END;
 	</insert>
 
 	<!-- 새로운 장바구니 및 인증 QR 정보 삽입을 위한 프로시저 호출 -->

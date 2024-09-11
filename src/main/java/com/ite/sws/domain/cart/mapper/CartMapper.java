@@ -39,6 +39,7 @@ import java.util.Optional;
  * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
  * 2024.09.08   김민정       cartMemberId로 장바구니 유저 이름 조회
  * 2024.09.08   김민정       productId로 채팅용 상품 정보 조회
+ * 2024.09.08   김민정       cartId로 memberId 조회
  * </pre>
  */
 public interface CartMapper {
@@ -144,4 +145,11 @@ public interface CartMapper {
      */
     CartItemChatDTO selectCartItemChatDetails(@Param("productId") Long productId,
                                               @Param("cartMemberId") Long cartMemberId);
+
+    /**
+     * cartId로 memberId 조회
+     * @param cartId 장바구니 ID
+     * @return
+     */
+    Long selectMemberIdByCartId(@Param("cartId") Long cartId);
 }

@@ -27,6 +27,7 @@
  * 2024.09.06  남진수        memberId로 cartMemberId 조회
  * 2024.09.08  김민정        cartMemberId로 장바구니 유저 이름 조회
  * 2024.09.08  김민정        productId로 채팅용 상품 정보 조회
+ * 2024.09.10  김민정        cartId로 memberId 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.cart.mapper.CartMapper">
@@ -212,6 +213,14 @@
 		FROM   PRODUCT P
 		WHERE  P.PRODUCT_ID = #{productId}
 		  AND  P.IS_DELETED = 0
+	</select>
+
+	<!-- cartId로 memberId 조회 -->
+	<select id="selectMemberIdByCartId" resultType="java.lang.Long">
+		SELECT MEMBER_ID
+		FROM   CART
+		WHERE  CART_ID = #{cartId}
+       		   AND STATUS = 'ACTIVE'
 	</select>
 
 </mapper>

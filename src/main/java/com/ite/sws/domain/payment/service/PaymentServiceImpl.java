@@ -7,7 +7,6 @@ import static com.ite.sws.exception.ErrorCode.EXIT_CREDENTIAL_NOT_FOUND;
 
 import com.ite.sws.domain.admin.dto.PaymentEvent;
 import com.ite.sws.domain.admin.service.WebFluxAsyncPaymentInfoEventPublisher;
-import com.ite.sws.domain.cart.dto.CartTotalDTO;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.member.mapper.MemberMapper;
 import com.ite.sws.domain.parking.dto.ParkingHistoryDTO;
@@ -17,15 +16,19 @@ import com.ite.sws.domain.payment.dto.PostPaymentReq;
 import com.ite.sws.domain.payment.dto.PostPaymentRes;
 import com.ite.sws.domain.payment.mapper.PaymentMapper;
 import com.ite.sws.domain.payment.vo.CartQRCodeVO;
+import com.ite.sws.domain.payment.vo.PaymentItemVO;
 import com.ite.sws.domain.payment.vo.PaymentVO;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.util.SecurityUtil;
+
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Service;
@@ -77,11 +80,11 @@ public class PaymentServiceImpl implements PaymentService {
                         .withZone(ZoneId.of("Asia/Seoul")))
                 .withZoneSameInstant(ZoneId.of("UTC"));
         LocalDateTime utcLocalDateTime = utcZonedDateTime.toLocalDateTime();
+
         // 1. 상품 결제 정보 삽입을 위한 프로시저 호출
         // 1-0. 장바구니 존재 확인
         // 1-1. 결제 생성
-        // 1-2. 결제 아이템 생성
-        // 1-3. 현재 장바구니 상태 DONE + URI NULL
+        // 1-2. 현재 장바구니 상태 DONE + URI NULL
         PaymentVO newPayment = PaymentVO.builder()
                 .cartId(postPaymentReq.getCartId())
                 .amount(postPaymentReq.getTotalPrice())
@@ -93,24 +96,22 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             paymentMapper.insertPayment(newPayment);
         } catch (UncategorizedSQLException e) {
-            if (e.getSQLException().getErrorCode() == 20001) {
-                throw new CustomException(CART_NOT_FOUND);
-            } else if (e.getSQLException().getErrorCode() == 20002) {
-                throw new CustomException(CART_ITEM_NOT_FOUND);
-            }
-            // 다른 예외 처리
-            throw new CustomException(DATABASE_ERROR);
+            handleDatabaseException(e);
         }
 
-        // 2. QR 코드 생성 및 S3 저장
+        // 2. 클라이언트로부터 받은 결제 아이템 정보를 이용해 결제 아이템 생성
+        List<PaymentItemVO> paymentItems = postPaymentReq.getItems();
+        paymentMapper.insertPaymentItems(newPayment.getPaymentId(), paymentItems);
+
+        // 3. QR 코드 생성 및 S3 저장
         String paymentId = String.valueOf(newPayment.getPaymentId());
         String qrText = generateQRText(paymentId);
         String qrCodeUri = qrCodePersistenceHelper.uploadQRCode(qrText, paymentId);
 
-        // 3. 장바구니 및 QR 코드 생성을 위한 프로시저 호출
-        // 3-1. 이전 장바구니를 가졌던 유저에게, 새로운 장바구니 생성
-        // 3-2. QR 코드 저장, 반환
-        // TODO: 장바구니 URI 암호화
+        // 4. 장바구니 및 QR 코드 생성을 위한 프로시저 호출
+        // 4-1. 이전 장바구니를 가졌던 유저에게, 새로운 장바구니 생성
+        // 4-2. QR 코드 저장, 반환
+        // 4-3. 장바구니 주인의 cart_member_id의 cart_id를 새로운 장바구니로 변경
         CartQRCodeVO cartQRCodeVO = CartQRCodeVO.builder()
             .cartId(postPaymentReq.getCartId())
             .paymentId(newPayment.getPaymentId())
@@ -138,6 +139,19 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     /**
+     * 데이터베이스 에외 핸들링
+     * @param e
+     */
+    private void handleDatabaseException(UncategorizedSQLException e) {
+        if (e.getSQLException().getErrorCode() == 20001) {
+            throw new CustomException(CART_NOT_FOUND);
+        } else if (e.getSQLException().getErrorCode() == 20002) {
+            throw new CustomException(CART_ITEM_NOT_FOUND);
+        }
+        throw new CustomException(DATABASE_ERROR);
+    }
+
+    /**
      * 출입증 인증 처리
      * @param paymentId 결제 ID
      */
@@ -154,16 +168,16 @@ public class PaymentServiceImpl implements PaymentService {
     /**
      * 무료 주차 정산 가능 금액대 상품 조회
      * @param cartId 장바구니 ID
+     * @param totalPrice 장바구니 총 금액
      * @return
      */
     @Override
     @Transactional
-    public GetProductRecommendationRes findRecommendProduct(Long cartId) {
+    public GetProductRecommendationRes findRecommendProduct(Long cartId, Long totalPrice) {
 
         // 1. 장바구니 총 금액 조회
-        CartTotalDTO result = cartMapper.calculateTotalCartValue(cartId);
-        Long memberId = result.getMemberId();
-        Long totalCartValue = result.getTotalCartFee();
+        Long memberId = cartMapper.selectMemberIdByCartId(cartId);
+        Long totalCartValue = totalPrice;
 
         // 예상 결제 금액이 60,000원을 초과하면 추천하지 않음
         if (totalCartValue > 60000) {
@@ -205,10 +219,6 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 7. 추가로 구매해야 할 금액 계산
         long additionalAmountRequired = requiredPurchaseAmount - totalCartValue;
-        // 추가 금액을 초과하지 않도록 조정 (최대 60,000원)
-        if (totalCartValue + additionalAmountRequired > 60000) {
-            additionalAmountRequired = 60000 - totalCartValue;
-        }
 
         // 8. 추가 금액에 해당하는 상품 추천
         ProductVO recommendedProduct = findProductsInPriceRange(additionalAmountRequired, memberId);
@@ -219,7 +229,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         return GetProductRecommendationRes.builder()
                 .message("추가 구매를 통해 무료 주차 혜택을 받을 수 있습니다.")
-                .remainingParkingFee(parkingFee)
+                .remainingParkingFee(additionalAmountRequired)
                 .productId(recommendedProduct.getProductId())
                 .productName(recommendedProduct.getName())
                 .productPrice(recommendedProduct.getPrice())

@@ -37,9 +37,10 @@ public interface PaymentService {
     /**
      * 무료 주차 정산 가능 금액대 상품 조회
      * @param cartId 장바구니 ID
+     * @param totalPrice 장바구니 총 금액
      * @return
      */
-    GetProductRecommendationRes findRecommendProduct(Long cartId);
+    GetProductRecommendationRes findRecommendProduct(Long cartId, Long totalPrice);
 
     /**
      * 주차 시간에 따른 필요한 최소 구매 금액을 결정
