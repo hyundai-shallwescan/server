@@ -217,8 +217,8 @@ public class CartServiceImpl implements CartService {
 
         // (2) 장바구니 변경 채팅 발송
         ChatDTO chatDTO = toChatDTO(messageDTO);
-        chatMapper.insertMessage(toChatMessageVO(chatDTO));    // 메시지 DB 저장
-        cartEventPublisher.publishCartUpdateChatEvent(chatDTO);     // 웹 소켓 전송
+        chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
+        cartEventPublisher.publishCartUpdateChatEvent(chatDTO); // 웹 소켓 전송
     }
 
     /**
