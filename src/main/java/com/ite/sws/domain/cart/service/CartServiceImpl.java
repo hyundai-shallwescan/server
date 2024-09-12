@@ -11,6 +11,9 @@ import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.cart.vo.CartItemVO;
 import com.ite.sws.domain.cart.vo.CartMemberVO;
 import com.ite.sws.domain.cart.vo.CartVO;
+import com.ite.sws.domain.chat.dto.ChatDTO;
+import com.ite.sws.domain.chat.mapper.ChatMapper;
+import com.ite.sws.domain.chat.vo.ChatMessageVO;
 import com.ite.sws.domain.member.dto.JwtToken;
 import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.util.JwtTokenProvider;
@@ -18,7 +21,6 @@ import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
 import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -53,8 +55,12 @@ import java.util.Optional;
  * 2024.09.06   남진수       memberId로 cartMemberId 조회 기능 추가
  * 2024.09.07   김민정       장바구니 변경 사항을 알리는 이벤트 발행 (비동기 처리)
  * 2024.09.07   김민정       장바구니 변경 채팅 발송
+ * 2024.09.07   김민정       CartItemMessageDTO -> ChatDTO 변환
+ * 2024.09.07   김민정       JSON to String 변환 메서드
  * 2024.09.07   김민정       CartItemChatDTO 생성
  * 2024.09.10   남진수       FCM 토큰 저장 기능 추가
+ * 2024.09.10   김민정       장바구니 변경 채팅 DB 저장
+ * 2024.09.10   김민정       ChatDTO -> ChatMessageVO 변환
  * </pre>
  */
 @Service
@@ -63,10 +69,10 @@ public class CartServiceImpl implements CartService {
 
     private final CartMapper cartMapper;
     private final ProductMapper productMapper;
+    private final ChatMapper chatMapper;
     private final BCryptPasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
-    private final ApplicationEventPublisher eventPublisher;
     private final CartEventPublisher cartEventPublisher;
     private final RedisTemplate<String, String> redisTemplate;
 
@@ -210,8 +216,9 @@ public class CartServiceImpl implements CartService {
         cartEventPublisher.publishCartUpdateEvent(messageDTO);
 
         // (2) 장바구니 변경 채팅 발송
-        CartItemChatDTO cartItemChatDTO = createCartItemChatDTO(messageDTO);
-        cartEventPublisher.publishCartUpdateChatEvent(cartItemChatDTO);
+        ChatDTO chatDTO = toChatDTO(messageDTO);
+        chatMapper.insertMessage(toChatMessageVO(chatDTO));    // 메시지 DB 저장
+        cartEventPublisher.publishCartUpdateChatEvent(chatDTO);     // 웹 소켓 전송
     }
 
     /**
@@ -266,8 +273,9 @@ public class CartServiceImpl implements CartService {
         cartEventPublisher.publishCartUpdateEvent(messageDTO);
 
         // (2) 장바구니 변경 채팅 발송
-        CartItemChatDTO cartItemChatDTO = createCartItemChatDTO(messageDTO);
-        cartEventPublisher.publishCartUpdateChatEvent(cartItemChatDTO);
+        ChatDTO chatDTO = toChatDTO(messageDTO);
+        chatMapper.insertMessage(toChatMessageVO(chatDTO));    // 메시지 DB 저장
+        cartEventPublisher.publishCartUpdateChatEvent(chatDTO);     // 웹 소켓 전송
     }
 
     /**
@@ -306,7 +314,9 @@ public class CartServiceImpl implements CartService {
         // (2) 장바구니 변경 채팅 발송
         Long cartMemberId = SecurityUtil.getCurrentCartMemberId();
         CartItemChatDTO cartItemChatDTO = cartMapper.selectCartItemChatDetails(productId, cartMemberId);
-        cartEventPublisher.publishCartUpdateChatEvent(createCartItemChatDTO(cartItemChatDTO, cartId, cartMemberId));
+        ChatDTO chatDTO = toChatDTO(cartItemChatDTO, cartId, cartMemberId);
+        chatMapper.insertMessage(toChatMessageVO(chatDTO));    // 메시지 DB 저장
+        cartEventPublisher.publishCartUpdateChatEvent(chatDTO);     // 웹 소켓 전송
     }
 
 
@@ -321,47 +331,74 @@ public class CartServiceImpl implements CartService {
     }
 
     /**
-     * CartItemChatDTO 생성
-     * : 장바구니 아이템 변경 시, 채팅을 위한 정보
-     * : create, update
-     *
-     * @param messageDTO 장바구니 아이템 메시지 객체
+     * CartItemMessageDTO -> ChatDTO 변환
+     * @param messageDTO 입력 및 수정 관련 채팅 객체
      * @return
      */
-    private CartItemChatDTO createCartItemChatDTO(CartItemMessageDTO messageDTO) {
+    private ChatDTO toChatDTO(CartItemMessageDTO messageDTO) {
         Long cartMemberId = SecurityUtil.getCurrentCartMemberId();
         String name = cartMapper.selectNameByCartMemberId(cartMemberId);
-        return CartItemChatDTO.builder()
-                .cartId((messageDTO.getCartId()))
+
+        return ChatDTO.builder()
                 .cartMemberId(cartMemberId)
-                .cartMemberName(name)
-                .action(messageDTO.getAction())
-                .productName(messageDTO.getProductName())
-                .productThumbnail(messageDTO.getProductThumbnail())
-                .quantity(messageDTO.getQuantity())
+                .cartId(messageDTO.getCartId())
+                .name(name)
+                .payload(toJsonPayload(messageDTO)) // JSON 변환 메서드
+                .status("CART")
                 .build();
     }
 
     /**
-     * CartItemChatDTO 생성
-     * : 장바구니 아이템 변경 시, 채팅을 위한 정보
-     * : delete
-     *
-     * @param cartItemChatDTO 장바구니 아이템 메시지 객체
+     * CartItemChatDTO -> ChatDTO 변환
+     * @param cartItemChatDTO 삭제 관련 채팅 객체
      * @param cartId 장바구니 ID
      * @param cartMemberId 장바구니 멤버 ID
      * @return
      */
-    private CartItemChatDTO createCartItemChatDTO(CartItemChatDTO cartItemChatDTO, Long cartId, Long cartMemberId) {
-        return CartItemChatDTO.builder()
-                .cartId(cartId)
+    private ChatDTO toChatDTO(CartItemChatDTO cartItemChatDTO, Long cartId, Long cartMemberId) {
+        return ChatDTO.builder()
                 .cartMemberId(cartMemberId)
-                .cartMemberName(cartItemChatDTO.getCartMemberName())
-                .action("delete")
-                .productName(cartItemChatDTO.getProductName())
-                .productPrice(cartItemChatDTO.getProductPrice())
-                .productThumbnail(cartItemChatDTO.getProductThumbnail())
-                .quantity(null)
+                .cartId(cartId)
+                .name(cartItemChatDTO.getCartMemberName())
+                .payload(toJsonPayload(cartItemChatDTO)) // JSON 변환 메서드
+                .status("CART")
+                .build();
+    }
+
+    /**
+     * JSON to String 변환 메서드
+     * @param dto 생성, 수정 메시지 객체
+     * @return
+     */
+    private String toJsonPayload(CartItemMessageDTO dto) {
+        return "{ \"action\": \"" + dto.getAction() + "\", "
+                + "\"productName\": \"" + dto.getProductName() + "\", "
+                + "\"productThumbnail\": \"" + dto.getProductThumbnail() + "\", "
+                + "\"quantity\": " + dto.getQuantity() + " }";
+    }
+
+    /**
+     * JSON to String 변환 메서드
+     * @param dto 삭제 메시지 객체
+     * @return
+     */
+    private String toJsonPayload(CartItemChatDTO dto) {
+        return "{ \"action\": \"delete\", "
+                + "\"productName\": \"" + dto.getProductName() + "\", "
+                + "\"productThumbnail\": \"" + dto.getProductThumbnail() + "\", "
+                + "\"quantity\": null }";
+    }
+
+    /**
+     * ChatDTO -> ChatMessageVO 변환
+     */
+    private ChatMessageVO toChatMessageVO(ChatDTO message) {
+        return ChatMessageVO.builder()
+                .cartMemberId(message.getCartMemberId())
+                .cartId(message.getCartId())
+                .name(message.getName())
+                .payload(message.getPayload())
+                .status(message.getStatus())
                 .build();
     }
 
