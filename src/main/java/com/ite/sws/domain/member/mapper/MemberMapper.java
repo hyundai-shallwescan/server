@@ -30,6 +30,7 @@ import java.util.Optional;
  * 2024.08.27   정은지        장바구니 생성 추가
  * 2024.08.27   정은지        구매 내역 조회 추가
  * 2024.08.27   정은지        작성 리뷰 조회 추가
+ * 2024.09.11   정은지        차량 번호 중복 체크 추가
  * </pre>
  */
 
@@ -41,6 +42,13 @@ public interface MemberMapper {
      * @return 로그인 아이디 개수
      */
     int selectCountByLoginId(String loginId);
+
+    /**
+     * 차량 번호 중복 체크
+     * @param carNumber
+     * @return 등록된 차량 번호 개수
+     */
+    int selectCountByCarNumber(String carNumber);
 
     /**
      * 회원가입
