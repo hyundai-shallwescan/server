@@ -62,7 +62,7 @@
 		FROM   SHARE_CHECK_LIST_ITEM SI
 			   LEFT JOIN PRODUCT P ON SI.PRODUCT_ID = P.PRODUCT_ID
 		WHERE  SI.CART_ID = #{cartId}
-		  AND  SI.PRODUC_ID = #{productId}
+		  AND  SI.PRODUCT_ID = #{productId}
 		  AND  SI.IS_DELETED = 0
 	</select>
 </mapper>

@@ -76,14 +76,6 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
     @Override
     @Transactional
     public void addShareCheckListItem(PostShareCheckListReq postShareCheckListReq) {
-        // cartId, productId가 유효한지 확인
-//        if (cartMapper.selectCountByCartId(postShareCheckListReq.getCartId()) == 0) {
-//            throw new CustomException(ErrorCode.CART_NOT_FOUND);
-//        }
-//        if (productMapper.selectCountByProductId(postShareCheckListReq.getProductId()) == 0) {
-//            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
-//        }
-
         Long cartId = postShareCheckListReq.getCartId();
         Long productId = postShareCheckListReq.getProductId();
         ShareCheckListItemVO newItem = ShareCheckListItemVO.builder()

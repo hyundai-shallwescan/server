@@ -58,5 +58,5 @@ public interface ShareCheckListMapper {
      * @param productId 상품 PK
      * @return
      */
-    ShareCheckMessageDTO selectShareCheck(Long cartId, Long productId);
+    ShareCheckMessageDTO selectShareCheck(@Param("cartId") Long cartId, @Param("productId") Long productId);
 }
