@@ -76,7 +76,8 @@
 			#{cartId, mode=IN, jdbcType=NUMERIC},
 			#{paymentId, mode=IN, jdbcType=NUMERIC},
 			#{qrCodeUri, mode=IN, jdbcType=VARCHAR},
-			#{newCartId, mode=OUT, jdbcType=NUMERIC, javaType=java.lang.Long}
+			#{newCartId, mode=OUT, jdbcType=NUMERIC, javaType=java.lang.Long},
+		    #{cartOwnerName, mode=OUT, jdbcType=VARCHAR, javaType=java.lang.String}
 			)
 	</insert>
 
