@@ -1,48 +1,50 @@
-# This workflow will build a package using Maven and then publish it to GitHub packages when a release is created
-# For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#apache-maven-with-a-settings-path
-
-name: server-ci-cd
+name: 🚀 Deploy workflow on production environment
 
 on:
-  push:
-    branches: [ dev ]
   pull_request:
-    branches: [ dev ]
+    types: [closed]
+    branches: [dev]
+      
 
 jobs:
-  build:
+  deploy:
+    if: github.event.pull_request.merged == true
+    env:
+      ENV_PATH: .env
+      S3_BUCKET_DIR_NAME: shall-we-scan-deploy-bucket
+      DEPLOYMENT_GROUP_NAME: shall-we-deploy
+    environment: dev
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up JDK 8
-      uses: actions/setup-java@v4
-      with:
-        java-version: '8'
-        distribution: 'temurin'
-        server-id: shall-wes-scan-server
-      
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+      - name: ✅ Checkout branch
+        uses: actions/checkout@v3
 
-    - name: Make zip file
-      run: zip -r ./$GITHUB_SHA.zip .
-      shell: bash
-      
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
-      
-    - name: Upload to S3
-      run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://$S3_BUCKET_NAME/$GITHUB_SHA.zip
+      - name: 🗂️ Make config folder
+        run: mkdir -p config
 
+      - name: ⚙️ Create .env file
+        run: |
+            touch ${{ env.ENV_PATH }}
+            echo DOMAIN_FIR=${{ secrets.DOMAIN_FIR }} >> ${{ env.ENV_PATH }}
+            echo SOCKET_PORT_PROD=${{ secrets.SOCKET_PORT_PROD }} >> ${{ env.ENV_PATH }}
+            echo SOCKET_PORT_TEST=${{ secrets.SOCKET_PORT_TEST }} >> ${{ env.ENV_PATH }}
       
-      env:
-        S3_BUCKET_NAME: shall-we-scan-deploy-bucket
-        AWS_REGION: ap-northeast-2
+      - name: 📦 Zip project files
+        run: zip -r ./$GITHUB_SHA.zip .
+      
+      - name: 🌎 Access to AWS
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+          
+      - name: 🚛 Upload to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.S3_BUCKET_NAME }}/${{ env.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip
+         
+      - name: 🚀 Deploy to EC2 with CodeDeploy
+        run: aws deploy create-deployment
+             --application-name codedeploy-app
+             --deployment-config-name CodeDeployDefault.AllAtOnce
+             --deployment-group-name ${{ env.DEPLOYMENT_GROUP_NAME }}
+             --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=${{ env.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip
