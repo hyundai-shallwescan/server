@@ -40,6 +40,7 @@ import static com.ite.sws.exception.ErrorCode.LOGIN_ID_ALREADY_EXISTS;
  * 2024.08.27   정은지        작성 리뷰 조회 API 생성
  * 2024.08.29   정은지        로그아웃 API 생성
  * 2024.09.10   남진수        FCM 토큰 처리
+ * 2024.09.12   정은지        액세스 토큰 재발급 API 생성
  * </pre>
  */
 
@@ -90,7 +91,7 @@ public class MemberController {
     /**
      * 로그인 API
      * @param postLoginReq 로그인 아이디, 비밀번호
-     * @return JwtToken 객체
+     * @return postLoginRes 객체
      */
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestHeader(value = "FCM-TOKEN", required = false) String fcmToken,
@@ -101,9 +102,10 @@ public class MemberController {
         }
 
         PostLoginRes postLoginRes = memberService.login(postLoginReq);
-        response.addHeader("Authorization", "Bearer " + postLoginRes.getToken());
+        response.addHeader("Authorization", "Bearer " + postLoginRes.getAccessToken());
+        response.addHeader("X-Refresh-Token", "Bearer " + postLoginRes.getRefreshToken());
 
-        return ResponseEntity.ok(new PostLoginRes(postLoginRes.getCartId(), null));
+        return ResponseEntity.ok(new PostLoginRes(postLoginRes.getCartId(), null, null));
     }
 
     /**
@@ -142,9 +144,10 @@ public class MemberController {
      * @return 회원 탈퇴 처리 결과 응답
      */
     @DeleteMapping
-    public ResponseEntity<Void> modifyMemberStatus() {
-        Long memberId = SecurityUtil.getCurrentMemberId();
-        memberService.removeMember(memberId);
+    public ResponseEntity<Void> modifyMemberStatus(@RequestHeader("X-Refresh-Token") String token) {
+
+        String refreshToken = token.substring(7);
+        memberService.removeMember(refreshToken);
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }
@@ -181,10 +184,26 @@ public class MemberController {
      * @return 로그아웃 성공 여부
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
+    public ResponseEntity<Void> logout(@RequestHeader("X-Refresh-Token") String token) {
 
-        Long memberId = SecurityUtil.getCurrentMemberId();
-        memberService.logout(memberId);
+        String refreshToken = token.substring(7);
+
+        memberService.logout(refreshToken);
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    /**
+     * 리프레시 토큰을 이용한 액세스 토큰 재발급 API
+     * @param token
+     * @return 액세스 토큰 재발급 여부
+     */
+    @PostMapping("/reissue")
+    public ResponseEntity<Void> reissueAccessToken(@RequestHeader("X-Refresh-Token") String token,
+                                                   HttpServletResponse response) {
+
+        String refreshToken = token.substring(7);
+        JwtToken newToken = memberService.reissueAccessToken(refreshToken);
+        response.addHeader("Authorization", "Bearer " + newToken.getAccessToken());
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

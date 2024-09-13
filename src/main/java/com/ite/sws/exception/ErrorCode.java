@@ -32,12 +32,17 @@ public enum ErrorCode {
     ALL_FILE_AND_INFO_SHOULD_BE_IN_REQUEST(BAD_REQUEST.value(), "파일과 모든 정보를 입력해야합니다."),
     NO_COMMAND(BAD_REQUEST.value(), "존재하지 않은 명령어입니다."),
     FCM_TOKEN_MISSING(BAD_REQUEST.value(), "FCM 토큰이 누락되었습니다."),
+    JWT_MALFORMED(BAD_REQUEST.value(), "JWT 토큰이 잘못되었습니다."),
+    UNSUPPORTED_TOKEN(BAD_REQUEST.value(), "지원되지 않는 JWT 토큰입니다."),
 
     /* 401: Unauthorized */
     REQUIRED_LOGIN(UNAUTHORIZED.value(), "로그인이 필요합니다."),
     UNAUTHORIZED_ACCESS(UNAUTHORIZED.value(), "인증이 필요합니다."),
     FCM_TOKEN_EXPIRED(UNAUTHORIZED.value(), "FCM 토큰이 만료되었습니다."),
     MEMBER_NOT_FOUND(UNAUTHORIZED.value(), "회원 정보를 찾을 수 없습니다."),
+    INVALID_REFRESH_TOKEN(UNAUTHORIZED.value(), "유효하지 않은 리프레시 토큰입니다."),
+    TOKEN_EXPIRED(UNAUTHORIZED.value(), "만료된 JWT 토큰입니다."),
+    INVALID_SIGNATURE(UNAUTHORIZED.value(), "유효하지 않은 서명입니다."),
 
     /* 403: Forbidden */
     FORBIDDEN_ACCESS(FORBIDDEN.value(), "해당 리소스에 대한 접근이 거부되었습니다."),

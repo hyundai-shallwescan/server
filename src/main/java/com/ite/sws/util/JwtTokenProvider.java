@@ -1,6 +1,8 @@
 package com.ite.sws.util;
 
 import com.ite.sws.domain.member.dto.JwtToken;
+import com.ite.sws.exception.CustomException;
+import com.ite.sws.exception.ErrorCode;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -33,8 +35,8 @@ import java.util.stream.Collectors;
  * 수정일        수정자        수정내용
  * ----------  --------    ---------------------------
  * 2024.08.25   정은지        최초 생성
- * 2024.09.01   정은지        accessToken에 cartId 저장
  * 2024.09.06   남진수        JWT 토큰에서 장바구니 멤버 ID를 추출
+ * 2024.09.12   정은지        리프레시 토큰을 이용한 액세스 토큰 재발급
  * </pre>
  */
 
@@ -48,8 +50,7 @@ public class JwtTokenProvider {
     @Value("${jwt.secret.key}")
     private String secretKey;
 
-//    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 5; 	// 5시간
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14; // 14일
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1000 * 60 * 1; // 30분
     private static final long REFRESH_TOKEN_EXPIRE_TIME = 1000 * 60 * 60 * 24 * 14;  // 14일
 
     /**
@@ -85,6 +86,10 @@ public class JwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .setSubject(authentication.getName())
+                .claim("auth", authorities) // 권한 정보 추가
+                .claim("memberId", memberId) // 사용자 ID 추가
+                .claim("cartMemberId", cartMemberId) // 카트 멤버 ID 추가
                 .setExpiration(new Date(now + REFRESH_TOKEN_EXPIRE_TIME)) // 만료 시간 설정
                 .signWith(key, SignatureAlgorithm.HS256) // 서명 알고리즘과 키 설정
                 .compact();
@@ -124,24 +129,26 @@ public class JwtTokenProvider {
 
     /**
      * JWT 토큰의 유효성 검사 메서드
-     * @param accessToken JWT 액세스토큰
+     * @param token JWT 토큰
      * @return boolean 토큰 유효 여부
      */
-    public boolean validateToken(String accessToken) {
+    public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
-
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 토큰입니다.", e);
+            throw new CustomException(ErrorCode.JWT_MALFORMED);
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.", e);
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.", e);
-        } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.", e);
+            throw new CustomException(ErrorCode.UNSUPPORTED_TOKEN);
+        } catch (SignatureException e) {
+            log.info("JWT 서명이 유효하지 않습니다.", e);
+            throw new CustomException(ErrorCode.INVALID_SIGNATURE);
         }
-        return false;
     }
 
     /**
@@ -192,6 +199,42 @@ public class JwtTokenProvider {
     public Long getCartMemberIdFromToken(String accessToken) {
         Claims claims = parseClaims(accessToken); // JWT 토큰에서 Claims를 파싱
         return claims.get("cartMemberId", Long.class); // Claims에서 cartMemberId 추출하여 반환
+    }
+
+    /**
+     * 리프레쉬 토큰을 이용한 액세스 토큰 재발급
+     * @param refreshToken
+     * @return JwtToken 객체
+     */
+    public JwtToken regenerateToken(String refreshToken) {
+
+        if (!validateToken(refreshToken)) {
+            throw new CustomException(ErrorCode.INVALID_REFRESH_TOKEN);
+        }
+
+        long now = (new Date()).getTime();
+
+        Claims claims = parseClaims(refreshToken);
+        String username = claims.getSubject();
+        String authorities = claims.get("auth").toString();
+        Long memberId = claims.get("memberId", Long.class);
+        Long cartMemberId = claims.get("cartMemberId", Long.class);
+
+        Date accessTokenExpiresIn = new Date(now + ACCESS_TOKEN_EXPIRE_TIME);
+        String accessToken = Jwts.builder()
+                .setSubject(username)
+                .claim("auth", authorities) // 권한 정보 추가
+                .claim("memberId", memberId) // 사용자 ID 추가
+                .claim("cartMemberId", cartMemberId) // 카트 멤버 ID 추가
+                .setExpiration(accessTokenExpiresIn)  // 만료 시간 설정
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+
+        return JwtToken.builder()
+                .grantType("Bearer")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     @Getter

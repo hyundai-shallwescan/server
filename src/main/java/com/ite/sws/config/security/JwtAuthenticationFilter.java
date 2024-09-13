@@ -1,5 +1,6 @@
 package com.ite.sws.config.security;
 
+import com.ite.sws.exception.CustomException;
 import com.ite.sws.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -13,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
@@ -47,23 +49,38 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        String requestURI = httpRequest.getRequestURI();
+
+        // 액세스 토큰 재발급은 필터에서 제외
+        if (requestURI.equals("/members/reissue")) {
+            logger.info("액세스토큰 재발급");
+            chain.doFilter(request, response);
+            return;
+        }
+
         // Request Header에서 JWT 토큰 추출
         String token = resolveToken((HttpServletRequest) request);
+        logger.info("Resolved JWT Token: " + token);
 
-        if (token != null && jwtTokenProvider.validateToken(token)) {
-            String key ="JWT_TOKEN:" + jwtTokenProvider.getMemberIdFromToken(token);
+        if (token != null)
+            try {
+                if (jwtTokenProvider.validateToken(token)) {
+                    if (redisTemplate.hasKey("BLACKLISTED_TOKEN:" + token)) {
+                        logger.info("블랙 리스트에 포함된 토큰" + token);
+                        ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        return;
+                    }
 
-            logger.info("key: " + key);
-            logger.info(redisTemplate.hasKey(key));
-
-            String storedToken = redisTemplate.opsForValue().get(key);
-
-            if(redisTemplate.hasKey(key) & storedToken != null) {
-                // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
-                Authentication authentication = jwtTokenProvider.getAuthentication(token);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                    // 토큰이 유효할 경우 토큰에서 Authentication 객체를 가지고 와서 SecurityContext에 저장
+                    Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
+            } catch (CustomException ex) {
+                logger.error("토큰 검증 중 예외 발생: " + ex.getMessage(), ex);
+                ((HttpServletResponse) response).setStatus(ex.getErrorCode().getStatus());
+                return;
             }
-        }
         chain.doFilter(request, response);
     }
 

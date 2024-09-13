@@ -15,6 +15,9 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
 /**
  * Spring Security 설정 클래스
@@ -27,6 +30,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * ----------  --------    ---------------------------
  * 2024.08.24  	정은지        최초 생성
  * 2024.08.27  	남진수        HttpSecurity 장바구니 설정 추가
+ * 2024.09.10   정은지        cors filter 설정
  * </pre>
  */
 
@@ -70,16 +74,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.httpBasic().disable()
+        http
+                .cors() // CORS 설정 적용
+                .and()
+                .csrf().disable()
+                .httpBasic().disable()
                 .formLogin().disable()
                 .authorizeRequests()
-                .antMatchers("/members").hasRole("USER")
-                .antMatchers("/**").permitAll();
-//                .antMatchers("/members/signup", "/members/check-id", "/members/login", "/members/logout").permitAll()
-//                .antMatchers("/admins/**").hasRole("ADMIN")
-//                .antMatchers("/carts/**").hasRole("CART_USER")
-//                .anyRequest().hasAnyRole("ADMIN", "USER");
+                .antMatchers("/members/signup", "/members/check-id", "/members/login", "/members/logout", "/ws/**", "/members/reissue", "/carts/login").permitAll()
+                .antMatchers("/carts/**", "/share-checklist/**").hasAnyRole("ADMIN", "USER", "CART_USER")
+                .antMatchers("/admins/**").hasRole("ADMIN")
+                .anyRequest().hasAnyRole("ADMIN", "USER");
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .exceptionHandling()
@@ -98,5 +103,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    /**
+     * corsFilter 설정
+     * @return
+     */
+    @Bean
+    public CorsFilter corsFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.addAllowedOrigin("http://localhost:3000");// 리액트 서버
+        config.addAllowedHeader("*");
+        config.addAllowedMethod("*");
+        config.addExposedHeader("Authorization");
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsFilter(source);
     }
 }

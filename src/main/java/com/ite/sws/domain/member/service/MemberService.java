@@ -22,6 +22,7 @@ import java.util.List;
  * 2024.08.27   정은지        구매 내역 조회 추가
  * 2024.08.27   정은지        작성 리뷰 조회 추가
  * 2024.08.29   정은지        로그아웃 추가
+ * 2024.09.12   정은지        액세스 토큰 재발급 추가
  * </pre>
  */
 
@@ -62,10 +63,9 @@ public interface MemberService {
 
     /**
      * 회원 탈퇴
-     * @param memberId 멤버 ID (PK)
+     * @param refreshToken 리프레시 토큰
      */
-    void removeMember(Long memberId);
-
+    void removeMember(String refreshToken);
 
     /**
      * 구매 내역 조회
@@ -83,7 +83,14 @@ public interface MemberService {
 
     /**
      * 로그아웃
-     * @param memberId 멤버 ID
+     * @param refreshToken 리프레시 토큰
      */
-    void logout(Long memberId);
+    void logout(String refreshToken);
+
+    /**
+     * 리프레시 토큰을 이용한 액세스 토큰 재발급
+     * @param refreshToken 리프레시 토큰
+     * @return JwtToken 객체
+     */
+    JwtToken reissueAccessToken(String refreshToken);
 }
