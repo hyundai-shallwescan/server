@@ -40,7 +40,7 @@ public class ReviewController {
 
   private final ReviewService reviewService;
 
-  @PostMapping(consumes = {"multipart/form-data"}, value = "/reviews")
+  @PostMapping(consumes = {"multipart/form-data"})
   public ResponseEntity<Void> createReview(
       @RequestPart MultipartFile shortForm,
       @RequestPart MultipartFile image,
