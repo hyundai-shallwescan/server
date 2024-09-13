@@ -1,13 +1,18 @@
 package com.ite.sws.domain.checklist.service;
 
 import com.ite.sws.domain.cart.mapper.CartMapper;
+import com.ite.sws.domain.chat.dto.ChatDTO;
+import com.ite.sws.domain.chat.mapper.ChatMapper;
+import com.ite.sws.domain.chat.vo.ChatMessageVO;
 import com.ite.sws.domain.checklist.dto.GetShareCheckListRes;
 import com.ite.sws.domain.checklist.dto.PostShareCheckListReq;
+import com.ite.sws.domain.checklist.dto.ShareCheckMessageDTO;
+import com.ite.sws.domain.checklist.event.ShareCheckListEventPublisher;
 import com.ite.sws.domain.checklist.mapper.ShareCheckListMapper;
 import com.ite.sws.domain.checklist.vo.ShareCheckListItemVO;
-import com.ite.sws.domain.product.mapper.ProductMapper;
 import com.ite.sws.exception.CustomException;
 import com.ite.sws.exception.ErrorCode;
+import com.ite.sws.util.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Service;
@@ -32,6 +37,8 @@ import static com.ite.sws.exception.ErrorCode.SHARE_CHECK_LIST_ITEM_NOT_FOUND;
  * 2024.08.27  	김민정       공유 체크리스트에 아이템 생성 기능 추가
  * 2024.08.28  	김민정       공유 체크리스트 아이템 삭제 기능 추가
  * 2024.08.28  	김민정       공유 체크리스트 아이템 체크 상태 변경 기능 추가
+ * 2024.09.12   김민정       공유 체크리스트 변경 실시간 처리
+ * 2024.09.12   김민정       공유 체크리스트 변경 채팅 발송
  * </pre>
  */
 @Service
@@ -40,7 +47,8 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
 
     private final ShareCheckListMapper shareCheckListMapper;
     private final CartMapper cartMapper;
-    private final ProductMapper productMapper;
+    private final ChatMapper chatMapper;
+    private final ShareCheckListEventPublisher eventPublisher;
 
     /**
      * cartId로 공유 체크리스트 아이템 조회
@@ -68,19 +76,24 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
     @Override
     @Transactional
     public void addShareCheckListItem(PostShareCheckListReq postShareCheckListReq) {
-        // cartId, productId가 유효한지 확인
-        if (cartMapper.selectCountByCartId(postShareCheckListReq.getCartId()) == 0) {
-            throw new CustomException(ErrorCode.CART_NOT_FOUND);
-        }
-        if (productMapper.selectCountByProductId(postShareCheckListReq.getProductId()) == 0) {
-            throw new CustomException(ErrorCode.PRODUCT_NOT_FOUND);
-        }
-
+        Long cartId = postShareCheckListReq.getCartId();
+        Long productId = postShareCheckListReq.getProductId();
         ShareCheckListItemVO newItem = ShareCheckListItemVO.builder()
-                .cartId(postShareCheckListReq.getCartId())
-                .productId(postShareCheckListReq.getProductId())
+                .cartId(cartId)
+                .productId(productId)
                 .build();
         shareCheckListMapper.insertShareCheckListItem(newItem);
+
+        // 공유 체트리스트 변경 관련 이벤트 발행 (비동기 처리)
+        // (1) 공유 체크리스트 변경 실시간 처리
+        ShareCheckMessageDTO messageDTO = shareCheckListMapper.selectShareCheck(cartId, productId);
+        messageDTO.setAction("create");
+        eventPublisher.publishShareCheckListEvent(messageDTO);
+
+        // (2) 공유 체크리스트 변경 채팅 발송
+        ChatDTO chatDTO = toChatDTO(messageDTO);
+        chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
+        eventPublisher.publishShareCheckListChatEvent(chatDTO); // 웹 소켓 전송
     }
 
     /**
@@ -91,6 +104,10 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
     @Override
     @Transactional
     public void removeShareCheckListItem(Long cartId, Long productId) {
+        // 웹소켓용 체크리스트 아이템 상세 DTO
+        ShareCheckMessageDTO messageDTO = shareCheckListMapper.selectShareCheck(cartId, productId);
+
+        // 삭제할 체크리스트 아이템
         ShareCheckListItemVO deleteItem = ShareCheckListItemVO.builder()
                 .cartId(cartId)
                 .productId(productId)
@@ -105,6 +122,16 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
             // 다른 예외 처리
             throw new CustomException(DATABASE_ERROR);
         }
+
+        // 공유 체트리스트 변경 관련 이벤트 발행 (비동기 처리)
+        // (1) 공유 체크리스트 변경 실시간 처리
+        messageDTO.setAction("delete");
+        eventPublisher.publishShareCheckListEvent(messageDTO);
+
+        // (2) 공유 체크리스트 변경 채팅 발송
+        ChatDTO chatDTO = toChatDTO(messageDTO);
+        chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
+        eventPublisher.publishShareCheckListChatEvent(chatDTO); // 웹 소켓 전송
     }
 
     /**
@@ -124,5 +151,58 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
             // 다른 예외 처리
             throw new CustomException(DATABASE_ERROR);
         }
+
+        // 공유 체트리스트 변경 관련 이벤트 발행 (비동기 처리)
+        // (1) 공유 체크리스트 변경 실시간 처리
+        ShareCheckMessageDTO messageDTO = shareCheckListMapper.selectShareCheck(cartId, productId);
+        messageDTO.setAction("update");
+        eventPublisher.publishShareCheckListEvent(messageDTO);
+
+        // (2) 공유 체크리스트 변경 채팅 발송
+        ChatDTO chatDTO = toChatDTO(messageDTO);
+        chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
+        eventPublisher.publishShareCheckListChatEvent(chatDTO); // 웹 소켓 전송
+    }
+
+    /**
+     * ShareCheckMessageDTO -> ChatDTO 변환
+     * @param messageDTO 채팅 객체
+     * @return
+     */
+    private ChatDTO toChatDTO(ShareCheckMessageDTO messageDTO) {
+        Long cartMemberId = SecurityUtil.getCurrentCartMemberId();
+        String name = cartMapper.selectNameByCartMemberId(cartMemberId);
+
+        return ChatDTO.builder()
+                .cartMemberId(cartMemberId)
+                .cartId(messageDTO.getCartId())
+                .name(name)
+                .payload(toJsonPayload(messageDTO)) // JSON 변환 메서드
+                .status("CHECK")
+                .build();
+    }
+
+    /**
+     * JSON to String 변환 메서드
+     * @param dto 메시지 객체
+     * @return
+     */
+    private String toJsonPayload(ShareCheckMessageDTO dto) {
+        return "{ \"action\": \"" + dto.getAction() + "\", "
+                + "\"productName\": \"" + dto.getProductName() + "\", "
+                + "\"productThumbnail\": " + dto.getProductThumbnail() + " }";
+    }
+
+    /**
+     * ChatDTO -> ChatMessageVO 변환
+     */
+    private ChatMessageVO toChatMessageVO(ChatDTO message) {
+        return ChatMessageVO.builder()
+                .cartMemberId(message.getCartMemberId())
+                .cartId(message.getCartId())
+                .name(message.getName())
+                .payload(message.getPayload())
+                .status(message.getStatus())
+                .build();
     }
 }

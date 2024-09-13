@@ -18,8 +18,6 @@ import org.springframework.stereotype.Component;
  * 2024.09.08  	김민정       최초 생성
  * 2024.09.08  	김민정       장바구니 업데이트 이벤트 발행
  * 2024.09.08  	김민정       장바구니 채팅 업데이트 이벤트 발행
- * 2024.09.08  	김민정       ChatDTO 생성
- * 2024.09.08  	김민정       JSON to String 변환 메서드
  * </pre>
  */
 @Component

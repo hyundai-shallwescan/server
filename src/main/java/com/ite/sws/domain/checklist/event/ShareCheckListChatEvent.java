@@ -1,12 +1,11 @@
-package com.ite.sws.domain.cart.event;
+package com.ite.sws.domain.checklist.event;
 
 import com.ite.sws.domain.chat.dto.ChatDTO;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
 /**
- * 장바구니와 관련된 채팅 업데이트 이벤트 클래스
- * : 장바구니 아이템이 추가되거나 수정될 때 발생하는 채팅 이벤트를 정의
+ * 공유 체크리스트 업데이트 관련 채팅 이벤트 클래스
  *
  * @author 김민정
  * @since 2024.09.12
@@ -19,10 +18,11 @@ import org.springframework.context.ApplicationEvent;
  * </pre>
  */
 @Getter
-public class CartUpdateChatEvent extends ApplicationEvent {
+public class ShareCheckListChatEvent extends ApplicationEvent {
+
     private final ChatDTO chatDTO;
 
-    public CartUpdateChatEvent(Object source, ChatDTO chatDTO) {
+    public ShareCheckListChatEvent(Object source, ChatDTO chatDTO) {
         super(source);
         this.chatDTO = chatDTO;
     }

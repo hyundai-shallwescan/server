@@ -16,6 +16,7 @@
  * 2024.08.27  김민정        공유 체크리스트 아이템 생성을 위한 프로시저 호출
  * 2024.08.28  김민정        공유 체크리스트 아이템 삭제를 위한 프로시저 호출
  * 2024.08.28  김민정        공유 체크리스트 아이템 체크 상태 변경을 위한 프로시저 호출
+ * 2024.09.12  김민정        공유 체크리스트 아이템 상세 조회
  * </pre>
  -->
 <mapper namespace="com.ite.sws.domain.checklist.mapper.ShareCheckListMapper">
@@ -49,4 +50,19 @@
 	<update id="updateShareCheckListItem">
 		CALL PROC_UPDATE_SHARE_CHECK_LIST_ITEM_STATUS(#{cartId}, #{productId})
 	</update>
+
+	<!-- 공유 체크리스트 아이템 상세 조회 -->
+	<select id="selectShareCheck" resultType="com.ite.sws.domain.checklist.dto.ShareCheckMessageDTO">
+		SELECT #{cartId}		 AS cartId,
+		       #{productId}		 AS productId,
+		       P.NAME            AS productName,
+			   P.PRICE           AS productPrice,
+			   P.THUMBNAIL_IMAGE AS productThumbnail,
+			   SI.STATUS		 AS status
+		FROM   SHARE_CHECK_LIST_ITEM SI
+			   LEFT JOIN PRODUCT P ON SI.PRODUCT_ID = P.PRODUCT_ID
+		WHERE  SI.CART_ID = #{cartId}
+		  AND  SI.PRODUCT_ID = #{productId}
+		  AND  SI.IS_DELETED = 0
+	</select>
 </mapper>
