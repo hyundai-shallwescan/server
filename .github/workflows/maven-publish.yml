@@ -44,6 +44,5 @@ jobs:
 
       
       env:
-        GITHUB_TOKEN: ${{ github.token }}
-        S3_BUCKET_NAME: deploy
+        S3_BUCKET_NAME: shall-we-scan-deploy-bucket
         AWS_REGION: ap-northeast-2
