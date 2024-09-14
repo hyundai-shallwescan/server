@@ -11,7 +11,7 @@ jobs:
     if: github.event.pull_request.merged == true
     env:
       ENV_PATH: .env
-      S3_BUCKET_DIR_NAME: shall-we-scan-deploy-bucket
+      S3_BUCKET_NAME: shall-we-scan-deploy-bucket
       DEPLOYMENT_GROUP_NAME: shall-we-deploy
     environment: dev
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
           aws-region: ap-northeast-2
           
       - name: 🚛 Upload to S3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ secrets.S3_BUCKET_NAME }}/${{ env.S3_BUCKET_DIR_NAME }}/$GITHUB_SHA.zip
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://${{ env.S3_BUCKET_NAME }}/$GITHUB_SHA.zip
          
       - name: 🚀 Deploy to EC2 with CodeDeploy
         run: aws deploy create-deployment
