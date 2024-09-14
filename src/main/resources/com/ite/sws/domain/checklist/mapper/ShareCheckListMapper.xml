@@ -37,8 +37,12 @@
 	</select>
 
 	<!-- 공유 체크리스트 아이템 생성을 위한 프로시저 호출 -->
-	<insert id="insertShareCheckListItem">
-		CALL PROC_INSERT_SHARE_CHECK_LIST_ITEM(#{cartId}, #{productId})
+	<insert id="insertShareCheckListItem" parameterType="com.ite.sws.domain.checklist.vo.ShareCheckListItemVO" statementType="CALLABLE">
+		{CALL PROC_INSERT_SHARE_CHECK_LIST_ITEM(
+		    #{cartId, mode=IN, jdbcType=NUMERIC},
+			#{productId, mode=IN, jdbcType=NUMERIC},
+			#{rowCount, mode=OUT, jdbcType=NUMERIC}
+		)}
 	</insert>
 
 	<!-- 공유 체크리스트 아이템 삭제를 위한 프로시저 호출 -->

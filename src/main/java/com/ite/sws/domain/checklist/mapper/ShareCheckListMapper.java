@@ -37,7 +37,7 @@ public interface ShareCheckListMapper {
      * 공유 체크리스트 아이템 생성을 위한 프로시저 호출
      * @param newItem 공유 체크리스트 아이템 생성 객체
      */
-    void insertShareCheckListItem(ShareCheckListItemVO newItem);
+    int insertShareCheckListItem(ShareCheckListItemVO newItem);
 
     /**
      * 공유 체크리스트 아이템 삭제를 위한 프로시저 호출
