@@ -22,6 +22,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ParkingPaymentDTO {
-    private Integer paymentAmount;
+    private int paymentAmount;
     private Long paymentId;
 }
