@@ -27,4 +27,5 @@ public class ShareCheckListItemVO {
     private String productName;
     private int productPrice;
     private String productThumbnail;
+    private int rowCount;
 }

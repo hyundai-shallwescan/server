@@ -84,6 +84,10 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
                 .build();
         shareCheckListMapper.insertShareCheckListItem(newItem);
 
+        if (newItem.getRowCount()==0) {
+            throw new CustomException(ErrorCode.SHARE_CHECK_LIST_ITEM_ALREADY_EXISTS);
+        }
+
         // 공유 체트리스트 변경 관련 이벤트 발행 (비동기 처리)
         // (1) 공유 체크리스트 변경 실시간 처리
         ShareCheckMessageDTO messageDTO = shareCheckListMapper.selectShareCheck(cartId, productId);

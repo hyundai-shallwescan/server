@@ -60,6 +60,7 @@ public enum ErrorCode {
     /* 409: Conflict */
     LOGIN_ID_ALREADY_EXISTS(CONFLICT.value(), "이미 존재하는 아이디입니다."),
     CART_NUMBER_ALREADY_EXISTS(CONFLICT.value(), "이미 등록된 차량입니다."),
+    SHARE_CHECK_LIST_ITEM_ALREADY_EXISTS(CONFLICT.value(), "이미 요청 리스트에 등록된 상품입니다."),
 
     /* 500: Internal Server Error */
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR.value(), "서버 내부 오류가 발생했습니다."),
