@@ -194,7 +194,7 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
     private String toJsonPayload(ShareCheckMessageDTO dto) {
         return "{ \"action\": \"" + dto.getAction() + "\", "
                 + "\"productName\": \"" + dto.getProductName() + "\", "
-                + "\"productThumbnail\": " + dto.getProductThumbnail() + " }";
+                + "\"productThumbnail\": \"" + dto.getProductThumbnail() + "\" }";
     }
 
     /**
