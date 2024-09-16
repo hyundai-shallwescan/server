@@ -88,7 +88,7 @@ public class ParkingServiceImpl implements ParkingService{
         // 당일 결제 금액이 존재할 경우
         if (parkingPaymentDTO != null) {
             // 결제 금액
-            totalPrice = parkingPaymentDTO.getPaymentAmount();
+            totalPrice = parkingPaymentDTO.getAmount();
             // 주차 결제 상태 조회
             paymentStatus = parkingMapper.selectParkingPaymentStatusByPaymentId(parkingPaymentDTO.getPaymentId());
             parkingPaymentStatus = "PAID";

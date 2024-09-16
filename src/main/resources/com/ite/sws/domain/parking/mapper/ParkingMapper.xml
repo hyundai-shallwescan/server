@@ -74,6 +74,8 @@
                                  FROM PARKING_PAYMENT PP
                                  WHERE PP.PAYMENT_ID = P.PAYMENT_ID)
                  AND TRUNC(P.CREATED_AT) = TRUNC(SYSDATE)
+        ORDER BY P.CREATED_AT DESC
+        FETCH FIRST 1 ROWS ONLY
     </select>
 
     <!-- 장바구니 금액 조회 -->
