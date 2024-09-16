@@ -12,6 +12,7 @@ jobs:
     env:
       ENV_PATH: .env
       S3_BUCKET_NAME: shall-we-scan-deploy-bucket
+      S3_BUCKET_DIR_NAME: server
       DEPLOYMENT_GROUP_NAME: shall-we-deploy
     environment: dev
     runs-on: ubuntu-latest
