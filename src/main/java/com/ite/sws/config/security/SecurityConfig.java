@@ -82,7 +82,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin().disable()
                 .authorizeRequests()
                 .antMatchers("/members/signup", "/members/check-id", "/members/login", "/members/logout", "/ws/**", "/members/reissue", "/carts/login").permitAll()
-                .antMatchers("/carts/**", "/share-checklist/**", "/products/**").hasAnyRole("ADMIN", "USER", "CART_USER")
+                .antMatchers("/carts/**", "/share-checklist/**", "/products/**", "/payments/**").hasAnyRole("ADMIN", "USER", "CART_USER")
                 .antMatchers("/admins/**").hasRole("ADMIN")
                 .anyRequest().hasAnyRole("ADMIN", "USER");
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
