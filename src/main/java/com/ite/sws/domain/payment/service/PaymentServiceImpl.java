@@ -143,7 +143,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
     private void emitPaymentEvent(PaymentVO paymentVO,LocalDateTime currentTime){
           eventPublisher.emitPaymentEvent(
-            PaymentEvent.of(paymentVO.getPaymentId(), SecurityUtil.getCurrentMemberId(),
+            PaymentEvent.of(paymentVO.getPaymentId(), cartMapper.selectMemberIdByCartId(paymentVO.getCartId()),
                 memberMapper.selectMemberByMemberId(SecurityUtil.getCurrentMemberId()).getName(),currentTime));
     }
 
