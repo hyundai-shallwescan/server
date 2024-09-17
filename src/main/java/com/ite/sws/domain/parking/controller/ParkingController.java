@@ -2,6 +2,7 @@ package com.ite.sws.domain.parking.controller;
 
 import com.ite.sws.domain.parking.dto.GetParkingRes;
 import com.ite.sws.domain.parking.dto.PatchParkingReq;
+import com.ite.sws.domain.parking.dto.PostParkingPaymentsReq;
 import com.ite.sws.domain.parking.dto.PostParkingReq;
 import com.ite.sws.domain.parking.service.ParkingService;
 import com.ite.sws.util.SecurityUtil;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
  * 2024.08.28  	남진수       최초 생성
  * 2024.08.28  	남진수       주차 기록 추가 API 생성
  * 2024.08.28  	남진수       주차 기록 수정 API 생성
+ * 2024.09.18  	남진수       주차 정산 정보 조회 API 생성
  * </pre>
  */
 @RestController
@@ -61,5 +63,16 @@ public class ParkingController {
         Long memberId = SecurityUtil.getCurrentMemberId();
         GetParkingRes getParkingRes = parkingService.findParkingInformation(memberId);
         return ResponseEntity.ok(getParkingRes);
+    }
+
+    /**
+     * 주차 결제 정보 등록
+     * @param postParkingPaymentsReq 주차 결제 정보
+     * @return ResponseEntity<Void>
+     */
+    @PostMapping("/payments")
+    public ResponseEntity<Void> addParkingPayments(@RequestBody PostParkingPaymentsReq postParkingPaymentsReq) {
+        parkingService.addParkingPayments(postParkingPaymentsReq);
+        return ResponseEntity.ok().build();
     }
 }

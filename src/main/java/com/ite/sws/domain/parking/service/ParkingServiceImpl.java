@@ -3,6 +3,7 @@ package com.ite.sws.domain.parking.service;
 import com.ite.sws.domain.parking.dto.*;
 import com.ite.sws.domain.parking.mapper.ParkingMapper;
 import com.ite.sws.domain.parking.vo.ParkingHistoryVO;
+import com.ite.sws.domain.parking.vo.ParkingPaymentVO;
 import com.ite.sws.domain.payment.service.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ import java.util.List;
  * 2024.08.28  	남진수       주차 기록 수정 메서드 추가
  * 2024.08.28  	남진수       주차 정산 정보 조회 메서드 추가
  * 2024.08.28  	남진수       무료 주차 시간 계산 메서드 추가
+ * 2024.09.18  	남진수       주차 결제 추가 메서드 추가
  * </pre>
  */
 @Service
@@ -144,6 +146,8 @@ public class ParkingServiceImpl implements ParkingService{
         Long parkingFee = (paidParkingTime.toMinutes() / 10 + (paidParkingTime.toMinutes() % 10 > 0 ? 1L : 0L)) * 1000L;
 
         return GetParkingRes.builder()
+                .parkingHistoryId(parkingHistoryDTO.getParkingHistoryId())
+                .paymentId(parkingPaymentDTO != null ? parkingPaymentDTO.getPaymentId() : null)
                 .paymentStatus(paymentStatus)
                 .freeParkingTime(freeParkingTime)
                 .feeForFreeParking(feeForFreeParking)
@@ -178,4 +182,20 @@ public class ParkingServiceImpl implements ParkingService{
         }
     }
 
+    /**
+     * 주차 결제 추가
+     * @param postParkingPaymentsReq 주차 결제 정보
+     */
+    @Transactional
+    public void addParkingPayments(PostParkingPaymentsReq postParkingPaymentsReq) {
+        ParkingPaymentVO parkingPaymentVO = ParkingPaymentVO.builder()
+                .parkingHistoryId(postParkingPaymentsReq.getParkingHistoryId())
+                .paymentId(postParkingPaymentsReq.getPaymentId())
+                .amount(postParkingPaymentsReq.getAmount())
+                .paymentKey(postParkingPaymentsReq.getPaymentKey())
+                .paymentCard(postParkingPaymentsReq.getPaymentCard())
+                .status("ACTIVE")
+                .build();
+        parkingMapper.insertParkingPayments(parkingPaymentVO);
+    }
 }

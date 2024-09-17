@@ -4,6 +4,7 @@ import com.ite.sws.domain.parking.dto.CartItemListDTO;
 import com.ite.sws.domain.parking.dto.ParkingHistoryDTO;
 import com.ite.sws.domain.parking.dto.ParkingPaymentDTO;
 import com.ite.sws.domain.parking.vo.ParkingHistoryVO;
+import com.ite.sws.domain.parking.vo.ParkingPaymentVO;
 import java.util.List;
 
 /**
@@ -22,6 +23,7 @@ import java.util.List;
  * 2024.08.28  	남진수       주차 기록 조회 메서드 추가
  * 2024.08.28  	남진수       결제 금액 조회 메서드 추가
  * 2024.08.28  	남진수       장바구니 금액 조회 메서드 추가
+ * 2024.09.18  	남진수       주차 결제 상태 조회 메서드 추가
  * </pre>
  */
 public interface ParkingMapper {
@@ -72,4 +74,10 @@ public interface ParkingMapper {
      * @return 주차 결제 상태
      */
     String selectParkingPaymentStatusByPaymentId(Long parkingPaymentId);
+
+    /**
+     * 주차 결제 정보 추가
+     * @param parkingPaymentVO 주차 결제 VO
+     */
+    void insertParkingPayments(ParkingPaymentVO parkingPaymentVO);
 }
