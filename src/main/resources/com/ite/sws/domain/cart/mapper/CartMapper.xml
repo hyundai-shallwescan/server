@@ -224,7 +224,7 @@
 	</select>
 
 	<select id="selectMemberNameByCartId" resultType="String" parameterType="java.lang.Long">
-		SELECT m.member_name
+		SELECT m.name
 		FROM member m
 		JOIN cart c ON m.member_id = c.member_id
 		WHERE c.cart_id = #{cartId}
