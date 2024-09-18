@@ -149,7 +149,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     // QR 텍스트 생성
     private String generateQRText(String qrText) {
-        return "scanandgo://deeplink?paymentId=" + qrText;
+        return "wlstnam.github.io/?paymentId=" + qrText;
     }
 
     /**

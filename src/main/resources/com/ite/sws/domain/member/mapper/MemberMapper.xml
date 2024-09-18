@@ -79,7 +79,7 @@
                      CART_URI)
         VALUES      (#{cartId},
                      #{memberId},
-                     'scanandgo://deeplink?cartId=' || #{cartId})
+                     'wlstnam.github.io/?cartId=' || #{cartId})
     </insert>
 
     <!-- 로그인 -->
