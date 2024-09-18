@@ -152,4 +152,9 @@ public interface CartMapper {
      * @return
      */
     Long selectMemberIdByCartId(@Param("cartId") Long cartId);
+
+    String selectMemberNameByCartId(@Param("cartI"
+        + "d") Long cartId);
+
 }
+

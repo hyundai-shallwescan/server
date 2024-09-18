@@ -22,16 +22,16 @@ import com.ite.sws.domain.payment.vo.PaymentItemVO;
 import com.ite.sws.domain.payment.vo.PaymentVO;
 import com.ite.sws.domain.product.vo.ProductVO;
 import com.ite.sws.exception.CustomException;
-import com.ite.sws.util.SecurityUtil;
-
+import com.ite.sws.exception.ErrorCode;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.UncategorizedSQLException;
 import org.springframework.stereotype.Service;
@@ -68,7 +68,7 @@ public class PaymentServiceImpl implements PaymentService {
     private final WebFluxAsyncPaymentInfoEventPublisher eventPublisher;
     private final MemberMapper memberMapper;
     private final ApplicationEventPublisher applicationEventPublisher;
-
+    private final SqlSessionFactory sqlSessionFactory;
     /**
      * 상품 결제 생성
      *
@@ -127,12 +127,12 @@ public class PaymentServiceImpl implements PaymentService {
 
         // 결제 관련 이벤트 발행 (비동기 처리)
         PaymentDoneDTO paymentDoneDTO = PaymentDoneDTO.builder()
-                .paymentId(newPayment.getPaymentId())
-                .oldCartId(postPaymentReq.getCartId())
-                .newCartId(cartQRCodeVO.getNewCartId())
-                .cartOwnerName(cartQRCodeVO.getCartOwnerName())
-                .qrUrl(qrCodeUri)
-                .build();
+            .paymentId(newPayment.getPaymentId())
+            .oldCartId(postPaymentReq.getCartId())
+            .newCartId(cartQRCodeVO.getNewCartId())
+            .cartOwnerName(cartQRCodeVO.getCartOwnerName())
+            .qrUrl(qrCodeUri)
+            .build();
         applicationEventPublisher.publishEvent(new PaymentDoneEvent(this, paymentDoneDTO));
 
         return PostPaymentRes.builder()
@@ -141,10 +141,23 @@ public class PaymentServiceImpl implements PaymentService {
             .qrUrl(qrCodeUri)
             .build();
     }
-    private void emitPaymentEvent(PaymentVO paymentVO,LocalDateTime currentTime){
-          eventPublisher.emitPaymentEvent(
-            PaymentEvent.of(paymentVO.getPaymentId(), cartMapper.selectMemberIdByCartId(paymentVO.getCartId()),
-                memberMapper.selectMemberByMemberId(SecurityUtil.getCurrentMemberId()).getName(),currentTime));
+
+    private void emitPaymentEvent(PaymentVO paymentVO, LocalDateTime currentTime) {
+
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            CartMapper cartMapper = sqlSession.getMapper(CartMapper.class);
+            Long memberId = cartMapper.selectMemberIdByCartId(paymentVO.getCartId());
+            String memberName = cartMapper.selectMemberNameByCartId(paymentVO.getCartId());
+            eventPublisher.emitPaymentEvent(
+                PaymentEvent.of(paymentVO.getPaymentId(),
+                    memberId,
+                    memberName,
+                    currentTime));
+            sqlSession.commit();
+        } catch (Exception e){
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
     // QR 텍스트 생성
