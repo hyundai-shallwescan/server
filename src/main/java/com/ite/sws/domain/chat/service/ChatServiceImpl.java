@@ -65,7 +65,7 @@ public class ChatServiceImpl implements ChatService {
      * @param message 채팅 메시지
      * @throws IOException IOException
      */
-    private void sendPushNotifications(Long cartId, ChatDTO message) throws IOException {
+    public void sendPushNotifications(Long cartId, ChatDTO message) throws IOException {
 
         List<Long> cartMemberIdList = chatMapper.selectCartMemberIdListByCartId(cartId);
 

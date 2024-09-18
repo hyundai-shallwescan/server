@@ -219,6 +219,9 @@ public class CartServiceImpl implements CartService {
         ChatDTO chatDTO = toChatDTO(messageDTO);
         chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
         cartEventPublisher.publishCartUpdateChatEvent(chatDTO); // 웹 소켓 전송
+
+        // (3) 장바구니 변경 FCM 알림 발송
+        cartEventPublisher.publishChatAlarmEvent(chatDTO);
     }
 
     /**
@@ -276,6 +279,9 @@ public class CartServiceImpl implements CartService {
         ChatDTO chatDTO = toChatDTO(messageDTO);
         chatMapper.insertMessage(toChatMessageVO(chatDTO));    // 메시지 DB 저장
         cartEventPublisher.publishCartUpdateChatEvent(chatDTO);     // 웹 소켓 전송
+
+        // (3) 장바구니 변경 FCM 알림 발송
+        cartEventPublisher.publishChatAlarmEvent(chatDTO);
     }
 
     /**
@@ -317,6 +323,9 @@ public class CartServiceImpl implements CartService {
         ChatDTO chatDTO = toChatDTO(cartItemChatDTO, cartId, cartMemberId);
         chatMapper.insertMessage(toChatMessageVO(chatDTO));    // 메시지 DB 저장
         cartEventPublisher.publishCartUpdateChatEvent(chatDTO);     // 웹 소켓 전송
+
+        // (3) 장바구니 변경 FCM 알림 발송
+        cartEventPublisher.publishChatAlarmEvent(chatDTO);
     }
 
 

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
  * 2024.09.08  	김민정       최초 생성
  * 2024.09.08  	김민정       장바구니 업데이트 이벤트 발행
  * 2024.09.08  	김민정       장바구니 채팅 업데이트 이벤트 발행
+ * 2024.09.18  	김민정       장바구니 변경 FCM 알림 이벤트 발행
  * </pre>
  */
 @Component
@@ -37,5 +38,12 @@ public class CartEventPublisher {
      */
     public void publishCartUpdateChatEvent(ChatDTO chatDTO) {
         eventPublisher.publishEvent(new CartUpdateChatEvent(this, chatDTO));
+    }
+
+    /**
+     * 장바구니 변경 FCM 알림 이벤트 발행
+     */
+    public void publishChatAlarmEvent(ChatDTO chatDTO) {
+        eventPublisher.publishEvent(new ChatAlarmEvent(this, chatDTO));
     }
 }
