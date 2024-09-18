@@ -1,3 +1,4 @@
+nano /home/ec2-user/action/deploy.sh
 #!/bin/bash
 
 BUILD_JAR=$(ls /home/ec2-user/action/build/libs/*.jar)
