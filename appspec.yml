@@ -4,7 +4,7 @@ files:
     - source: /
       destination: /home/api/api_back
     - source: /nginx
-      destination: /opt/codedeploy-agent/deployment-root/06d913c2-b77e-41b4-8589-d966e21ebdf9/d-FK6FGC47K/deployment-archive/nginx
+      destination: /home/api
     - source: /docker-compose.yml
       destination: /home/api
     - source: /.env
