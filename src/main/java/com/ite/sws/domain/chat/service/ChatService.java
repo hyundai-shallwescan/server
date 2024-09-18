@@ -17,6 +17,7 @@ import java.util.List;
  * 2024.08.26  	남진수       최초 생성
  * 2024.08.26  	남진수       채팅 메시지 조회 기능 추가
  * 2024.09.03  	남진수       채팅 메시지 저장 기능 추가
+ * 2024.09.10  	남진수       푸쉬 알림 전송 기능 추가
  * </pre>
  */
 public interface ChatService {
@@ -33,4 +34,11 @@ public interface ChatService {
      * @return 채팅 메시지 리스트
      */
     List<GetChatRes> getMessages(Long cartId);
+
+    /**
+     * 푸쉬 알림 전송 기능 추가
+     * @param cartId 장바구니 식별자
+     * @param message 채팅 메시지
+     */
+    void sendPushNotifications(Long cartId, ChatDTO message) throws IOException;
 }

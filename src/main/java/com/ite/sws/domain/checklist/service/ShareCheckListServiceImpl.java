@@ -1,5 +1,6 @@
 package com.ite.sws.domain.checklist.service;
 
+import com.ite.sws.domain.cart.event.CartEventPublisher;
 import com.ite.sws.domain.cart.mapper.CartMapper;
 import com.ite.sws.domain.chat.dto.ChatDTO;
 import com.ite.sws.domain.chat.mapper.ChatMapper;
@@ -48,6 +49,7 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
     private final ShareCheckListMapper shareCheckListMapper;
     private final CartMapper cartMapper;
     private final ChatMapper chatMapper;
+    private final CartEventPublisher cartEventPublisher;
     private final ShareCheckListEventPublisher eventPublisher;
 
     /**
@@ -98,6 +100,9 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
         ChatDTO chatDTO = toChatDTO(messageDTO);
         chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
         eventPublisher.publishShareCheckListChatEvent(chatDTO); // 웹 소켓 전송
+
+        // (3) 장바구니 변경 FCM 알림 발송
+        cartEventPublisher.publishChatAlarmEvent(chatDTO);
     }
 
     /**
@@ -136,6 +141,9 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
         ChatDTO chatDTO = toChatDTO(messageDTO);
         chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
         eventPublisher.publishShareCheckListChatEvent(chatDTO); // 웹 소켓 전송
+
+        // (3) 장바구니 변경 FCM 알림 발송
+        cartEventPublisher.publishChatAlarmEvent(chatDTO);
     }
 
     /**
@@ -166,6 +174,9 @@ public class ShareCheckListServiceImpl implements ShareCheckListService {
         ChatDTO chatDTO = toChatDTO(messageDTO);
         chatMapper.insertMessage(toChatMessageVO(chatDTO));     // 메시지 DB 저장
         eventPublisher.publishShareCheckListChatEvent(chatDTO); // 웹 소켓 전송
+
+        // (3) 장바구니 변경 FCM 알림 발송
+        cartEventPublisher.publishChatAlarmEvent(chatDTO);
     }
 
     /**
