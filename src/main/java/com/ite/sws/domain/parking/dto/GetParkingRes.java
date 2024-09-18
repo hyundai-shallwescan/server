@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class GetParkingRes {
+    private Long parkingHistoryId; // 주차 기록 ID
+    private Long paymentId; // 결제 ID
     private String paymentStatus; // 주차 결제 상태 (null, ACTIVE, CANCEL)
     private String freeParkingTime; // 무료 출차 가능 시간
     private Long feeForFreeParking; // 무료로 출차하기 위한 금액

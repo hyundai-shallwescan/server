@@ -2,6 +2,7 @@ package com.ite.sws.domain.parking.service;
 
 import com.ite.sws.domain.parking.dto.GetParkingRes;
 import com.ite.sws.domain.parking.dto.PatchParkingReq;
+import com.ite.sws.domain.parking.dto.PostParkingPaymentsReq;
 import com.ite.sws.domain.parking.dto.PostParkingReq;
 
 /**
@@ -17,6 +18,7 @@ import com.ite.sws.domain.parking.dto.PostParkingReq;
  * 2024.08.28  	남진수       주차 기록 추가 메서드 추가
  * 2024.08.28  	남진수       주차 기록 수정 메서드 추가
  * 2024.08.28  	남진수       주차 정산 정보 조회 메서드 추가
+ * 2024.09.18  	남진수       주차 결제 정보 등록 메서드 추가
  * </pre>
  */
 public interface ParkingService {
@@ -39,4 +41,10 @@ public interface ParkingService {
      * @return GetParkingRes
      */
     GetParkingRes findParkingInformation(Long memberId);
+
+    /**
+     * 주차 결제 정보 등록
+     * @param postParkingPaymentsReq 주차 결제 정보
+     */
+    void addParkingPayments(PostParkingPaymentsReq postParkingPaymentsReq);
 }
