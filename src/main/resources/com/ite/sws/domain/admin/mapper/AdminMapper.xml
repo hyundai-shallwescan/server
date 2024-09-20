@@ -87,7 +87,7 @@
 <select id="selectMemberPaymentHistory" parameterType="long" resultMap="memberPaymentHistoryResultMap">
     SELECT
         P.PAYMENT_ID AS paymentId,
-        paymentTotals.totalAmountSum, -- Total amount for the payment
+        paymentTotals.totalAmountSum,
         P.CREATED_AT AS paymentCreatedAt,
         PI.PRODUCT_ID AS productId,
         PI.NAME AS productName,

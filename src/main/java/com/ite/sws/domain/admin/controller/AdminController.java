@@ -80,7 +80,7 @@ public class AdminController {
   }
 
   @GetMapping("/payments/{paymentId}")
-  public ResponseEntity<List<GetMemberPaymentHistoryRes>> findMemberPaymentHistory(
+  public ResponseEntity<GetMemberPaymentHistoryRes> findMemberPaymentHistory(
       @PathVariable Long paymentId) {
     return ResponseEntity.ok().body(adminService.findUserPaymentHistory(paymentId));
   }

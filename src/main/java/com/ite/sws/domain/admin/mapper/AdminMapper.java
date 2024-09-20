@@ -32,7 +32,7 @@ public interface AdminMapper {
 
       void updateProduct(ProductVO productVO);
 
-      List<GetMemberPaymentHistoryRes> selectMemberPaymentHistory(Long paymentId);
+      GetMemberPaymentHistoryRes selectMemberPaymentHistory(Long paymentId);
 
       List<GetSalesRes> selectSalesByCriteria(SalesCriteria criteria);
 

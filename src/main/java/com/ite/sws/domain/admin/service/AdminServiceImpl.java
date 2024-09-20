@@ -68,7 +68,7 @@ public class AdminServiceImpl implements AdminService {
   }
 
   @Override
-  public List<GetMemberPaymentHistoryRes> findUserPaymentHistory(Long paymentId) {
+  public GetMemberPaymentHistoryRes findUserPaymentHistory(Long paymentId) {
     return adminMapper.selectMemberPaymentHistory(paymentId);
   }
 
