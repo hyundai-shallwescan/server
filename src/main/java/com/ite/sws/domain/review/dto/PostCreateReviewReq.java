@@ -17,7 +17,6 @@ import lombok.NoArgsConstructor;
  * </pre>
  * @since 2024.08.24
  */
-
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor

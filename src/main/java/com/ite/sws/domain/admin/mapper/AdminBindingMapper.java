@@ -19,7 +19,6 @@ import org.mapstruct.factory.Mappers;
  * </pre>
  *
  */
-
 @Mapper
 public interface AdminBindingMapper {
 

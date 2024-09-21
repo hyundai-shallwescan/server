@@ -51,6 +51,13 @@ public class AdminController {
   private final WebFluxAsyncPaymentInfoEventPublisher retrievePaymentEvents;
   private final AdminService adminService;
 
+  /**
+   * *
+   * @param postCreateReviewReq text 형식의 requestBody
+   * @param thumbnail image 타입의 thumbnail
+   * @param descriptionImage image 타입의 descriptionImage
+   * @return Void
+   */
   @PutMapping(produces = {"multipart/form-data"}, value = "/products")
   public ResponseEntity<Void> addProduct(
       @RequestPart @Valid PostCreateProductReq postCreateReviewReq,
@@ -60,6 +67,11 @@ public class AdminController {
     return ResponseEntity.status(201).build();
   }
 
+  /**
+   * *
+   * @param productId 삭제할 상품 아이디
+   * @return Void
+   */
   @DeleteMapping("/products/{productId}")
   public ResponseEntity<Void> updateProductDeleteStatus(
       @PathVariable Long productId) {
@@ -67,6 +79,14 @@ public class AdminController {
     return ResponseEntity.status(200).build();
   }
 
+  /**
+   * *
+   * @param productId 식별아이디, productId
+   * @param patchProductReq 변경할 항목의 text based requestBody
+   * @param thumbnail image 타입의 thumbnail
+   * @param descriptionImage image 타입의 descriptionImage
+   * @return Void
+   */
   @PatchMapping("/products/{productId}")
   public ResponseEntity<Void> modifyProduct(
       @PathVariable Long productId,
@@ -79,12 +99,23 @@ public class AdminController {
     return ResponseEntity.status(200).build();
   }
 
+  /**
+   * *
+   * @param paymentId 식별할 paymentId
+   * @return GetMemberPaymentHistoryRes.java
+   */
   @GetMapping("/payments/{paymentId}")
   public ResponseEntity<GetMemberPaymentHistoryRes> findMemberPaymentHistory(
       @PathVariable Long paymentId) {
     return ResponseEntity.ok().body(adminService.findUserPaymentHistory(paymentId));
   }
 
+  /**
+   * *
+   * @param year 입력 년도
+   * @param month 입력 달
+   * @return List<GetSalesRes>
+   */
   @GetMapping("/sales")
   public ResponseEntity<List<GetSalesRes>> findSaleByCriteria(
       @RequestParam(defaultValue = "2024") int year,
@@ -95,6 +126,15 @@ public class AdminController {
     return ResponseEntity.ok(sales);
   }
 
+  /**
+   * *
+   * @param page 페이지 입력
+   * @param size 사이즈 입력
+   * @param year 입력 년도
+   * @param month 입력 월
+   * @param day 입력 날짜
+   * @return Flux<PaymentEvent>
+   */
   @GetMapping(value = "/payments/members", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
   public Flux<PaymentEvent> streamUserPayments(
       @RequestParam(value = "page",defaultValue = "0") int page,
@@ -102,18 +142,19 @@ public class AdminController {
       @RequestParam("year") int year,
       @RequestParam(value = "month") int month,
       @RequestParam("day") int day) {
-
     List<GetPaymentHistoryRes> initData = adminService.findPaymentHistoryOnThatDay(
         PaymentHistoryCriteria.of(page, size, year, month, day));
-
     Flux<PaymentEvent> initialPayments = Flux.fromIterable(initData)
         .map(this::convertToPaymentEvent);
-
     Flux<PaymentEvent> realTimePayments = retrievePaymentEvents.retrievePaymentEvents();
     return initialPayments.concatWith(realTimePayments);
-
   }
 
+  /**
+   * helper method
+   * @param history
+   * @return PaymentInfo
+   */
   private PaymentEvent convertToPaymentEvent(GetPaymentHistoryRes history) {
     return PaymentEvent.of(history.getPaymentId(), history.getUserId(), history.getUserName(),
         history.getCreatedAt());

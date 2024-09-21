@@ -26,7 +26,6 @@ import org.springframework.stereotype.Component;
  * </pre>
  *
  */
-
 @Component
 public class ProductPersistenceHelper extends AbstractPersistenceHelper<ProductVO> {
 

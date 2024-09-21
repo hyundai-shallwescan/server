@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
  * 2024.09.05  	구지웅        상품 조회 페이지네이션 추가
  * </pre>
  */
-
 @RequiredArgsConstructor
 @RequestMapping(value = "/products")
 @RestController
@@ -35,18 +34,36 @@ public class ProductController {
 
   private final ProductService productService;
 
-
+  /**
+   *
+   * @param productId 식별할 아이디
+   * @return GetProductDetailRes
+   */
   @GetMapping("/{productId}")
   public ResponseEntity<GetProductDetailRes> findProduct(@PathVariable Long productId) {
     return ResponseEntity.ok().body(productService.findProductDetail(productId));
   }
 
+  /**
+   *
+   * @param name 입력 파라미터
+   * @param page 입력 페이지
+   * @param size 입력 사이즈
+   * @return List<ProductVO>
+   */
   @GetMapping
   public ResponseEntity<List<ProductVO>> findProductByName(@RequestParam String name,
       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
     return ResponseEntity.ok().body(productService.findProductsByProductName(name,page, size));
   }
 
+  /**
+   * *
+   * @param productId 식별할 아이디
+   * @param page 입력 페이지
+   * @param size 입력 사이즈
+   * @return
+   */
   @GetMapping("/{productId}/reviews")
   public ResponseEntity<List<GetProductReviewRes>> findProductReview(@PathVariable Long productId,
       @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {

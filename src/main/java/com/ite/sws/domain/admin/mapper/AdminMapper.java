@@ -8,7 +8,6 @@ import com.ite.sws.domain.admin.dto.SalesCriteria;
 import com.ite.sws.domain.product.vo.ProductVO;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Param;
 
 
 /**

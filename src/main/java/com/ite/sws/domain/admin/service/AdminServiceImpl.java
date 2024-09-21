@@ -86,7 +86,6 @@ public class AdminServiceImpl implements AdminService {
 
   private void findProductHelper(Long productId) {
     Optional<ProductVO> optionalProduct = productMapper.selectProduct(productId);
-
     optionalProduct.orElseThrow(() ->
         new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 

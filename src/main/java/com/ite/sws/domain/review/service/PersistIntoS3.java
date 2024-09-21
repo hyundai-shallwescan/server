@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
  * </pre>
  *
  */
-
-
 @RequiredArgsConstructor
 @Service
 public class PersistIntoS3 implements

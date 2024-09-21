@@ -24,7 +24,6 @@ import org.springframework.stereotype.Service;
  * </pre>
  * @since 2024.08.24
  */
-
 @RequiredArgsConstructor
 @Service
 public class S3Service {

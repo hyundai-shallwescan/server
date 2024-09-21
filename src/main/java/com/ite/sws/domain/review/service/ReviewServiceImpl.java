@@ -27,8 +27,6 @@ import org.springframework.web.multipart.MultipartFile;
  * </pre>
  * @since 2024.08.24
  */
-
-
 @Service
 public class ReviewServiceImpl implements ReviewService {
 

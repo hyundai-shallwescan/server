@@ -16,8 +16,6 @@ import lombok.NoArgsConstructor;
  * </pre>
  *
  */
-
-
 @AllArgsConstructor(staticName = "of")
 @NoArgsConstructor
 @Getter

@@ -8,7 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
- * 상품 컨트롤러
+ * 상품 매퍼
  * @author 구지웅
  * @since 2024.08.27
  * @version 1.0
