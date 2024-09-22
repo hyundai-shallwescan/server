@@ -1,5 +1,9 @@
 package com.ite.sws.config.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ite.sws.domain.cart.event.CartRedisSubscriber;
+import com.ite.sws.domain.cart.event.ChatRedisSubscriber;
+import com.ite.sws.domain.cart.event.PaymentRedisSubscriber;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -8,6 +12,10 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
@@ -55,4 +63,66 @@ public class RedisConfig {
         redisTemplate.setValueSerializer(new StringRedisSerializer());
         return redisTemplate;
     }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplateObject() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+        return redisTemplate;
+    }
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        return new ObjectMapper();
+    }
+
+    @Bean
+    public RedisMessageListenerContainer redisMessageListenerContainer(
+            RedisConnectionFactory connectionFactory,
+            MessageListenerAdapter cartUpdateListener,
+            MessageListenerAdapter chatListener,
+            MessageListenerAdapter paymentListener,
+            ChannelTopic cartUpdateTopic,
+            ChannelTopic chatTopic,
+            ChannelTopic paymentTopic) {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.addMessageListener(cartUpdateListener, cartUpdateTopic);
+        container.addMessageListener(chatListener, chatTopic);
+        container.addMessageListener(paymentListener, paymentTopic);
+        return container;
+    }
+
+    @Bean
+    public MessageListenerAdapter cartUpdateListener(CartRedisSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "handleCartUpdateMessage");
+    }
+
+    @Bean
+    public MessageListenerAdapter chatListener(ChatRedisSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "handleChatMessage");
+    }
+
+    @Bean
+    public MessageListenerAdapter paymentListener(PaymentRedisSubscriber subscriber) {
+        return new MessageListenerAdapter(subscriber, "handlePaymentMessage");
+    }
+
+    @Bean
+    public ChannelTopic cartUpdateTopic() {
+        return new ChannelTopic("cartUpdateTopic");
+    }
+
+    @Bean
+    public ChannelTopic chatTopic() {
+        return new ChannelTopic("chatTopic");
+    }
+
+    @Bean
+    public ChannelTopic paymentTopic() {
+        return new ChannelTopic("paymentTopic");
+    }
+
 }
