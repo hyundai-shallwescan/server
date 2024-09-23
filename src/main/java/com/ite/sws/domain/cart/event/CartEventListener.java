@@ -36,6 +36,7 @@ import java.io.IOException;
 public class CartEventListener {
     private final MessageSender messageSender;
     private final ChatService chatService;
+    private final CartRedisPublisher redisPublisher;
 
     /**
      * 장바구니 업데이트 이벤트를 처리하는 메서드
@@ -46,7 +47,7 @@ public class CartEventListener {
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void handleCartUpdateEvent(CartUpdateEvent event) {
         CartItemMessageDTO messageDTO = event.getCartItemMessageDTO();
-        messageSender.sendCartUpdateMessage(messageDTO.getCartId(), messageDTO);     // 웹소켓으로 메시지 전송
+        messageSender.sendCartUpdateMessage(messageDTO.getCartId(), messageDTO);
     }
 
     /**
@@ -57,8 +58,8 @@ public class CartEventListener {
     @EventListener
     @Retryable(value = { MessagingException.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void handleCartUpdateChatEvent(CartUpdateChatEvent event) {
-        ChatDTO messageDTO = event.getChatDTO();
-        messageSender.sendChatMessage(messageDTO.getCartId(), messageDTO);     // 웹소켓으로 메시지 전송
+        ChatDTO chatDTO  = event.getChatDTO();
+        messageSender.sendChatMessage(chatDTO.getCartId(), chatDTO);
     }
 
     /**
@@ -70,7 +71,7 @@ public class CartEventListener {
     @EventListener
     @Retryable(value = { MessagingException.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void handleChatAlarmEventEvent(ChatAlarmEvent event) throws IOException {
-        ChatDTO messageDTO = event.getChatDTO();
-        chatService.sendPushNotifications(messageDTO.getCartId(), messageDTO);      // FCM 알림 전송
+        ChatDTO chatDTO = event.getChatDTO();
+        chatService.sendPushNotifications(chatDTO.getCartId(), chatDTO);      // FCM 알림 전송
     }
 }
