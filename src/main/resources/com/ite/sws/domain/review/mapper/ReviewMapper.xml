@@ -78,15 +78,15 @@
         p.BARCODE AS barcode,
         p.DESCRIPTION AS description
         FROM
-        SHORT_FORM r
-        JOIN
-        PRODUCT p ON r.PRODUCT_ID = p.PRODUCT_ID
+        PRODUCT p
+        LEFT JOIN
+        SHORT_FORM r ON r.PRODUCT_ID = p.PRODUCT_ID AND r.IS_DELETED = 0
         WHERE
-        r.PRODUCT_ID = #{productId}
-        AND r.IS_DELETED = 0
+        p.PRODUCT_ID = #{productId}
         ORDER BY
         r.CREATED_AT DESC
         OFFSET #{page} * #{size} ROWS FETCH NEXT #{size} ROWS ONLY
     </select>
+
 
 </mapper>

@@ -8,7 +8,6 @@ CONTAINER_NAME="shall-we-server-container"
 LOG_FILE="/home/ec2-user/action/deploy.log"
 
 echo ">>> Build 파일명: $JAR_NAME" >> $LOG_FILE
-
 if [ -z "$BUILD_JAR" ]; then
   echo ">>> No JAR file found. Exiting." >> $LOG_FILE
   exit 1
