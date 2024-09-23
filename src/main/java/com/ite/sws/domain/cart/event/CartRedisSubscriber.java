@@ -1,7 +1,7 @@
 package com.ite.sws.domain.cart.event;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ite.sws.domain.chat.dto.ChatDTO;
+import com.ite.sws.domain.cart.dto.CartItemMessageDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -29,11 +29,7 @@ public class CartRedisSubscriber {
 
     public void handleCartUpdateMessage(String message) {
         try {
-            ChatDTO messageDTO = objectMapper.readValue(message, ChatDTO.class);
-            System.out.println("=============");
-            System.out.println("Cart update message received for Cart ID: {}" + messageDTO.getCartId());
-            System.out.println("Cart update message received for Cart ID: {}" + messageDTO);
-            System.out.println("=============");
+            CartItemMessageDTO messageDTO = objectMapper.readValue(message, CartItemMessageDTO.class);
             log.info("Cart update message received for Cart ID: {}", messageDTO.getCartId());
             messagingTemplate.convertAndSend("/sub/cart/" + messageDTO.getCartId(), messageDTO);
         } catch (Exception e) {

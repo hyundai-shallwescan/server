@@ -47,7 +47,7 @@ public class CartEventListener {
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void handleCartUpdateEvent(CartUpdateEvent event) {
         CartItemMessageDTO messageDTO = event.getCartItemMessageDTO();
-        redisPublisher.publishCartUpdateMessage(messageDTO.getCartId(), messageDTO);
+        messageSender.sendCartUpdateMessage(messageDTO.getCartId(), messageDTO);
     }
 
     /**
@@ -59,7 +59,7 @@ public class CartEventListener {
     @Retryable(value = { MessagingException.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void handleCartUpdateChatEvent(CartUpdateChatEvent event) {
         ChatDTO chatDTO  = event.getChatDTO();
-        redisPublisher.publishChatMessage(chatDTO.getCartId(), chatDTO);
+        messageSender.sendChatMessage(chatDTO.getCartId(), chatDTO);
     }
 
     /**

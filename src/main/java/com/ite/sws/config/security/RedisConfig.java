@@ -1,5 +1,6 @@
 package com.ite.sws.config.security;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ite.sws.domain.cart.event.CartRedisSubscriber;
 import com.ite.sws.domain.cart.event.ChatRedisSubscriber;
@@ -75,7 +76,8 @@ public class RedisConfig {
 
     @Bean
     public ObjectMapper objectMapper() {
-        return new ObjectMapper();
+        return new ObjectMapper()
+                .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @Bean

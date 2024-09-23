@@ -1,5 +1,6 @@
 package com.ite.sws.domain.cart.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,8 +22,9 @@ import lombok.Setter;
  */
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 @Getter
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CartItemMessageDTO {
     @Setter
     private Long cartId;
