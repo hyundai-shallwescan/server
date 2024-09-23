@@ -108,11 +108,9 @@ public class PaymentServiceImpl implements PaymentService {
         paymentMapper.insertPaymentItems(newPayment.getPaymentId(), paymentItems);
 
         // 3. QR 코드 생성 및 S3 저장
-        // TODO: 코드 제출 전, QR URL 하드코딩 지우기
         String paymentId = String.valueOf(newPayment.getPaymentId());
         String qrText = generateQRText(paymentId);
-//        String qrCodeUri = qrCodePersistenceHelper.uploadQRCode(qrText, paymentId);
-        String qrCodeUri = "https://shall-we-sacn-exitcredentials.s3.ap-northeast-2.amazonaws.com/qrcode-4845470712902172917119.png";
+        String qrCodeUri = qrCodePersistenceHelper.uploadQRCode(qrText, paymentId);
 
         // 4. 장바구니 및 QR 코드 생성을 위한 프로시저 호출
         // 4-1. 이전 장바구니를 가졌던 유저에게, 새로운 장바구니 생성
