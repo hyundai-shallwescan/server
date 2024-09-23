@@ -24,17 +24,16 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CartItemMessageDTO {
-    @Setter
     private Long cartId;
     private Long productId;
     private Integer quantity;
     private String productName;
     private Integer productPrice;
     private String productThumbnail;
-    @Setter
     private String action; // "create", "increase", "decrease", "delete"
     @Builder.Default
-    private String type = "cartUpdate";   // "cartUpdate", "paymentDone", "shareCheck"
+    private String type = "cartUpdate";   // 기본 메시지 타입 설정
 }

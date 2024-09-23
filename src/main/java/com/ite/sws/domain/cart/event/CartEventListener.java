@@ -47,7 +47,8 @@ public class CartEventListener {
     @Retryable(value = { Exception.class }, maxAttempts = 3, backoff = @Backoff(delay = 1000))
     public void handleCartUpdateEvent(CartUpdateEvent event) {
         CartItemMessageDTO messageDTO = event.getCartItemMessageDTO();
-        messageSender.sendCartUpdateMessage(messageDTO.getCartId(), messageDTO);
+//        messageSender.sendCartUpdateMessage(messageDTO.getCartId(), messageDTO);
+        redisPublisher.publishCartUpdateMessage(messageDTO.getCartId(), messageDTO);
     }
 
     /**
